@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.privilege.UserRoleRelateDao">
+	<select id="queryUserRoleRelatePageInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT b.`ID` AS id,a.`REAL_NAME` AS realName,a.`PHONE` AS phone,a.`EMAIL`
+		AS email,a.`SEX` AS sex,
+		c.`POST_NAME` AS postName,a.`COMPANY_NAME` AS companyName,a.`ADDR` AS
+		addr,a.`REGISTER_TIME` AS registerTime FROM ${uTableName}
+		a RIGHT JOIN ${urrTableName} b ON a.`ID`=b.`USER_ID` LEFT JOIN ${pTableName} c ON c.`ID`=a.`POST_ID` 
+		WHERE a.`IS_SEALED`=0 AND a.TENANT_ID=#{TENANT_ID} 
+		<if  test="ROLE_ID != null">
+           AND b.`ROLE_ID`=#{ROLE_ID} 
+        </if>
+        <if  test="REAL_NAME != null">
+           AND a.`REAL_NAME` LIKE #{REAL_NAME}
+        </if>
+	</select>
+</mapper>

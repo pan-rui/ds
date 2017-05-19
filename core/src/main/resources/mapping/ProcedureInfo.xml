@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.procedure.ProcedureInfoDao">
+
+	<select id="queryProcedureTreeInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.PROCEDURE_TYPE_NAME as name,a.PARENT_ID as parentId,a.IS_LEAF as isLeaf 
+		FROM ${ptTableName} a WHERE a.IS_SEALED=0 AND a.TENANT_ID=#{tenantId} UNION ALL 
+		SELECT b.ID as id,b.PROCEDURE_NAME as name,b.PROCEDURE_TYPE_ID as parentId,3 as isLeaf 
+		FROM ${pTableName} b WHERE b.IS_SEALED=0 AND b.TENANT_ID=#{tenantId}
+	</select>
+
+	<select id="queryListByUserInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT a.* FROM ${pTableName}
+		a,${prprTableName} b,${rdprTableName}
+		c,${dpTableName} d,${rTableName} e,${urrTableName} f WHERE
+		a.`ID`=b.`PROCEDURE_ID` AND a.`ID`=d.`DATA_ID` AND
+		c.`DATA_PRIVILEGE_ID`=d.`ID` AND c.`ROLE_ID`=e.`ID` AND
+		e.`ID`=f.`ROLE_ID` AND
+		a.`IS_SEALED`=0 AND e.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND a.TENANT_ID=#{tenantId} AND
+		b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
+		AND f.`USER_ID`=#{userId} AND d.`DATA_TYPE_ID`=#{dataTypeId}
+		<if test="regionTypeId !=null" >
+           AND b.REGION_TYPE_ID=#{regionTypeId}
+        </if>
+	</select>
+
+	<select id="queryListByRegionInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT a.* FROM ${pTableName}
+		a,${prprTableName} b
+		WHERE a.`ID`=b.`PROCEDURE_ID` AND a.`IS_SEALED`=0
+		AND a.TENANT_ID=#{tenantId}
+		AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
+		<if test="regionTypeId !=null" >
+           AND b.REGION_TYPE_ID=#{regionTypeId}
+        </if>
+	</select>
+
+</mapper>

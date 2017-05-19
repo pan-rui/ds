@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.project.ProjectBuildingDao">
+
+	<select id="queryProjectBuildingListByUserInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT c.* FROM ${pbTableName} c,${phTableName} d,
+		${rdprTableName} e,${dpTableName} f,${rTableName} g,${urrTableName} h WHERE 
+		c.`ID`=d.`BUILDING_ID` AND d.`ID`=f.`DATA_ID` AND e.`DATA_PRIVILEGE_ID`=f.`ID` AND
+		e.`ROLE_ID`=g.`ID` AND g.`ID`=h.`ROLE_ID`
+		AND c.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND
+		f.`IS_SEALED`=0 AND g.`IS_SEALED`=0
+		AND h.`USER_ID`=#{userId} AND f.`DATA_TYPE_ID`=#{dataTypeId} AND c.TENANT_ID=#{TENANT_ID} 
+		<if  test="projectPeriodId != null">
+            AND c.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+        </if>
+	</select>
+
+    <select id="queryLatestProjectBuildingDetailListInTab" parameterType="map" resultType="map"
+            statementType="PREPARED">
+        SELECT a.*, b.USER_NAME buildingManagerName  FROM ${projectBuildingTableName} a
+        LEFT JOIN ${userTableName} b ON a.BUILDING_MANAGER_ID = b.ID
+        WHERE  1=1
+
+        <if  test="IS_SEALED != null">
+            AND a.`IS_SEALED`=#{IS_SEALED}
+        </if>
+        <if  test="TENANT_ID != null">
+            AND a.`TENANT_ID`=#{TENANT_ID}
+        </if>
+        <if  test="MANAGER_NAME != null">
+            AND b.`USER_NAME`=#{MANAGER_NAME}
+        </if>
+        <if  test="PROJECT_PERIOD_ID != null">
+            AND a.`PROJECT_PERIOD_ID` = #{PROJECT_PERIOD_ID}
+        </if>
+        <if  test="ID != null">
+            AND a.`ID` = #{ID}
+        </if>
+        <if  test="BEGIN_BUILDING_SNO != null and END_BUILDING_SNO != null">
+            AND (a.`BUILDING_SNO` &gt;= #{BEGIN_BUILDING_SNO} AND a.`BUILDING_SNO` &lt;= #{END_BUILDING_SNO})
+        </if>
+
+        ORDER BY  a.BUILDING_SNO DESC
+
+        LIMIT 1
+
+    </select>
+
+    <select id="queryProjectBuildingDetailListInTab" parameterType="map" resultType="map"
+            statementType="PREPARED">
+        SELECT a.*, b.USER_NAME buildingManagerName  FROM ${projectBuildingTableName} a
+        LEFT JOIN ${userTableName} b ON a.BUILDING_MANAGER_ID = b.ID
+        WHERE  1=1
+
+        <if  test="IS_SEALED != null">
+            AND a.`IS_SEALED`=#{IS_SEALED}
+        </if>
+        <if  test="TENANT_ID != null">
+            AND a.`TENANT_ID`=#{TENANT_ID}
+        </if>
+        <if  test="MANAGER_NAME != null">
+            AND b.`USER_NAME`=#{MANAGER_NAME}
+        </if>
+        <if  test="PROJECT_PERIOD_ID != null">
+            AND a.`PROJECT_PERIOD_ID` = #{PROJECT_PERIOD_ID}
+        </if>
+        <if  test="ID != null">
+            AND a.`ID` = #{ID}
+        </if>
+        <if  test="BEGIN_BUILDING_SNO != null and END_BUILDING_SNO != null">
+            AND (a.`BUILDING_SNO` &gt;= #{BEGIN_BUILDING_SNO} AND a.`BUILDING_SNO` &lt;= #{END_BUILDING_SNO})
+        </if>
+
+        ORDER BY  a.BUILDING_SNO ASC
+
+    </select>
+
+    <select id="queryProjectBuildingDetailPageInTab" parameterType="map" resultType="map"
+            statementType="PREPARED">
+        SELECT a.*, b.USER_NAME buildingManagerName  FROM ${projectBuildingTableName} a
+        LEFT JOIN ${userTableName} b ON a.BUILDING_MANAGER_ID = b.ID
+        WHERE  1=1
+
+        <if  test="IS_SEALED != null">
+            AND a.`IS_SEALED`=#{IS_SEALED}
+        </if>
+        <if  test="TENANT_ID != null">
+            AND a.`TENANT_ID`=#{TENANT_ID}
+        </if>
+        <if  test="MANAGER_NAME != null">
+            AND b.`USER_NAME`=#{MANAGER_NAME}
+        </if>
+        <if  test="PROJECT_PERIOD_ID != null">
+            AND a.`PROJECT_PERIOD_ID` = #{PROJECT_PERIOD_ID}
+        </if>
+        <if  test="ID != null">
+            AND a.`ID` = #{ID}
+        </if>
+        ORDER BY  a.BUILDING_SNO ASC
+    </select>
+
+    <select id="insertBatch" parameterType="map"
+            statementType="PREPARED">
+        INSERT INTO ${projectBuildingTableName}
+        (ID,
+        PROJECT_PERIOD_ID,
+        ID_TREE,
+        NAME_TREE,
+        BUILDING_NAME,
+        BUILDING_MANAGER_ID,
+        BUILDING_SNO,
+        LOGOGRAM,
+        ELEVATION_ID,
+        TOTAL_AREA,
+        COMMERCIAL_AREA,
+        OFFICE_AREA,
+        TOTAL_FLOOR,
+        HEIGHT,
+        FLOOR_HEIGHT,
+        REMARK,
+        UPDATE_TIME,
+        UPDATE_USER_ID,
+        IS_SEALED,
+        SEALED_USER_ID,
+        SEALED_TIME,
+        TENANT_ID
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.ID},
+            #{item.PROJECT_PERIOD_ID},
+            #{item.ID_TREE},
+            #{item.NAME_TREE},
+            #{item.BUILDING_NAME},
+            #{item.BUILDING_MANAGER_ID},
+            #{item.BUILDING_SNO},
+            #{item.LOGOGRAM},
+            #{item.ELEVATION_ID},
+            #{item.TOTAL_AREA},
+            #{item.COMMERCIAL_AREA},
+            #{item.OFFICE_AREA},
+            #{item.TOTAL_FLOOR},
+            #{item.HEIGHT},
+            #{item.FLOOR_HEIGHT},
+            #{item.REMARK},
+            #{item.UPDATE_TIME},
+            #{item.UPDATE_USER_ID},
+            #{item.IS_SEALED},
+            #{item.SEALED_USER_ID},
+            #{item.SEALED_TIME},
+            #{item.TENANT_ID}
+            )
+        </foreach>
+    </select>
+</mapper>

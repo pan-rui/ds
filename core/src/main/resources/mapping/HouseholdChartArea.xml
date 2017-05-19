@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.project.HouseholdChartAreaDao">
+	<select id="queryHouseholdAreaInfoByChartInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS
+		id,b.`HOUSEHOLD_CHART_AREA_TYPE_NAME` AS
+		householdChartAreaTypeName,a.`HOUSEHOLD_AREA_INFORMATION` AS
+		householdAreaInformation FROM ${hcaTableName} a,${hcatTableName} b
+		WHERE b.`ID`=a.`HOUSEHOLD_CHART_TYPE_ID` AND a.`IS_SEALED`=0 AND
+		b.`IS_SEALED`=0
+		AND a.`HOUSEHOLD_CHART_ID`=#{householdChartId}
+	</select>
+</mapper>

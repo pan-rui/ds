@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.project.ProjectPeriodDao">
+
+	<select id="queryProjectPeriodListByUserInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT b.* FROM ${ppTableName} b,${pbTableName} c,${phTableName} d,
+		${rdprTableName} e,${dpTableName} f,${rTableName} g,${urrTableName} h WHERE
+		b.`ID`=c.`PROJECT_PERIOD_ID` AND c.`ID`=d.`BUILDING_ID`
+		AND d.`ID`=f.`DATA_ID` AND e.`DATA_PRIVILEGE_ID`=f.`ID` AND
+		e.`ROLE_ID`=g.`ID` AND g.`ID`=h.`ROLE_ID`
+		AND b.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND
+		f.`IS_SEALED`=0 AND g.`IS_SEALED`=0
+		AND h.`USER_ID`=#{userId} AND f.`DATA_TYPE_ID`=#{dataTypeId} AND b.TENANT_ID=#{TENANT_ID} 
+		ORDER BY b.UPDATE_TIME DESC
+	</select>
+
+	<select id="queryProjectPeriodDetailListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.*, b.ORGANIZATION_NAME organizationName, c.USER_NAME
+		managerName, d.PROJECT_NAME projectName FROM ${projectPeriodTableName}
+		a
+		LEFT JOIN ${orgTableName} b ON a.COM_ID = b.ID
+		LEFT JOIN ${userTableName} c ON a.PROJECT_MANAGER_ID = c.ID
+		LEFT JOIN ${projectTableName} d ON a.PROJECT_ID = d.ID
+		WHERE 1=1
+		<if test="PROJECT_NAME != null">
+			AND d.`PROJECT_NAME` LIKE #{PROJECT_NAME}
+		</if>
+		<if test="IS_SEALED != null">
+			AND a.`IS_SEALED`=#{IS_SEALED}
+		</if>
+		<if test="TENANT_ID != null">
+			AND a.`TENANT_ID`=#{TENANT_ID}
+		</if>
+		<if test="ORGANIZATION_NAME != null">
+			AND b.`ORGANIZATION_NAME` LIKE #{ORGANIZATION_NAME}
+		</if>
+		<if test="MANAGER_NAME != null">
+			AND c.`USER_NAME`=#{MANAGER_NAME}
+		</if>
+		<if test="PROJECT_ID != null">
+			AND a.`PROJECT_ID` = #{PROJECT_ID}
+		</if>
+		<if test="PERIOD_NAME != null">
+			AND a.`PERIOD_NAME` LIKE #{PERIOD_NAME}
+		</if>
+
+	</select>
+
+	<select id="queryProjectPeriodDetailPageInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.*, b.ORGANIZATION_NAME organizationName, c.USER_NAME
+		managerName, d.PROJECT_NAME projectName FROM ${projectPeriodTableName}
+		a
+		LEFT JOIN ${orgTableName} b ON a.COM_ID = b.ID
+		LEFT JOIN ${userTableName} c ON a.PROJECT_MANAGER_ID = c.ID
+		LEFT JOIN ${projectTableName} d ON a.PROJECT_ID = d.ID
+		WHERE 1=1
+		<if test="PROJECT_NAME != null">
+			AND d.`PROJECT_NAME` LIKE #{PROJECT_NAME}
+		</if>
+		<if test="PROJECT_ID != null">
+			AND a.`PROJECT_ID` = #{PROJECT_ID}
+		</if>
+		<if test="IS_SEALED != null">
+			AND a.`IS_SEALED`=#{IS_SEALED}
+		</if>
+		<if test="TENANT_ID != null">
+			AND a.`TENANT_ID`=#{TENANT_ID}
+		</if>
+		<if test="ORGANIZATION_NAME != null">
+			AND b.`ORGANIZATION_NAME` LIKE #{ORGANIZATION_NAME}
+		</if>
+		<if test="MANAGER_NAME != null">
+			AND c.`USER_NAME`=#{MANAGER_NAME}
+		</if>
+		<if test="PERIOD_NAME != null">
+			AND a.`PERIOD_NAME` LIKE #{PERIOD_NAME}
+		</if>
+	</select>
+</mapper>

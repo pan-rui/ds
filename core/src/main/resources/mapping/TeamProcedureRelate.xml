@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.organization.TeamProcedureRelateDao">
+	<select id="queryProcedureListByTeamInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT b.ID AS id,c.`TEAM_NAME` AS
+		teamName,a.`PROCEDURE_NAME` AS procedureName,b.`UPDATE_USER_ID` AS
+		updateUserId,b.`UPDATE_TIME` AS updateTime FROM ${pTableName}
+		a,${tprTableName} b,${tTableName} c WHERE a.`ID`=b.`PROCEDURE_ID`
+		AND c.`ID`=b.`TEAM_ID` AND a.`IS_SEALED`=0 AND a.`TENANT_ID`=#{TENANT_ID} 
+		<if test="TEAM_ID !=null" >
+           AND b.`TEAM_ID`=#{TEAM_ID}
+        </if>
+	</select>
+</mapper>

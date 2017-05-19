@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.cache.OfflineDao">
+
+    <select id="queryOffLineProject" parameterType="map" resultMap="offlineProject" statementType="PREPARED">
+        SELECT
+        pp.ID pp_id,pp.PROJECT_ID pp_projectId,pp.PERIOD_NAME pp_periodName,pp.PROJECT_MANAGER_ID
+        pp_projectManagerId,pp.TOTAL_BUILDINGS pp_totalBuildings,pp.ID_TREE pp_idTree,pp.NAME_TREE
+        pp_nameTree,pp.UPDATE_TIME pp_updateTime,pp.REMARK pp_remark,pp.TOTAL_AREA pp_totalArea,
+        pi.ID pi_id,pi.PROJECT_NAME pi_projectName,pi.PROJECT_TYPE pi_projectType,pi.GENERAL_CONTRACT_ID
+        pi_generalContractId,pi.CONSTRUCTION_ID pi_constructionId,pi.OWNER_UNIT pi_ownerUnit,pi.UPDATE_TIME
+        pi_updateTime,
+        c.ID c_id,c.CORPORATE_NAME c_corporateName,c.CORPORATE_TYPE c_corporateType,c.CORPORATE_LEADER
+        c_corporateLeader,c.CORPORATE_CODE c_corporateCode,c.CORPORATE_LEGAL_PERSON
+        c_corporateLegeaPerson,c.CORPORATE_ADDR c_corporateAddr,c.REMARK c_remark,c.UPDATE_TIME c_updateTime,
+        c2.ID c2_id,c2.CORPORATE_NAME c2_corporateName,c2.CORPORATE_TYPE c2_corporateType,c2.CORPORATE_LEADER
+        c2_corporateLeader,c2.CORPORATE_CODE c2_corporateCode,c2.CORPORATE_LEGAL_PERSON
+        c2_corporateLegalPerson,c2.CORPORATE_ADDR c2_corporateAddr,c2.REMARK c2_remark,c2.UPDATE_TIME c2_updateTime,
+        pb.ID pb_id,pb.PROJECT_PERIOD_ID pb_projectPeriodId,pb.ID_TREE pb_idTree,pb.NAME_TREE
+        pb_nameTree,pb.BUILDING_NAME pb_buildingName,pb.BUILDING_SNO pb_buildingSno,pb.LOGOGRAM pb_logogram,
+        pb.ELEVATION_ID pb_elevationId,pb.TOTAL_FLOOR pb_totalFloor,pb.HEIGHT pb_height,pb.UPDATE_TIME pb_updateTime,
+        ph.ID ph_id,ph.ROOM_CODE ph_roomCode,ph.ROOM_NAME ph_roomName,ph.ID_TREE ph_idTree,ph.NAME_TREE
+        ph_nameTree,ph.BUILDING_ID ph_buildingId,ph.HOUSEHOLD_CHART_ID ph_householdChartId,ph.ROOM ph_room,ph.FLOOR
+        ph_floor,ph.REGION_TYPE_ID ph_regionTypeId,ph.UPDATE_TIME ph_updateTime
+        <!--
+        ,uc.ID uc_id,uc.HOUSEHOLD_NAME uc_householdName,uc.HOUSEHOLD_TYPE_ID uc_householdTypeId,uc.UNIT_CHART_IMAGE_PATH
+        uc_unitChartImagePath,uc.HOUSEHOLD_REMARK uc_householdRemark,uc.UPDATE_TIME uc_updateTime,
+        hca.ID hca_id,hca.HOUSEHOLD_CHART_ID hca_householdChartId,hca.HOUSEHOLD_CHART_TYPE_ID
+        hca_householdChartTypeId,hca.HOUSEHOLD_AREA_INFORMATION hca_householdAreaInformation,hca.REMARK
+        hca_remark,hca.UPDATE_TIME hca_updateTime
+        -->
+        FROM
+        ${ddBB}.PROJECT_PERIOD pp
+        LEFT JOIN ${ddBB}.PROJECT_INFO pi ON pp.PROJECT_ID = pi.ID
+        LEFT JOIN ${ddBB}.COMPANY c ON pi.GENERAL_CONTRACT_ID = c.ID
+        LEFT JOIN ${ddBB}.COMPANY c2 ON pi.CONSTRUCTION_ID = c2.ID
+        LEFT JOIN ${ddBB}.PROJECT_BUILDING pb ON pp.ID = pb.PROJECT_PERIOD_ID
+        LEFT JOIN ${ddBB}.PROJECT_HOUSEHOLD ph ON pb.ID=ph.BUILDING_ID
+        <!--
+        LEFT JOIN ${ddBB}.UNIT_CHART uc ON ph.HOUSEHOLD_CHART_ID=uc.ID
+        LEFT JOIN ${ddBB}.HOUSEHOLD_CHART_AREA hca ON uc.ID=hca.HOUSEHOLD_CHART_ID
+        -->
+        WHERE
+        pp.TENANT_ID=#{tenantId}
+       and pp.IS_SEALED='0'
+        <if test='projectPeriodId !=null and projectPeriodId !=""'>
+            and pp.ID=#{projectPeriodId}
+        </if>
+        <if test='updateTime !=null'>
+            and ph.UPDATE_TIME &gt; #{updateTime}
+        </if>
+    </select>
+
+    <resultMap id="offlineProject" type="java.util.LinkedHashMap">
+        <id property="id" column="pp_id"/>
+        <result property="projectId" column="pp_projectId"/>
+        <result property="periodName" column="pp_periodName"/>
+        <result property="projectManager" column="pp_projectManager"/>
+        <result property="totalBuildings" column="pp_totalBuildings"/>
+        <result property="idTree" column="pp_idTree"/>
+        <result property="nameTree" column="pp_nameTree"/>
+        <result property="updateTime" column="pp_updateTime"/>
+        <result property="remark" column="pp_remark"/>
+        <result property="totalArea" column="pp_totalArea"/>
+        <association property="projectInfo" javaType="map">
+            <id property="id" column="pi_id"></id>
+            <result property="projectName" column="pi_projectName"/>
+            <result property="projectType" column="pi_projectType"/>
+            <result property="generalContractId" column="pi_generalContractId"/>
+            <result property="constructionId" column="pi_constructionId"/>
+            <result property="ownerUnit" column="pi_ownerUnit"/>
+            <result property="updateTime" column="pi_updateTime"/>
+            <association property="construction" javaType="map">
+                <id property="id" column="c_id"></id>
+                <result property="corporateName" column="c_corporateName"/>
+                <result property="corporateType" column="c_corporateType"/>
+                <result property="corporateLeader" column="c_corporateLeader"/>
+                <result property="corporateCode" column="c_corporateCode"/>
+                <result property="corporateLegalPerson" column="c_corporateLegeaPerson"/>
+                <result property="corporateAddr" column="c_corporateAddr"/>
+                <result property="remark" column="c_remark"/>
+                <result property="updateTime" column="c_updateTime"/>
+            </association>
+            <association property="generalContract" javaType="map" columnPrefix="c2_" autoMapping="true">
+                <id property="id" column="id"></id>
+                <result property="corporateName" column="corporateName"/>
+                <result property="corporateType" column="corporateType"/>
+                <result property="corporateLeader" column="corporateLeader"/>
+                <result property="corporateCode" column="corporateCode"/>
+                <result property="corporateLegalPerson" column="corporateLegalPerson"/>
+                <result property="corporateAddr" column="corporateAddr"/>
+                <result property="remark" column="remark"/>
+                <result property="updateTime" column="updateTime"/>
+            </association>
+        </association>
+        <collection property="projectBuilding" ofType="java.util.LinkedHashMap" javaType="ArrayList">
+            <id property="id" column="pb_id"></id>
+            <result property="projectPeriod" column="pb_projectPeriod"/>
+            <result property="idTree" column="pb_idTree"/>
+            <result property="nameTree" column="pb_nameTree"/>
+            <result property="buildingName" column="pb_buildingName"/>
+            <result property="buildingSno" column="pb_buildingSno"/>
+            <result property="logogram" column="pb_logogram"/>
+            <result property="elevationId" column="pb_elevationId"/>
+            <result property="totalFloor" column="pb_totalFloor"/>
+            <result property="height" column="pb_height"/>
+            <result property="updateTime" column="pb_updateTime"/>
+            <collection property="projectHouseholds" ofType="java.util.LinkedHashMap" javaType="ArrayList">
+                <id property="id" column="ph_id"></id>
+                <result property="roomCode" column="ph_roomCode"/>
+                <result property="roomName" column="ph_roomName"/>
+                <result property="idTree" column="ph_idTree"/>
+                <result property="nameTree" column="ph_nameTree"/>
+                <result property="buildingId" column="ph_buildingId"/>
+                <result property="householdChartId" column="ph_householdChartId"/>
+                <result property="room" column="ph_room"/>
+                <result property="floor" column="ph_floor"/>
+                <result property="regionTypeId" column="ph_regionTypeId"/>
+                <result property="updateTime" column="ph_updateTime"/>
+<!--
+                <association property="unitChart" javaType="map">
+                    <id property="id" column="uc_id"></id>
+                    <result property="householdName" column="uc_householdName"/>
+                    <result property="householdTypeId" column="uc_householdTypeId"/>
+                    <result property="unitChartImagePath" column="uc_unitChartImagePath"/>
+                    <result property="houseHoldRemark" column="uc_householdRemark"/>
+                    <result property="updateTime" column="uc_updateTime"/>
+                    <collection property="charArea" ofType="java.util.LinkedHashMap" columnPrefix="hca_" autoMapping="true" javaType="ArrayList">
+                        <id property="id" column="id"></id>
+                        &lt;!&ndash;                     <result property="householdChartId" column="householdChartId"/>
+                                             <result property="houseHoldChartTypeId" column="houseHoldChartTypeId"/>
+                                             <result property="householdAreaInformation" column="householdAreaInformation"/>
+                                             <result property="remark" column="remark"/>
+                                             <result property="updateTime" column="updateTime"/>&ndash;&gt;
+                    </collection>
+                </association>
+-->
+            </collection>
+        </collection>
+    </resultMap>
+<select id="queryChart" parameterType="map" resultMap="offlineChart" statementType="PREPARED">
+    select DISTINCT ph.HOUSEHOLD_CHART_ID,  uc.ID uc_id,uc.HOUSEHOLD_NAME uc_householdName,uc.HOUSEHOLD_TYPE_ID uc_householdTypeId,uc.UNIT_CHART_IMAGE_PATH
+                  uc_unitChartImagePath,uc.HOUSEHOLD_REMARK uc_householdRemark,uc.UPDATE_TIME uc_updateTime,
+  hca.ID hca_id,hca.HOUSEHOLD_CHART_ID hca_householdChartId,hca.HOUSEHOLD_CHART_TYPE_ID
+                  hca_householdChartTypeId,hca.HOUSEHOLD_AREA_INFORMATION hca_householdAreaInformation,hca.REMARK
+                  hca_remark,hca.UPDATE_TIME hca_updateTime
+    ,hpr.ID hpr_id,hpr.ROOM_ID hpr_roomId,hpr.HOUSEHOLD_AREA_ID hpr_houseHoldAreaId,hpr.PHOTO_NUM hpr_photoNum,hpr.REMARK hpr_remark,hpr.UPDATE_TIME hpr_updateTime
+FROM ${ddBB}.PROJECT_HOUSEHOLD ph
+JOIN ${ddBB}.UNIT_CHART uc ON ph.HOUSEHOLD_CHART_ID=uc.ID
+left JOIN ${ddBB}.HOUSEHOLD_CHART_AREA hca ON uc.ID=hca.HOUSEHOLD_CHART_ID
+    left JOIN ${ddBB}.HIDDEN_PHOTOS_RECORD hpr ON hca.ID=hpr.HOUSEHOLD_AREA_ID
+WHERE ph.TENANT_ID=#{tenantId}
+    <if test='projectPeriodId !=null and projectPeriodId !=""'>
+        AND ph.ID_TREE  LIKE '${projectPeriodId}%'
+    </if>
+    <if test='updateTime !=null'>
+        and ph.UPDATE_TIME &gt; #{updateTime}
+    </if>
+</select>
+
+    <resultMap id="offlineChart" type="java.util.LinkedHashMap">
+                    <id property="id" column="uc_id"></id>
+                    <result property="householdName" column="uc_householdName"/>
+                    <result property="householdTypeId" column="uc_householdTypeId"/>
+                    <result property="unitChartImagePath" column="uc_unitChartImagePath"/>
+                    <result property="householdRemark" column="uc_householdRemark"/>
+                    <result property="updateTime" column="uc_updateTime"/>
+                    <collection property="charArea" ofType="java.util.LinkedHashMap" javaType="ArrayList">
+                        <id property="id" column="hca_id"></id>
+                         <result property="householdChartId" column="hca_householdChartId"/>
+                         <result property="houseHoldChartTypeId" column="hca_houseHoldChartTypeId"/>
+                         <result property="householdAreaInformation" column="hca_householdAreaInformation"/>
+                         <result property="remark" column="hca_remark"/>
+                         <result property="updateTime" column="hca_updateTime"/>
+                        <collection property="photosRecord" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="hpr_" autoMapping="true">
+                            <id  property="id" column="id"/>
+                        </collection>
+                    </collection>
+    </resultMap>
+
+    <select id="queryOfflineProcedure" parameterType="map" resultMap="offlineProcefure" statementType="PREPARED">
+        SELECT
+        prpr.ID prpr_id,prpr.PROJECT_PERIOD_ID prpr_projectPeriodId,prpr.PROCEDURE_ID
+        prpr_procedureId,prpr.REGION_TYPE_ID prpr_regionTypeId,
+        pi.ID pi_id,pi.PROCEDURE_TYPE_ID pi_procedureTypeId,pi.PROCEDURE_NAME pi_procedureName,pi.REMARK
+        pi_remark,pi.IS_HIDE pi_isHide,pi.UPDATE_TIME pi_updateTime,
+        pt.ID pt_id,pt.PROCEDURE_TYPE_NAME pt_procedureTypeName,pt.PARENT_ID pt_parentId,pt.IS_LEAF pt_isLeaf,pt.ID_TREE
+        pt_idTree,pt.NAME_TREE pt_nameTree,pt.LEVEL pt_level,pt.UPDATE_TIME pt_updateTime,
+        di.ID di_id,di.PROCEDURE_ID di_procedureId,di.GRADING_STANDARD di_gradingStandard,di.ERROR_RANGE
+        di_errorRange,di.STANDARD_VAL di_standardVal,di.UNIT di_unit,di.CALC_TYPE di_calcType,di.PASS_TEXT
+        di_passText,di.NO_PASS_TEXT di_noPassText,di.REMARK di_remark,di.UPDATE_TIME di_updateTime,
+        gi.ID gi_id,gi.PROCEDURE_ID gi_procedureId,gi.GRADING_STANDARD gi_gradingStandard,gi.ERROR_RANGE
+        gi_errorRange,gi.ALLOW_MAX_VALUE gi_allowMaxValue,gi.ALLOW_MIN_VALUE gi_allowMinValue,gi.STANDARD_VAL gi_standardVal,gi.UNIT gi_unit,gi.CALC_TYPE gi_calcType,gi.PASS_TEXT
+        gi_passText,gi.NO_PASS_TEXT gi_noPassText,gi.REMARK gi_remark,gi.UPDATE_TIME gi_updateTime,
+        tpr.ID tpr_id,tpr.PROCEDURE_ID tpr_procedureId,tpr.TEAM_ID tpr_teamId,tpr.REMARK tpr_remark,tpr.UPDATE_TIME
+        tpr_updateTime,
+        ti.ID ti_id,ti.TEAM_NAME ti_teamName,ti.PARTNER_ID ti_partnerId,ti.UPDATE_TIME ti_updateTime
+        ,pi2.ID pi2_id,pi2.PARTNER_NAME pi2_partner,pi2.CORPORATE_ID pi2_corporateId,pi2.PARTNER_LEADER pi2_partnerLeader,pi2.LINKER pi2_linker,pi2.LINKER_PHONE pi2_linkerPhone,pi2.GRADE pi2_grade,pi2.IS_ENTITY pi2_isEntity
+        ,c.ID c_id,c.CORPORATE_NAME c_corporateName,c.CORPORATE_TYPE c_corporateType,c.CORPORATE_LEADER
+        c_corporateLeader,c.CORPORATE_CODE c_corporateCode,c.CORPORATE_LEGAL_PERSON
+        c_corporateLegeaPerson,c.CORPORATE_ADDR c_corporateAddr,c.REMARK c_remark,c.UPDATE_TIME c_updateTime,
+        tur.ID tur_id,tur.USER_ID tur_userId,tur.ROLE_TYPE tur_roleType,tur.TEAM_ID tur_teamId,tur.UPDATE_TIME tur_updateTime,
+        u.ID u_id,u.USER_NAME u_userName,u.REAL_NAME u_realName
+<!--        ,u.COMPANY_ID u_companyId           -->
+        ,u.PHONE u_phone,u.WECHAT u_wechat,u.TENANT_ID u_tenantId,
+        an.ID an_id,an.PARENT_COMPANY_ID an_parentCompanyId,an.SUPERVISOR_COMPANY_ID
+        an_supervisorCompanyId,an.CONTRACTING_PRO_ID an_contractingProId,an.CONSTRUCTION_TEAM_ID an_constructionTeamId,
+        an.CONSTRUCTION_TEAM an_constructionTeam,an.CONSTRUCTION_MANAGER_ID
+        an_constructionManagerId,an.PROJECT_PERIOD_ID an_perjectPeriodId,
+        an.PROJECT_NAME an_projectName,an.REGION_ID an_regionId,an.REGION_NAME an_regionName,an.REGION_TYPE
+        an_regionType,an.REGION_ID_TREE an_regioinIdTree,
+        an.REGION_NAME_TREE an_regionNameTree,an.PROCEDURE_ID an_procedureId,an.PROCEDURE_NAME
+        an_procedureName,an.STATEMENT_ID an_statementId,
+        an.BATCH_TIMES an_batchTimes,an.CHECK_TIMES an_checkTimes,an.COINCIDENCE_RATE an_coincidenceRate,an.WORK_RATIO
+        an_workRatio,an.SUPERVISOR_ID an_supervisorId,an.SUPERVISOR_NAME an_supervisor,an.SUPERVISOR_CHECKED
+        an_supervisorChecked,an.SUPERVISOR_CHECK_RESULT an_supervisorCheckResult,an.SUPERVISOR_CHECK_TIME an_supervisorCheckTime,an.CONSTRUCTION_INSPECTOR an_constructionInspector,an.CONSTRUCTION_INSPECTOR_CHECKED
+        an_constructionInspectorChecked,an.CONSTRUCTION_INSPECTOR_CHECK_RESULT
+        an_constructionInspectorCheckResult,an.CONSTRUCTION_INSPECTOR_CHECK_DATE an_constructionInspectorCheckDate,an.TEAM_INSPECTOR an_teamInspector, an.TEAM_INSPECTOR_CHECKED
+        an_teamInspectorChecked,an.TEAM_INSPECTOR_CHECK_RESULT an_teamInspectorCheckResult,an.TEAM_INSPECTOR_CHECK_TIME an_teamInspectorCheckTime,an.REMARK an_remark,an.UPDATE_TIME an_updateTime,
+        ab.ID ab_id,ab.ACCEPTANCE_NOTE_ID ab_acceptanceNoteId,ab.ACCEPTANCE_NOTE_MODIFY_ID
+        ab_acceptanceNoteModifyId,ab.ACCEPTANCE_FIRST_ID ab_acceptanceFirstId,ab.BATCH_NO ab_batchNo,ab.ELIGIBLE_RATE
+        ab_eligibleRate,ab.ACCEPTANCE_PERSON_ID ab_acceptancePersonId,ab.ACCEPTER ab_accepter,
+        ab.INSPECTOR_ROLE ab_inspectorRole,ab.DOMINANT_ITEM_CHECK_RESULT
+        ab_dominantItemCheckResult,ab.GENERAL_ITEM_CHECK_RESULT ab_generalItemCheckResult,ab.MIN_PASS_RATIO
+        ab_minPassRatio,ab.CREATE_DATE ab_createDate,ab.BATCH_STATUS_ID ab_batchStatusId,ab.UPDATE_TIME ab_updateTime,
+        s.ID s_id,s.STATUS_NAME s_statusName,s.STATUS_NUM s_statusNum,s.NOTIFY_ORGANIZATION_TYPE
+        s_notifyOrganizationType,s.NOTIFY_ORGANIZATION_ID s_notifyOrganizationId,s.STATUS_TYPE
+        s_statusType,s.STATUS_TRAIT s_statusTrait,s.REMARK s_remark,s.UPDATE_TIME s_updateTime,
+        pbs.ID pbs_id,pbs.PROCEDURE_ID pbs_procedureId,pbs.BATCH_NO pbs_batchNo,pbs.STATEMENT_ID
+        pbs_statementId,pbs.REMARK pbs_remark,pbs.UPDATE_TIME pbs_updateTime,
+        si.ID si_id,si.STATUS_NAME si_statusName,si.STATUS_NUM si_statusNum,si.NOTIFY_ORGANIZATION_TYPE
+        si_notifyOrganizationType,si.NOTIFY_ORGANIZATION_ID si_notifyOrganizationId,si.STATUS_TYPE
+        si_statusType,si.STATUS_TRAIT si_statusTrait,si.REMARK si_remark,si.UPDATE_TIME si_updateTime
+        FROM
+        ${ddBB}.PROJECT_REGION_PROCEDURE_RELATE prpr
+        JOIN ${ddBB}.PROCEDURE_INFO pi on prpr.PROCEDURE_ID = pi.ID
+        JOIN ${ddBB}.PROCEDURE_TYPE pt ON pi.PROCEDURE_TYPE_ID = pt.ID
+        LEFT JOIN ${ddBB}.DOMINANT_ITEM di ON pi.ID = di.PROCEDURE_ID
+        LEFT JOIN ${ddBB}.GENERAL_ITEM gi ON pi.ID = gi.PROCEDURE_ID
+        LEFT JOIN ${ddBB}.TEAM_PROCEDURE_RELATE tpr ON pi.ID = tpr.PROCEDURE_ID
+        LEFT JOIN ${ddBB}.TEAM_INFO ti ON tpr.TEAM_ID = ti.ID
+        LEFT JOIN ${ddBB}.PARTNER_INFO pi2 ON ti.PARTNER_ID = pi2.ID
+        LEFT JOIN ${ddBB}.COMPANY c ON pi2.CORPORATE_ID=c.ID
+        LEFT JOIN ${ddBB}.TEAM_USER_RELATE tur ON ti.ID = tur.TEAM_ID
+        LEFT JOIN ${ddBB}.USER u ON tur.USER_ID = u.ID
+        JOIN ${ddBB}.ACCEPTANCE_NOTE an ON pi.ID = an.PROCEDURE_ID
+        LEFT JOIN ${ddBB}.ACCEPTANCE_BATCH ab ON an.ID = ab.ACCEPTANCE_NOTE_ID
+        LEFT JOIN ${ddBB}.STATUS_INFO s ON ab.BATCH_STATUS_ID=s.ID
+        LEFT JOIN ${ddBB}.PROCEDURE_BATCH_STATUS pbs ON an.ID = pbs.ACCEPTANCE_NOTE_ID
+        LEFT JOIN ${ddBB}.STATUS_INFO si ON pbs.STATEMENT_ID = si.ID
+        WHERE
+        pi.TENANT_ID=#{tenantId} and pi.IS_SEALED = '0'
+ <!--       AND di.IS_SEALED='0' AND gi.IS_SEALED='0'   -->
+        AND prpr.PROJECT_PERIOD_ID=#{projectPeriodId}
+        <if test="statusList != null">
+            AND an.STATEMENT_ID NOT IN
+            <foreach collection="statusList" open="(" close=")" index="ind" item="status" separator=",">
+                #{status}
+            </foreach>
+        </if>
+    </select>
+<!--        <if test='updateTime !=null'>
+            AND an.UPDATE_TIME &gt;= #{updateTime}
+        </if>-->
+    <resultMap id="offlineProcefure" type="java.util.LinkedHashMap">
+        <id property="id" column="prpr_id"></id>
+        <result property="projectPeriodId" column="prpr_projectPeriodId"/>
+        <result property="procedureId" column="prpr_procedureId"/>
+        <result property="regionTypeId" column="prpr_regionTypeId"/>
+        <association property="procedure" javaType="java.util.LinkedHashMap">
+            <id property="id" column="pi_id"></id>
+            <result property="procedureTypeId" column="pi_procedureTypeId"/>
+            <result property="procedureName" column="pi_procedureName"/>
+            <result property="remark" column="pi_remark"/>
+            <result property="isHide" column="pi_isHide"/>
+            <result property="updateTime" column="pi_updateTime"/>
+            <association property="procedureType" javaType="map" columnPrefix="pt_" autoMapping="true">
+                <id property="id" column="id"/>
+            </association>
+            <association property="acceptanceNote" javaType="java.util.LinkedHashMap" foreignColumn="PROCEDURE_ID">
+                <id property="id" column="an_id"/>
+                <result property="parentCompanyId" column="an_parentCompanyId"/>
+                <result property="supervisorCompanyId" column="an_supervisorCompanyId"/>
+                <result property="contractingProId" column="an_contractingProId"/>
+                <result property="constructionTeamId" column="an_constructionTeamId"/>
+                <result property="constructionTeam" column="an_constructionTeam"/>
+                <result property="constructionManagerId" column="an_constructionManagerId"/>
+                <result property="perjectPeriodId" column="an_perjectPeriodId"/>
+                <result property="projectName" column="an_projectName"/>
+                <result property="regionId" column="an_regionId"/>
+                <result property="regionName" column="an_regionName"/>
+                <result property="regionType" column="an_regionType"/>
+                <result property="regioinIdTree" column="an_regioinIdTree"/>
+                <result property="regionNameTree" column="an_regionNameTree"/>
+                <result property="procedureId" column="an_procedureId"/>
+                <result property="procedureName" column="an_procedureName"/>
+                <result property="statementId" column="an_statementId"/>
+                <result property="batchTimes" column="an_batchTimes"/>
+                <result property="checkTimes" column="an_checkTimes"/>
+                <result property="coincidenceRate" column="an_coincidenceRate"/>
+                <result property="workRatio" column="an_workRatio"/>
+                <result property="supervisorId" column="an_supervisorId"/>
+                <result property="supervisor" column="an_supervisor"/>
+                <result property="supervisorChecked" column="an_supervisorChecked"/>
+                <result property="supervisorCheckResult" column="an_supervisorCheckResult"/>
+                <result property="supervisorCheckTime" column="an_supervisorCheckTime"/>
+                <result property="constructionInspector" column="an_constructionInspector"/>
+                <result property="constructionInspectorChecked" column="an_constructionInspectorChecked"/>
+                <result property="constructionInspectorCheckResult" column="an_constructionInspectorCheckResult"/>
+                <result property="constructionInspectorCheckDate" column="an_constructionInspectorCheckDate"/>
+                <result property="teamInspector" column="an_teamInspector"/>
+                <result property="teamInspectorChecked" column="an_teamInspectorChecked"/>
+                <result property="teamInspectorCheckResult" column="an_teamInspectorCheckResult"/>
+                <result property="teamInspectorCheckTime" column="an_teamInspectorCheckTime"/>
+                <result property="remark" column="an_remark"/>
+                <result property="updateTime" column="an_updateTime"/>
+                <collection property="acceptanceBatch" ofType="map" javaType="ArrayList">
+                    <id property="id" column="ab_id"/>
+                    <result property="acceptanceNoteId" column="ab_acceptanceNoteId"/>
+                    <result property="acceptanceNoteModifyId" column="ab_acceptanceNoteModifyId"/>
+                    <result property="acceptanceFirstId" column="ab_acceptanceFirstId"/>
+                    <result property="batchNo" column="ab_batchNo"/>
+                    <result property="eligibleRate" column="ab_eligibleRate"/>
+                    <result property="acceptancePersonId" column="ab_acceptancePersonId"/>
+                    <result property="accepter" column="ab_accepter"/>
+                    <result property="inspectorRole" column="ab_inspectorRole"/>
+                    <result property="dominantItemCheckResult" column="ab_dominantItemCheckResult"/>
+                    <result property="generalItemCheckResult" column="ab_generalItemCheckResult"/>
+                    <result property="minPassRatio" column="ab_minPassRatio"/>
+                    <result property="createDate" column="ab_createDate"/>
+                    <result property="batchStatusId" column="ab_batchStatusId"/>
+                    <result property="updateTime" column="ab_updateTime"/>
+                    <association property="statusInfo" javaType="map" columnPrefix="s_" autoMapping="true">
+                        <id property="id" column="id"/>
+                    </association>
+                </collection>
+                <collection property="procedureBatchStatus" ofType="map" javaType="ArrayList">
+                    <id property="id" column="pbs_id"/>
+                    <result property="procedureId" column="pbs_procedureId"/>
+                    <result property="batchNo" column="pbs_batchNo"/>
+                    <result property="statementId" column="pbs_statementId"/>
+                    <result property="remark" column="pbs_remark"/>
+                    <result property="updateTime" column="pbs_updateTime"/>
+                    <association property="bStatusInfo" javaType="map" columnPrefix="si_" autoMapping="true">
+                        <id property="id" column="id"/>
+                    </association>
+                </collection>
+            </association>
+            <collection property="dominantItem" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="di_">
+                <id property="id" column="id"/>
+                <result property="procedureId" column="procedureId"/>
+                <result property="gradingStandard" column="gradingStandard"/>
+                <result property="errorRange" column="errorRange"/>
+                <result property="standardVal" column="standardVal"/>
+                <result property="unit" column="unit"/>
+                <result property="calcType" column="calcType"/>
+                <result property="passText" column="passText"/>
+                <result property="noPassText" column="noPassText"/>
+                <result property="remark" column="remark"/>
+                <result property="updateTime" column="updateTime"/>
+            </collection>
+            <collection property="generalItem" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="gi_">
+                <id property="id" column="id"/>
+                <result property="procedureId" column="procedureId"/>
+                <result property="gradingStandard" column="gradingStandard"/>
+                <result property="errorRange" column="errorRange"/>
+                <result property="allowMaxValue" column="allowMaxValue"/>
+                <result property="allowMinValue" column="allowMinValue"/>
+                <result property="standardVal" column="standardVal"/>
+                <result property="unit" column="unit"/>
+                <result property="calcType" column="calcType"/>
+                <result property="passText" column="passText"/>
+                <result property="noPassText" column="noPassText"/>
+                <result property="remark" column="remark"/>
+                <result property="updateTime" column="updateTime"/>
+            </collection>
+            <collection property="teamProcedures" ofType="java.util.LinkedHashMap" javaType="ArrayList">
+                <id property="id" column="tpr_id"/>
+                <result property="procedureId" column="tpr_procedureId"/>
+                <result property="teamId" column="tpr_teamId"/>
+                <result property="remark" column="tpr_remark"/>
+                <result property="updateTime" column="tpr_updateTime"/>
+                <association property="teamInfo" javaType="map">
+                    <id property="id" column="ti_id"/>
+                    <result property="teamName" column="ti_teamName"/>
+                    <result property="partnerId" column="ti_partnerId"/>
+                    <result property="updateTime" column="ti_updateTime"/>
+                    <association property="partnerInfo" javaType="map">
+                        <id property="id" column="pi2_id"/>
+                        <result property="partner" column="pi2_partner"/>
+                        <result property="corporateId" column="pi2_corporateId"/>
+                        <result property="partnerLeader" column="pi2_partnerLeader"/>
+                        <result property="linker" column="pi2_linker"/>
+                        <result property="linkerPhone" column="pi2_linkerPhone"/>
+                        <result property="grade" column="pi2_grade"/>
+                        <result property="isEntity" column="pi2_isEntity"/>
+                        <association property="partnerCompany" javaType="map">
+                            <id property="id" column="c_id"></id>
+                            <result property="corporateName" column="c_corporateName"/>
+                            <result property="corporateType" column="c_corporateType"/>
+                            <result property="corporateLeader" column="c_corporateLeader"/>
+                            <result property="corporateCode" column="c_corporateCode"/>
+                            <result property="corporateLegalPerson" column="c_corporateLegeaPerson"/>
+                            <result property="corporateAddr" column="c_corporateAddr"/>
+                            <result property="remark" column="c_remark"/>
+                            <result property="updateTime" column="c_updateTime"/>
+                        </association>
+                    </association>
+                    <collection property="teamUsers" ofType="java.util.LinkedHashMap" javaType="ArrayList">
+                        <id property="id" column="tur_id"/>
+                        <result property="userId" column="tur_userId"/>
+                        <result property="roleType" column="tur_roleType"/>
+                        <result property="teamId" column="tur_teamId"/>
+                        <result property="updateTime" column="tur_updateTime"/>
+                        <association property="user" javaType="map" columnPrefix="u_" autoMapping="true">
+                            <id property="id" column="id"/>
+                        </association>
+                    </collection>
+                </association>
+            </collection>
+        </association>
+    </resultMap>
+</mapper>

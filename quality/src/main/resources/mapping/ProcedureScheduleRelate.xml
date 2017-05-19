@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.acceptance.ProcedureScheduleRelateDao">
+	<select id="queryProcedureScheduleRoomListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${phTableName}
+		a,${pbTableName} b,${psrTableName} c
+		WHERE a.`BUILDING_ID`=b.`ID` AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0
+		AND a.`ID`=c.`ROOM_ID` AND c.`PROCEDURE_TYPE_ID`=#{procedureTypeId}
+		AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		AND a.`REGION_TYPE_ID`=#{regionTypeId}
+	</select>
+
+	<select id="queryBuildingProcedureScheduleListInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id,b.`PROCEDURE_ID` AS procedureId,
+		a.`FLOOR` AS `floor`,a.`FLOOR_ID` AS floorId,a.`BUILDING_ID` AS
+		buildingId,a.`ROOM_NAME` AS roomName,b.SUPERVISOR_CHECKED AS supervisorChecked,
+		b.`CONSTRUCTION_INSPECTOR_CHECKED` AS constructionInspectorChecked FROM ${phTableName} a LEFT JOIN
+		${anTableName} b ON b.`REGION_ID`=a.`ID` AND b.`REGION_TYPE`=#{regionType} AND
+		b.`IS_SEALED`=0 WHERE a.`IS_SEALED`=0 AND
+		a.`REGION_TYPE_ID`=#{regionTypeId} AND a.`TENANT_ID`=#{tenantId} AND
+		a.`BUILDING_ID`=#{buildingId} AND (b.`PROCEDURE_ID`=#{procedureId} OR b.`PROCEDURE_ID` IS NULL) 
+		ORDER BY a.`ROOM_NAME`
+	</select>
+</mapper>

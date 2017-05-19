@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.privilege.RoleDataPrivilegesRelateDao">
+
+	<select id="insertList" parameterType="map" statementType="PREPARED">
+		INSERT INTO ${rdprTableName}
+		(
+		ID,
+		ROLE_ID,
+		DATA_PRIVILEGE_ID,
+		UPDATE_USER_ID,
+		UPDATE_TIME,
+		TENANT_ID
+		)
+		VALUES
+		<foreach collection="list" index="index" item="item"
+			separator=",">
+			(
+			#{item.ID},
+			#{item.ROLE_ID},
+			#{item.DATA_PRIVILEGE_ID},
+			#{item.UPDATE_USER_ID},
+			#{item.UPDATE_TIME},
+			#{item.TENANT_ID}
+			)
+		</foreach>
+	</select>
+
+	<select id="deleteList" parameterType="map" statementType="PREPARED">
+		DELETE a FROM ${rdprTableName} a,${dpTableName} b
+		WHERE a.`DATA_PRIVILEGE_ID`=b.`ID` AND a.`ROLE_ID`=#{roleId} AND
+		b.`DATA_TYPE_ID`=#{dataTypeId}
+	</select>
+
+	<select id="queryDataPrivilegesListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${dpTableName} a,
+		${rdprTableName} b WHERE
+		a.ID=b.DATA_PRIVILEGE_ID AND a.IS_VALID=0 AND
+		a.IS_SEALED=0 AND a.DATA_TYPE_ID=#{DATA_TYPE_ID} AND
+		b.ROLE_ID=#{ROLE_ID}
+	</select>
+
+</mapper>

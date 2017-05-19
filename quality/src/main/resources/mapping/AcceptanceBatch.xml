@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.acceptance.AcceptanceBatchDao">
+
+	<select id="queryAllAcceptanceBatchByNoticeInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id, b.`PROJECT_NAME` AS projectName, 
+		b.`REGION_NAME` AS regionName,b.PROCEDURE_NAME as procedureName,
+		a.ACCEPTANCE_NOTE_ID as acceptanceNoteId,
+		a.`BATCH_NO` AS batchNo FROM ${abTableName} a,${anTableName}
+		b,${pbsTableName} c WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND
+		c.`BATCH_NO`=a.`BATCH_NO` AND c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND c.`IS_NOTICE_JL`=#{isNoticeJL} AND
+		a.`ACCEPTANCE_PERSON_ID`=#{userId} AND a.`BATCH_STATUS_ID`=#{batchStatusId} AND 
+		a.`INSPECTOR_ROLE`=#{inspectorRole} AND a.`BATCH_STATUS`=#{batchStatus} AND 
+		c.STATEMENT_ID=#{statementId} 
+		ORDER BY b.`PROJECT_NAME`,b.`REGION_NAME` ASC
+	</select>
+
+	<select id="queryAllAcceptanceBatchByPostInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.BATCH_NO as batchNo,b.REGION_NAME as
+		regionName,b.REGION_MIN_NAME as regionMinName,
+		a.BATCH_STATUS_ID as statementId, 
+		a.ACCEPTANCE_NOTE_ID as acceptanceNoteId,
+		b.PROCEDURE_NAME as procedureName, b.BATCH_TIMES as batchTimes,
+		a.INSPECTOR_ROLE as inspectorRole, c.STATEMENT_ID as stateId 
+		FROM ${abTableName} a, ${anTableName}
+		b, ${pbsTableName} c WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		c.`BATCH_NO`=a.`BATCH_NO` AND c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND
+		b.`PROJECT_PERIOD_ID`=#{projectPeriodId} AND
+		b.`PROCEDURE_ID`=#{procedureId}
+		AND a.BATCH_STATUS=#{batchStatus} AND a.`INSPECTOR_ROLE`=#{inspectorRole}
+		<if test="procedureId != null and procedureId != ''">
+			AND b.PROCEDURE_ID=#{procedureId}
+		</if>
+		<if test="regionId != null and regionId != ''">
+			AND b.REGION_ID=#{regionId}
+		</if>
+		<if test="idTree != null and idTree != ''">
+			AND b.REGION_ID_TREE LIKE #{idTree}
+		</if>
+	</select>
+
+	<select id="queryAcceptanceBatchByStatusPageInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.BATCH_NO as batchNo,c.REGION_NAME as regionName,
+		a.ACCEPTANCE_NOTE_ID as acceptanceNoteId, c.PROCEDURE_NAME
+		as
+		procedureName, c.BATCH_TIMES as batchTimes FROM ${abTableName}
+		a,${pbsTableName} b,${anTableName} c WHERE
+		c.`STATEMENT_ID`!=#{anStatementId} AND b.`ACCEPTANCE_NOTE_ID`=c.`ID`
+		AND
+		a.`ACCEPTANCE_NOTE_ID`=c.`ID` AND b.`PROCEDURE_ID`=c.`PROCEDURE_ID`
+		AND a.`BATCH_NO`=b.`BATCH_NO` AND c.`IS_SEALED`=0 AND a.`IS_SEALED`=0
+		AND a.BATCH_STATUS=1 AND a.`ACCEPTANCE_PERSON_ID`=#{userId}
+		AND
+		a.BATCH_STATUS_ID=#{batchStatusId} AND
+		c.PROJECT_PERIOD_ID=#{projectPeriodId} AND
+		a.BATCH_STATUS=#{batchStatus}
+		<if test="pbsStatementId != null and pbsStatementId != ''">
+			AND b.`STATEMENT_ID`=#{pbsStatementId}
+		</if>
+	</select>
+
+	<select id="queryBatchInfoInTab" parameterType="map" resultType="map"
+		statementType="PREPARED">
+		SELECT a.`ID` AS id,b.`REGION_NAME` AS
+		regionName,a.ACCEPTANCE_NOTE_ID as acceptanceNoteId,
+		a.BATCH_NO as batchNo, b.`PROCEDURE_NAME` AS
+		procedureName,
+		b.BATCH_TIMES as batchTimes, b.`PROCEDURE_ID` AS
+		procedureId,b.`TEAM_INSPECTOR` AS teamInspector,
+		b.`TEAM_INSPECTOR_CHECK_TIME` AS teamInspectorCheckTime,
+		a.MIN_PASS_RATIO as minPassRatio,b.`CONSTRUCTION_TEAM_ID` AS
+		constructionTeamId,b.`CONSTRUCTION_TEAM` AS constructionTeam,
+		b.`SUPERVISOR_COMPANY_ID` AS
+		supervisorCompanyId,b.`CONTRACTING_PRO_ID` AS contractingProId,
+		b.`SUPERVISOR_COMPANY` AS supervisorCompany,b.`CONTRACTING_PRO` AS
+		contractingPro,
+		a.REMARK AS remark,a.DOMINANT_ITEM_CHECK_RESULT AS
+		dominantItemCheckResult,a.GENERAL_ITEM_CHECK_RESULT AS
+		generalItemCheckResult,a.TOTAL_CHECK_RESULT AS totalCheckResult,
+		a.GENERAL_ITEM_CHECK_SCORE as
+		generalItemCheckSocre,a.TOTAL_CHECK_SCORE as totalCheckScore,
+		b.CONSTRUCTION_INSPECTOR as constructionInspector,b.SUPERVISOR_NAME as
+		supervisorName
+		FROM ${abTableName} a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0
+		AND a.`ID`=#{id}
+	</select>
+</mapper>

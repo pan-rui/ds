@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.procedure.ProcedureTypeDao">
+
+	<select id="queryProcedureTypeByUserInTab" parameterType="map"
+            resultType="map" statementType="PREPARED">
+        SELECT DISTINCT a.* FROM ${procTypeTab} a, ${procTypeTab} b, ${procInfoTab} c, ${prprTab} d,
+        ${rdprTableName} e,${dpTableName} f,${rTableName} g,${urrTableName} h 
+        WHERE INSTR(b.ID_TREE, a.ID_TREE)>0  AND b.ID = c.PROCEDURE_TYPE_ID and c.ID = d.PROCEDURE_ID 
+        AND c.`ID`=f.`DATA_ID` AND e.`DATA_PRIVILEGE_ID`=f.`ID` AND e.`ROLE_ID`=g.`ID` AND g.`ID`=h.`ROLE_ID` 
+        AND c.`IS_SEALED`=0 AND a.`IS_SEALED`=0 AND h.`USER_ID`=#{userId} 
+        AND f.`DATA_TYPE_ID`=#{dataTypeId}  
+        AND d.PROJECT_PERIOD_ID = #{projectPeriodId} 
+        AND c.TENANT_ID = #{tenantId}
+        <if test="regionTypeId !=null" >
+           AND d.REGION_TYPE_ID = #{regionTypeId} 
+        </if>
+    </select>
+
+    <select id="queryProcedureTypeByProjectRegionInTab" parameterType="map"
+            resultType="map" statementType="PREPARED">
+        SELECT DISTINCT a.* FROM ${procTypeTab} a, ${procTypeTab} b, ${procInfoTab} c,  ${prprTab} d
+        WHERE INSTR(b.ID_TREE, a.ID_TREE)>0  AND b.ID = c.PROCEDURE_TYPE_ID and c.ID = d.PROCEDURE_ID 
+        <if test="projectPeriodId !=null" >
+            AND d.PROJECT_PERIOD_ID = #{projectPeriodId} 
+        </if>
+        <if test="regionTypeId !=null" >
+            AND d.REGION_TYPE_ID = #{regionTypeId} 
+        </if>
+        <if test="tenantId !=null" >
+            AND c.TENANT_ID = #{tenantId}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.organization.TeamInfoDao">
+	<select id="queryTeamsInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${tTableName} a, ${pprTableName} b,${tprTableName} c WHERE a.`ID`=b.`TEAM_ID` AND 
+		a.`ID`=c.`TEAM_ID` AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND a.`TENANT_ID`=#{tenantId} AND 
+		b.`PROJECT_PERIOD_ID`=#{projectPeriodId} AND c.PROCEDURE_ID=#{procedureId} 
+	</select>
+</mapper>

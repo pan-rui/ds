@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.sys.AppInfoDao">
+	<select id="queryAppInfoDetailListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.NAME as name,a.APP_ICON as appIcon,a.APP_PACKAGE_NAME as appPackageName,
+		a.APP_ANDROID_PATH as appAndroidPath,a.APP_IOS_PATH as appIosPath,a.REMARK as remark,b.UPDATE_TYPE as 
+		updateType,b.VERSION_CODE as versionCode,b.VERSION_NAME as versionName,b.FILE_SIZE as fileSize,
+		b.UPDATE_CONTENT as b.updateContent,b.PUBLISH_TIME as publishTime 
+		FROM ${aTableName} a, ${uvTableName} b WHERE a.LATEST_VERSION_ID=b.ID 
+		<if  test="NAME != null">
+			AND a.NAME like #{NAME} 
+		</if>
+		<if  test="APP_TYPE != null">
+			AND a.APP_TYPE=#{APP_TYPE} 
+		</if>
+		<if  test="IS_SEALED != null">
+			AND a.IS_SEALED=#{IS_SEALED}
+		</if>
+		<if  test="TENANT_ID != null">
+			AND a.TENANT_ID=#{TENANT_ID} 
+		</if>
+		ORDER BY a.APP_TYPE ASC,a.TOP_FIXED_SQNO ASC,a.UPDATE_TIME DESC
+	</select>
+	
+	<select id="queryAppInfoDetailPageInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.NAME as name,a.APP_ICON as appIcon,a.APP_PACKAGE_NAME as appPackageName,
+		a.APP_ANDROID_PATH as appAndroidPath,a.APP_IOS_PATH as appIosPath,a.REMARK as remark,b.UPDATE_TYPE as 
+		updateType,b.VERSION_CODE as versionCode,b.VERSION_NAME as versionName,b.FILE_SIZE as fileSize,
+		b.UPDATE_CONTENT as b.updateContent,b.PUBLISH_TIME as publishTime 
+		FROM ${aTableName} a, ${uvTableName} b WHERE a.LATEST_VERSION_ID=b.ID 
+		<if  test="NAME != null">
+			AND a.NAME like #{NAME} 
+		</if>
+		<if  test="APP_TYPE != null">
+			AND a.APP_TYPE=#{APP_TYPE} 
+		</if>
+		<if  test="IS_SEALED != null">
+			AND a.IS_SEALED=#{IS_SEALED} 
+		</if>
+		<if  test="TENANT_ID != null">
+			AND a.TENANT_ID=#{TENANT_ID} 
+		</if>
+		ORDER BY a.APP_TYPE ASC,a.TOP_FIXED_SQNO ASC,a.UPDATE_TIME DESC
+	</select>
+</mapper>

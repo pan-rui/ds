@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.organization.OrganizationInfoDao">
+	<select id="queryProjectOrganizationInfoListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT a.* FROM ${oTableName} a, ${oTableName} a1, ${ppTableName} b,${pbTableName} c,${phTableName} d,
+		${rdprTableName} e,${dpTableName} f,${rTableName} g,${urrTableName} h WHERE
+		INSTR(a1.ID_TREE, a.ID_TREE)>0 AND a1.ID=b.COM_ID AND
+		b.`ID`=c.`PROJECT_PERIOD_ID` AND c.`ID`=d.`BUILDING_ID`
+		AND d.`ID`=f.`DATA_ID` AND e.`DATA_PRIVILEGE_ID`=f.`ID` AND
+		e.`ROLE_ID`=g.`ID` AND g.`ID`=h.`ROLE_ID`
+		AND b.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND
+		f.`IS_SEALED`=0 AND g.`IS_SEALED`=0
+		AND h.`USER_ID`=#{userId} AND f.`DATA_TYPE_ID`=#{dataTypeId} AND b.TENANT_ID=#{TENANT_ID} 
+
+	</select>
+</mapper>

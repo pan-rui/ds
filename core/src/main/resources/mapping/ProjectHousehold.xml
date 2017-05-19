@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.project.ProjectHouseholdDao">
+
+	<select id="queryProjectRegionTreeInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.PROJECT_NAME as name,null as parentId FROM ${pTableName} a 
+		WHERE a.IS_SEALED=0 AND a.TENANT_ID=#{TENANT_ID} UNION ALL 
+		SELECT b.ID as id,b.PERIOD_NAME as name,b.PROJECT_ID as parentId FROM ${ppTableName} b 
+		WHERE b.IS_SEALED=0 AND b.TENANT_ID=#{TENANT_ID} UNION ALL 
+		SELECT c.ID as id,c.BUILDING_NAME as name,c.PROJECT_PERIOD_ID as parentId FROM ${pbTableName} c 
+		WHERE c.IS_SEALED=0 AND c.TENANT_ID=#{TENANT_ID} UNION ALL 
+		SELECT d.ID as id,d.ROOM_NAME as name,d.BUILDING_ID as parentId FROM ${phTableName} d 
+		WHERE d.IS_SEALED=0 AND d.TENANT_ID=#{TENANT_ID} AND d.REGION_TYPE_ID=${floorTypeId} UNION ALL 
+		SELECT e.ID as id,e.ROOM_NAME as name,e.FLOOR_ID as parentId FROM ${phTableName} e 
+		WHERE e.IS_SEALED=0 AND e.TENANT_ID=#{TENANT_ID} AND e.REGION_TYPE_ID=${roomTypeId}
+	</select>
+	
+	<select id="queryProjectRoomListByUserInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT d.* FROM ${phTableName} d,${pbTableName} c,
+		${rdprTableName} e,${dpTableName} f,${rTableName} g,${urrTableName} h WHERE
+		c.`ID`=d.`BUILDING_ID` AND d.`ID`=f.`DATA_ID` AND e.`DATA_PRIVILEGE_ID`=f.`ID` AND
+		e.`ROLE_ID`=g.`ID` AND g.`ID`=h.`ROLE_ID`
+		AND d.`IS_SEALED`=0 AND
+		f.`IS_SEALED`=0 AND g.`IS_SEALED`=0
+		AND h.`USER_ID`=#{userId} AND f.`DATA_TYPE_ID`=#{dataTypeId} AND d.TENANT_ID=#{TENANT_ID} 
+		<if  test="regionTypeId != null">
+            AND d.REGION_TYPE_ID=#{regionTypeId} 
+        </if>
+		<if  test="projectPeriodId != null">
+            AND c.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+        </if>
+	</select>
+
+	<select id="queryProjectFloorListByUserInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT c.* FROM ${phTableName} c,${pbTableName} b,${phTableName} d,
+		${rdprTableName} e,${dpTableName} f,${rTableName} g,${urrTableName} h WHERE
+		b.`ID`=c.BUILDING_ID AND c.`FLOOR`=d.`FLOOR` AND c.BUILDING_ID=d.BUILDING_ID AND 
+		d.`ID`=f.`DATA_ID` AND e.`DATA_PRIVILEGE_ID`=f.`ID` AND
+		e.`ROLE_ID`=g.`ID` AND g.`ID`=h.`ROLE_ID`
+		AND c.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND
+		f.`IS_SEALED`=0 AND g.`IS_SEALED`=0
+		AND h.`USER_ID`=#{userId} AND f.`DATA_TYPE_ID`=#{dataTypeId} AND c.TENANT_ID=#{TENANT_ID} 
+		<if  test="regionTypeId != null">
+            AND c.REGION_TYPE_ID=#{regionTypeId} 
+        </if>
+		<if  test="projectPeriodId != null">
+            AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+        </if>
+	</select>
+
+	<select id="queryRoomsInTab" parameterType="map" resultType="map"
+		statementType="PREPARED">
+		SELECT a.* FROM ${phTableName} a,${pbTableName} b
+		WHERE a.`BUILDING_ID`=b.`ID` AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 
+		AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
+		<if  test="regionTypeId != null">
+            AND a.REGION_TYPE_ID=#{regionTypeId} 
+        </if>
+	</select>
+	<select id="queryFloorsInTab" parameterType="map" resultType="map"
+		statementType="PREPARED">
+		SELECT a.* FROM ${phTableName} a,${pbTableName} b
+		WHERE a.`BUILDING_ID`=b.`ID` AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 
+		AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
+		<if  test="regionTypeId != null">
+            AND a.REGION_TYPE_ID=#{regionTypeId} 
+        </if>
+	</select>
+	<select id="queryHouseholdsByRegionInTab" parameterType="map" resultType="map"
+			statementType="PREPARED">
+		SELECT a.*, b.BUILDING_NAME buildingName FROM ${phTableName} a, ${pbTableName} b, ${rtTableName} c
+		WHERE  a.`BUILDING_ID`=b.`ID` AND a.`REGION_TYPE_ID`=c.`ID`
+		<if  test="REGION_TYPE_ID != null">
+			AND a.`REGION_TYPE_ID`=#{REGION_TYPE_ID}
+		</if>
+		<if  test="REGION_TYPE_NAME != null">
+			AND c.`REGION_TYPE_NAME`=#{REGION_TYPE_NAME}
+		</if>
+		<if  test="IS_SEALED != null">
+			AND a.`IS_SEALED`=#{IS_SEALED}
+	    </if>
+		<if  test="TENANT_ID != null">
+			AND a.`TENANT_ID`=#{TENANT_ID}
+		</if>
+		<if  test="BUILDING_ID != null">
+			AND a.`BUILDING_ID`=#{BUILDING_ID}
+		</if>
+		<if  test="BUILDING_IDS != null">
+			AND a.`BUILDING_ID` IN (${BUILDING_IDS})
+		</if>
+		<if  test="FLOOR != null">
+			AND a.`FLOOR`=#{FLOOR}
+		</if>
+		<if  test="FLOORS != null">
+			AND a.`FLOOR` IN (${FLOORS})
+		</if>
+		<if  test="FLOOR_ID != null">
+			AND a.`ID`=#{FLOOR_ID}
+		</if>
+		<if  test="FLOOR_IDS != null">
+			AND a.`FLOOR_ID` IN (${FLOOR_IDS})
+		</if>
+		<if  test="PROJECT_PERIOD_ID != null">
+			AND b.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		</if>
+
+		ORDER BY a.`FLOOR` ASC
+
+	</select>
+
+	<select id="queryHouseholdsPageByRegionInTab"
+			parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.*, b.BUILDING_NAME buildingName  FROM ${phTableName} a, ${pbTableName} b, ${rtTableName} c
+		WHERE  a.`BUILDING_ID`=b.`ID` AND a.`REGION_TYPE_ID`=c.`ID`
+		<if  test="REGION_TYPE_ID != null">
+			AND a.`REGION_TYPE_ID`=#{REGION_TYPE_ID}
+		</if>
+		<if  test="REGION_TYPE_NAME != null">
+			AND c.`REGION_TYPE_NAME`=#{REGION_TYPE_NAME}
+		</if>
+		<if  test="IS_SEALED != null">
+			AND a.`IS_SEALED`=#{IS_SEALED}
+		</if>
+		<if  test="TENANT_ID != null">
+			AND a.`TENANT_ID`=#{TENANT_ID}
+		</if>
+		<if  test="BUILDING_ID != null">
+			AND a.`BUILDING_ID`=#{BUILDING_ID}
+		</if>
+		<if  test="BUILDING_IDS != null">
+			AND a.`BUILDING_ID` IN (${BUILDING_IDS})
+		</if>
+		<if  test="FLOOR_ID != null">
+			AND a.`ID`=#{FLOOR_ID}
+		</if>
+		<if  test="FLOOR != null">
+			AND a.`FLOOR`=#{FLOOR}
+		</if>
+		<if  test="FLOORS != null">
+			AND a.`FLOOR` IN (${FLOORS})
+		</if>
+		<if  test="FLOOR_IDS != null">
+			AND a.`FLOOR_ID` IN (${FLOOR_IDS})
+		</if>
+		<if  test="PROJECT_PERIOD_ID != null">
+			AND b.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		</if>
+		ORDER BY a.`FLOOR` ASC
+	</select>
+
+	<select id="insertBatch" parameterType="map"
+			statementType="PREPARED">
+		INSERT INTO ${phTableName}
+		(
+		ID,
+		REGION_TYPE_ID,
+		ROOM_NAME,
+		ROOM_FULL_NAME,
+		ROOM,
+		HOUSEHOLD_CHART_ID,
+		ROOM_CODE,
+		CONSTRACTION_AREA,
+		USABLE_AREA,
+		BUILDING_ID,
+		FLOOR_ID,
+		FLOOR,
+		FLOOR_TYPE_ID,
+		ID_TREE,
+		NAME_TREE,
+		REMARK,
+		UPDATE_TIME,
+		IS_SEALED,
+		SEALED_USER_ID,
+		SEALED_TIME,
+		UPDATE_USER_ID,
+		TENANT_ID
+		)
+		VALUES
+		<foreach collection="list" index="index" item="item" separator=",">
+			(
+			#{item.ID},
+			#{item.REGION_TYPE_ID},
+			#{item.ROOM_NAME},
+			#{item.ROOM_FULL_NAME},
+			#{item.ROOM},
+			#{item.HOUSEHOLD_CHART_ID},
+			#{item.ROOM_CODE},
+			#{item.CONSTRACTION_AREA},
+			#{item.USABLE_AREA},
+			#{item.BUILDING_ID},
+			#{item.FLOOR_ID},
+			#{item.FLOOR},
+			#{item.FLOOR_TYPE_ID},
+			#{item.ID_TREE},
+			#{item.NAME_TREE},
+			#{item.REMARK},
+			#{item.UPDATE_TIME},
+			#{item.IS_SEALED},
+			#{item.SEALED_USER_ID},
+			#{item.SEALED_TIME},
+			#{item.UPDATE_USER_ID},
+			#{item.TENANT_ID}
+			)
+		</foreach>
+	</select>
+
+	<select id="updateBatch" parameterType="map"
+			statementType="PREPARED">
+			UPDATE ${phTableName}
+			<trim prefix="set" prefixOverrides=",">
+				<if test="REGION_TYPE_ID != null">
+					,REGION_TYPE_ID = #{REGION_TYPE_ID}
+				</if>
+				<if test="ROOM_NAME != null">
+					,ROOM_NAME = #{ROOM_NAME}
+				</if>
+				<if test="ROOM_FULL_NAME != null">
+					,ROOM_FULL_NAME = #{ROOM_FULL_NAME}
+				</if>
+				<if test="ROOM != null">
+					,ROOM = #{ROOM}
+				</if>
+				<if test="HOUSEHOLD_CHART_ID != null">
+					,HOUSEHOLD_CHART_ID = #{HOUSEHOLD_CHART_ID}
+				</if>
+				<if test="ROOM_CODE != null">
+					,ROOM_CODE = #{ROOM_CODE}
+				</if>
+				<if test="CONSTRACTION_AREA != null">
+					,CONSTRACTION_AREA = #{CONSTRACTION_AREA}
+				</if>
+				<if test="USABLE_AREA != null">
+					,USABLE_AREA = #{USABLE_AREA}
+				</if>
+				<if test="BUILDING_ID != null">
+					,BUILDING_ID = #{BUILDING_ID}
+				</if>
+				<if test="FLOOR_ID != null">
+					,FLOOR_ID = #{FLOOR_ID}
+				</if>
+				<if test="FLOOR != null">
+					,FLOOR = #{FLOOR}
+				</if>
+				<if test="FLOOR_TYPE_ID != null">
+					,FLOOR_TYPE_ID = #{FLOOR_TYPE_ID}
+				</if>
+				<if test="ID_TREE != null">
+					,ID_TREE = #{ID_TREE}
+				</if>
+				<if test="NAME_TREE != null">
+					,NAME_TREE = #{NAME_TREE}
+				</if>
+				<if test="REMARK != null">
+					,REMARK = #{REMARK}
+				</if>
+				<if test="UPDATE_TIME != null">
+					,UPDATE_TIME = #{UPDATE_TIME}
+				</if>
+				<if test="IS_SEALED != null">
+					,IS_SEALED = #{IS_SEALED}
+				</if>
+				<if test="SEALED_USER_ID != null">
+					,SEALED_USER_ID = #{SEALED_USER_ID}
+				</if>
+				<if test="SEALED_TIME != null">
+					,SEALED_TIME = #{SEALED_TIME}
+				</if>
+				<if test="UPDATE_USER_ID != null">
+					,UPDATE_USER_ID = #{UPDATE_USER_ID}
+				</if>
+				<if test="TENANT_ID != null">
+					,TENANT_ID = #{TENANT_ID}
+				</if>
+
+			</trim>
+			WHERE ID IN
+			<foreach close=")" collection="ROOM_IDS" index="index" item="item" open="(" separator=",">
+				#{item}
+			</foreach>
+		</select>
+</mapper>

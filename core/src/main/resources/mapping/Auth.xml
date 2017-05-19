@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.auth.AuthDao">
+	<select id="authenticationQuery" parameterType="string"
+		resultType="string" statementType="PREPARED">
+		SELECT PWD FROM ${dbName}.USER WHERE
+		USER_NAME= #{uName}
+	</select>
+
+	<select id="userRolesQuery" parameterType="string" resultType="string"
+		statementType="PREPARED">
+		SELECT r.ROLE_NAME from ${dbName}.ROLE r join
+		${dbName}.USER_ROLE ur ON
+		r.ROLE_ID=ur.ROLE_ID join ${dbName}.USER u on
+		ur.USER_ID=u.USER_ID
+		WHERE u.USER_NAME = #{uName}
+	</select>
+	<select id="permissionsQuery" parameterType="string" resultType="string"
+		statementType="PREPARED">
+		SELECT p.PRIVILEGES_NAME FROM ${dbName}.PRIVILEGES p
+		join
+		${dbName}.ROLE_PRIVILEGES rp on p.PRIVILEGES_ID=rp.PRIVILEGES_ID
+		join
+		${dbName}.ROLE r on rp.ROLE_ID=r.ROLE_ID WHERE r.ROLE_NAME =
+		#{roleName}
+	</select>
+	<select id="userPermissionsQuery" parameterType="string"
+		resultType="string" statementType="PREPARED">
+		SELECT * FROM ${dbName}.user u JOIN
+		${dbName}.USER_OPERATE_PRIVILEGES_RELATE
+		uopr on u.ID=uopr.USER_ID
+		where u.USER_NAME=#{uName}
+	</select>
+
+
+	<select id="queryOperatRolePrivilegesTab" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${opTableName} a,
+		${orprTableName} b WHERE
+		a.ID=b.OPERATE_PRIVILEGE_ID AND a.IS_VALID=0
+		AND a.IS_SEALED=0 AND
+		b.OPERATE_ROLE_ID=#{operatRoleId}
+	</select>
+
+	<select id="queryUserOperatPrivilegesByRoleTab" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${opTableName} a,
+		${orprTableName} b,${uorrTableName} c WHERE
+		a.ID=b.OPERATE_PRIVILEGE_ID AND b.OPERATE_ROLE_ID=c.OPERATE_ROLE_ID
+		AND a.IS_VALID=0 AND a.IS_SEALED=0 AND c.USER_ID=#{userId}
+	</select>
+
+	<select id="queryUserOperatRolesTab" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${orTableName} a,
+		${uorrTableName} b WHERE
+		a.ID=b.OPERATE_ROLE_ID AND a.IS_VALID=0 AND
+		a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+
+	<select id="queryUserOperatPrivilegesByUserTab" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${opTableName} a,
+		${uoprTableName} b WHERE
+		a.ID=b.OPERATE_PRIVILEGE_ID AND a.IS_VALID=0
+		AND a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+
+	<select id="queryUserOperatPrivilegesTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${opTableName} a,
+		${orprTableName} b, ${uorrTableName} c
+		WHERE
+		a.ID=b.OPERATE_PRIVILEGE_ID AND
+		b.OPERATE_ROLE_ID=c.OPERATE_ROLE_ID AND
+		a.IS_VALID=0 AND a.IS_SEALED=0 AND c.USER_ID=#{userId} union
+		SELECT
+		a.*
+		FROM ${opTableName} a, ${uoprTableName} b WHERE
+		a.ID=b.OPERATE_PRIVILEGE_ID AND a.IS_VALID=0 AND a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+
+
+	<select id="queryDataRolePrivilegesTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${dpTableName} a,
+		${drprTableName} b WHERE
+		a.ID=b.DATA_PRIVILEGE_ID AND a.IS_VALID=0 AND
+		a.IS_SEALED=0 AND
+		b.DATA_ROLE_ID=#{dataRoleId}
+	</select>
+
+	<select id="queryUserDataRolesTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${drTableName} a,
+		${udrrTableName} b where
+		a.ID=b.DATA_ROLE_ID AND a.IS_VALID=0 AND
+		a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+
+	<select id="queryUserDataPrivilegesByUserTab" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${dpTableName} a,
+		${udprTableName} b WHERE
+		a.ID=b.DATA_PRIVILEGE_ID AND a.IS_VALID=0 AND
+		a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+
+	<select id="queryDataPrivilegesTypePageInTab" parameterType="map"
+		resultType="map">
+		SELECT b.ID as id,b.DATA_PRIVILEGES_NAME as
+		dataPrivilegesName,
+		b.DATA_DEFINITION as dataDefinition,
+		a.DATA_TYPE_NAME as dataTypeName,
+		a.TABLE_NAME as tableName from
+		${dtTableName} a JOIN ${dpTableName} b
+		ON a.ID=b.DATA_TYPE_ID AND
+		b.IS_VALID=0 AND b.IS_SEALED=0
+	</select>
+
+	<select id="queryUserOperatPrivilegesRolePageInTab"
+		parameterType="map" resultType="map">
+		SELECT b.ID as id,a.USER_NAME as userName,a.REAL_NAME as
+		realName,c.OPERATE_ROLE_NAME as operateRoleName FROM ${uTableName}
+		a,${urrTableName} b,${rTableName} c WHERE a.ID=b.USER_ID AND
+		c.ID=b.OPERATE_ROLE_ID AND c.IS_VALID=0 AND c.IS_SEALED=0 AND
+		a.IS_SEALED=0 AND a.TENANT_ID=#{tenantId}
+		<if test="null != page.params">
+			<foreach collection="page.params" item="item" index="key"
+				separator=" and ">
+				<if test="null != item">
+					${key}='${item}'
+				</if>
+			</foreach>
+		</if>
+	</select>
+
+	<select id="queryUserDataPrivilegesRolePageInTab" parameterType="map"
+		resultType="map">
+		SELECT b.ID as id,a.USER_NAME as userName,a.REAL_NAME as
+		realName,c.DATA_ROLE_NAME as dataRoleName FROM ${uTableName}
+		a,${urrTableName} b,${rTableName} c WHERE a.ID=b.USER_ID AND
+		c.ID=b.DATA_ROLE_ID AND c.IS_VALID=0 AND c.IS_SEALED=0 AND
+		a.IS_SEALED=0 AND a.TENANT_ID=#{tenantId}
+		<if test="null != page.params">
+			<foreach collection="page.params" item="item" index="key"
+				separator=" and ">
+				<if test="null != item">
+					${key}='${item}'
+				</if>
+			</foreach>
+		</if>
+	</select>
+
+	<select id="queryDataPrivilegesRolePageInTab" parameterType="map"
+		resultType="map">
+		SELECT e.ID as id, a.DATA_ROLE_NAME as dataRoleName,
+		b.DATA_PRIVILEGES_NAME as dataPrivileges, d.DATA_TYPE_NAME as
+		dataTypeName, d.TABLE_NAME as tableName, e.UPDATE_TIME as updateTime,
+		e.UPDATE_USER_ID as updateUserId FROM ${drTableName} a,${dpTableName}
+		b,${dsTableName} c,${dtTableName} d,${drprTableName} e WHERE
+		a.ID=e.DATA_ROLE_ID AND
+		b.ID=e.DATA_PRIVILEGE_ID AND c.ID=e.SCENE_ID
+		AND d.ID=e.DATA_TYPE_ID AND a.IS_SEALED=0 AND
+		a.IS_VALID=0 AND
+		b.IS_SEALED=0 AND b.IS_VALID=0 AND
+		c.IS_SEALED=0 AND c.IS_VALID=0 AND
+		d.IS_SEALED=0 AND d.IS_VALID=0 AND
+		a.TENANT_ID=#{tenantId} AND
+		b.TENANT_ID=#{tenantId}
+		<if test="null != page.params">
+			<foreach collection="page.params" item="item" index="key" 
+				separator=" and ">
+				<if test="null != item">
+					${key}='${item}'
+				</if>
+			</foreach>
+		</if>
+	</select>
+	
+	<select id="queryFuncRolePrivilegesTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${fpTableName} a,
+		${frprTableName} b WHERE
+		a.ID=b.FUNC_PRIVILEGE_ID AND a.IS_VALID=0
+		AND a.IS_SEALED=0 AND
+		b.FUNC_ROLE_ID=#{funcRoleId}
+	</select>
+	
+	<select id="queryUserFuncPrivilegesByUserTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${fpTableName} a,
+		${ufprTableName} b WHERE
+		a.ID=b.FUNC_PRIVILEGE_ID AND a.IS_VALID=0
+		AND a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+	
+	<select id="queryUserFuncRolesTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${frTableName} a,
+		${ufrrTableName} b WHERE
+		a.ID=b.FUNC_ROLE_ID AND a.IS_VALID=0
+		AND a.IS_SEALED=0 AND
+		b.USER_ID=#{userId}
+	</select>
+	
+	<select id="queryDataPrivilegesUserPageInTab" parameterType="map"
+		resultType="map">
+		SELECT e.ID as id, a.REAL_NAME as realName,
+		b.DATA_PRIVILEGES_NAME as dataPrivileges, d.DATA_TYPE_NAME as
+		dataTypeName, d.TABLE_NAME as tableName, e.UPDATE_TIME as updateTime,
+		e.UPDATE_USER_ID as updateUserId FROM ${uTableName} a,${dpTableName}
+		b,${dsTableName} c,${dtTableName} d,${udprTableName} e WHERE
+		a.ID=e.USER_ID AND
+		b.ID=e.DATA_PRIVILEGE_ID AND c.ID=e.SCENE_ID
+		AND d.ID=e.DATA_TYPE_ID AND a.IS_SEALED=0 AND
+		b.IS_SEALED=0 AND b.IS_VALID=0 AND
+		c.IS_SEALED=0 AND c.IS_VALID=0 AND
+		d.IS_SEALED=0 AND d.IS_VALID=0 AND
+		a.TENANT_ID=#{tenantId} AND
+		b.TENANT_ID=#{tenantId}
+		<if test="null != page.params">
+			<foreach collection="page.params" item="item" index="key" 
+				separator=" and ">
+				<if test="null != item">
+					${key}='${item}'
+				</if>
+			</foreach>
+		</if>
+	</select>
+	
+
+
+	<select id="queryRoleByFunPrivileges" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${roleFunPriTable}
+		a,${funPriTab} b where
+		a.FUNC_PRIVILEGE_ID=b.ID and b.ID=#{funPriId}
+	</select>
+	<select id="queryPremissByFunPri" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${funModuleTab}
+		a,${funPriTab} b where a.FUNC_PRIVILEGE_ID=b.ID and b.ID=#{funPriId}
+	</select>
+	<select id="queryDataPrivilegesByUser" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${drprTableName} a LEFT
+		JOIN ${udrrTableName} b ON
+		a.DATA_ROLE_ID = b.DATA_ROLE_ID AND
+		b.USER_ID = #{userId};
+	</select>
+
+	<select id="queryDataPrivilegesDetailByDataType" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.*,c.*,b.* FROM
+		${udprTableName} a LEFT JOIN ${dpTableName} c ON
+		c.ID =
+		a.DATA_PRIVILEGE_ID LEFT JOIN ${dtTableName} b ON b.ID =
+		a.DATA_TYPE_ID WHERE a.DATA_TYPE_ID = #{dataSignId} AND a.USER_ID =
+		#{userId};
+	</select>
+	<select id="queryDataPrivilegesByDataTypeRole" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${drprTableName} a LEFT
+		JOIN ${udrrTableName} b ON
+		a.DATA_ROLE_ID = b.DATA_ROLE_ID AND
+		b.USER_ID = #{userId} WHERE
+		a.DATA_TYPE_ID = #{dataSignId};
+	</select>
+	<select id="queryDataPrivilegesDetailByDataTypeRole"
+		parameterType="string" resultType="map" statementType="PREPARED">
+		SELECT
+		a.*,b.*,c.*,d.* FROM ${drprTableName} a
+		LEFT JOIN ${udrrTableName} b ON
+		a.DATA_ROLE_ID = b.DATA_ROLE_ID AND
+		b.USER_ID = #{userId}
+		LEFT JOIN
+		${dpTableName} c ON c.ID = a.DATA_PRIVILEGE_ID
+		LEFT JOIN ${dtTableName}
+		d ON d.ID = a.DATA_TYPE_ID
+		WHERE a.DATA_TYPE_ID = #{dataSignId};
+	</select>
+	<select id="queryDataSceneRuleGroupDetailByScene" parameterType="string"
+		resultType="map" statementType="PREPARED">
+		SELECT a.*, b.NAME, b.SCENE_GROUP_OP,
+		b.PARENT_ID, b.ID_TREE, b.NAME_TREE
+		FROM ${dsrTableName} a LEFT JOIN
+		${dsrgTableName} b ON
+		a.SCENE_RULE_GROUP_ID = b.ID WHERE a.SCENE_ID =
+		#{sceneId};
+	</select>
+
+	<select id="queryFuncRolesByUserTab" parameterType="map" resultType="map" statementType="PREPARED">
+		select c.*  FROM ${funcRoleTab} c,${funcUserRoleTable} a,${userTable} b where a.USER_ID=b.ID and b.PHONE=#{username} and c.IS_SEALED='0' c.IS_VALID='0' and a.FUNC_ROLE_ID=c.ID
+	</select>
+	<select id="queryFuncPermissByRolesTab" parameterType="map" resultType="map" statementType="PREPARED">
+		select a.* from ${funcPermissTab} a,${funcRoleTab} b where b.FUNC_PRIVILEGE_ID=a.ID and a.IS_SEALED='0' and a.IS_VALID='0' and
+		b.FUNC_ROLE_ID in
+		<trim prefix="(" suffix=")" prefixOverrides="(">
+			<foreach collection="roles" item="item" index="key" separator=" , ">
+				<if test="null != item">#{item}</if>
+			</foreach>
+		</trim>
+	</select>
+	<!--TODO:有效标记 待定-->
+	<select id="queryFuncPermissByRoleTab" parameterType="map" resultType="map" statementType="PREPARED">
+		select a.*  from ${funcPermissTab} a,${funcRoleTab} b where b.FUNC_PRIVILEGE_ID=a.ID and a.IS_SEALED='0' and a.IS_VALID='0' and b.FUNC_ROLE_ID=#{role}
+	</select>
+	<select id="queryRoleByFunPermissTab" parameterType="map" resultType="map" statementType="PREPARED">
+		select a.*  from ${funcRoleTab} a,${funcRolePermissTab} b where a.ID=b.FUNC_ROLE_ID and a.IS_SEALED='0' and a.IS_VALID='0' and b.FUNC_PRIVILEGE_ID=#{perId}
+	</select>
+
+</mapper>

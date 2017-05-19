@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.privilege.DataPrivilegesInfoDao">
+	<select id="queryOperatePrivilegesListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,a.MODULE_ID as parentId,a.OPERATE_PRIVILEGES_NAME as name,1 as isLeaf 
+		FROM ${omTableName} a WHERE a.IS_VALID=0 AND a.IS_SEALED=0 AND b.TENANT_ID=#{TENANT_ID}
+	</select>
+	
+	<select id="queryDataListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${tableName} a,${rdprTableName} b,${dpTableName} c,
+		${rTableName} d,${urrTableName} e WHERE a.`ID`=c.`DATA_ID` AND
+		b.`DATA_PRIVILEGE_ID`=c.`ID` AND b.`ROLE_ID`=d.`ID` AND
+		d.`ID`=e.`ROLE_ID` AND a.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND 
+		d.`IS_SEALED`=0 AND a.TENANT_ID=#{tenantId} AND
+		e.`USER_ID`=#{userId} AND c.`DATA_TYPE_ID`=#{dataTypeId}
+	</select>
+</mapper>

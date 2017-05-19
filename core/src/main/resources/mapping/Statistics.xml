@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.sys.StatisticsDao">
+    <select id="queryAccessStatByPage" parameterType="map" resultType="map" statementType="PREPARED">
+        SELECT i.cou,u.ID,u.PHONE,u.USER_NAME,u.REAL_NAME ,i.ACCESS_TIME from USER u ,
+        (SELECT count(1) cou,USER_ID,ACCESS_TIME FROM ACCESS_STATISTICS a
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+        <if test='null != sDate'>
+            AND a.ACCESS_TIME &gt;=#{sDate}
+        </if>
+        <if test="null != eDate">
+            AND a.ACCESS_TIME &lt;=#{eDate}
+        </if>
+        </trim>
+        group by a.USER_ID,date_format(a.ACCESS_TIME,
+        <if test=' 1=type'>'%Y-%m')</if>
+        <if test=' 2=type'>'%Y-%m-%d')</if>
+        ) i
+        WHERE u.ID=i.USER_ID
+    </select>
+</mapper>

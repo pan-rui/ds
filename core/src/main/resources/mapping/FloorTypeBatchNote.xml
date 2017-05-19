@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.dao.project.FloorTypeBatchNoteDao">
+    <select id="insertBatch" parameterType="map"
+            statementType="PREPARED">
+        INSERT INTO ${ftbnTableName}
+        (
+        ID,
+        FLOOR_ROOM_BATCH_NOTE_ID,
+        FLOOR_TYPE_ID,
+        FLOOR_RANGE,
+        ROOM_PER_FLOOR,
+        REMARK,
+        UPDATE_USER_ID,
+        UPDATE_TIME,
+        IS_SEALED,
+        SEALED_USER_ID,
+        SEALED_TIME,
+        TENANT_ID
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.ID},
+            #{item.FLOOR_ROOM_BATCH_NOTE_ID},
+            #{item.FLOOR_TYPE_ID},
+            #{item.FLOOR_RANGE},
+            #{item.ROOM_PER_FLOOR},
+            #{item.REMARK},
+            #{item.UPDATE_USER_ID},
+            #{item.UPDATE_TIME},
+            #{item.IS_SEALED},
+            #{item.SEALED_USER_ID},
+            #{item.SEALED_TIME},
+            #{item.TENANT_ID}
+            )
+        </foreach>
+    </select>
+</mapper>

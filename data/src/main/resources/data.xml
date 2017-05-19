@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+    http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+       default-autowire="byName">
+
+    <!-- 引入属性文件 -->
+<!--    <context:property-placeholder file-encoding="utf8" location="classpath*:config.properties"/>
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath*:config.properties"/>
+        &lt;!&ndash;<property name="location" value="file:#{config['user.dir']}/db.properties"/>&ndash;&gt;
+        &lt;!&ndash;<property name="location" value="file:/usr/share/conf/db.properties"/>&ndash;&gt;
+    </bean>-->
+    <util:properties id="config" location="classpath:config.properties"/>
+    <!--<util:properties id="message" location="classpath:message.properties"/>-->
+    <util:properties id="initData" location="classpath*:initData.properties"/>
+    <!-- 自动扫描(自动注入) -->
+    <!--<context:component-scan base-package="com.ygo" scoped-proxy="interfaces"/>-->
+    <context:component-scan base-package="com.pc.core,com.pc.dao"/>
+    <context:annotation-config/>
+
+    <!-- 阿里 druid数据库连接池 -->
+    <bean id="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close" abstract="true">
+        <property name="filters" value="#{config['jdbc.filters']}"/>
+        <!-- 最大并发连接数 -->
+        <property name="maxActive" value="#{config['jdbc.maxActive']}"/>
+        <!-- 初始化连接数量 -->
+        <property name="initialSize" value="#{config['jdbc.initialSize']}"/>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="#{config['jdbc.maxWait']}"/>
+        <!-- 最小空闲连接数 -->
+        <property name="minIdle" value="#{config['jdbc.minIdle']}"/>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="#{config['jdbc.timeBetweenEvictionRunsMillis']}"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="#{config['jdbc.minEvictableIdleTimeMillis']}"/>
+        <property name="validationQuery" value="#{config['jdbc.validationQuery']}"/>
+        <property name="testWhileIdle" value="#{config['jdbc.testWhileIdle']}"/>
+        <property name="testOnBorrow" value="#{config['jdbc.testOnBorrow']}"/>
+        <property name="testOnReturn" value="#{config['jdbc.testOnReturn']}"/>
+        <property name="maxOpenPreparedStatements" value="#{config['jdbc.maxOpenPreparedStatements']}"/>
+        <!-- 打开removeAbandoned功能 -->
+        <property name="removeAbandoned" value="#{config['jdbc.removeAbandoned']}"/>
+        <!-- 1800秒，也就是30分钟 -->
+        <property name="removeAbandonedTimeout" value="#{config['jdbc.removeAbandonedTimeout']}"/>
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="#{config['jdbc.logAbandoned']}"/>
+    </bean>
+    <!--主数据源-->
+    <bean id="master" parent="parentDataSource">
+        <!-- 数据库基本信息配置 -->
+        <property name="url" value="#{config['jdbc.master.url']}"/>
+        <property name="username" value="#{config['mysql.username']}"/>
+        <property name="password" value="#{config['mysql.password']}"/>
+        <property name="driverClassName" value="#{config['jdbc.driverClassName']}"/>
+    </bean>
+    <!--从数据源-->
+    <bean id="slave1" parent="parentDataSource">
+        <!-- 数据库基本信息配置 -->
+        <property name="url" value="#{config['jdbc.slave1.url']}"/>
+        <property name="username" value="#{config['mysql.username']}"/>
+        <property name="password" value="#{config['mysql.password']}"/>
+        <property name="driverClassName" value="#{config['jdbc.driverClassName']}"/>
+    </bean>
+
+    <!--动态数据源-->
+    <bean id="dataSource" class="com.pc.core.DynamicDataSource">
+        <property name="targetDataSources">
+            <map key-type="java.lang.String">
+                <entry key="master" value-ref="master"/>
+                <entry key="slave1" value-ref="slave1"/>
+<!--                <entry key="yg602" value-ref="yg602"/>
+                <entry key="yg618" value-ref="yg618"/>-->
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="master"/>
+    </bean>
+    <!--    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+            <property name="basenames">
+                <list>
+                    <value>message</value>
+                    <value>org/hibernate/validator/ValidationMessages</value>
+                </list>
+            </property>
+            <property name="defaultEncoding" value="UTF-8"/>
+            <property name="commonMessages" value="message"/>
+        </bean>-->
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <property name="basenames">
+            <list>
+                <!-- 在web环境中一定要定位到classpath 否则默认到当前web应用下找  -->
+                <value>message</value>
+                <value>org/hibernate/validator/ValidationMessages</value>
+            </list>
+        </property>
+
+        <property name="useCodeAsDefaultMessage" value="false"/>
+        <property name="defaultEncoding" value="UTF-8"/>
+        <property name="cacheSeconds" value="86400"/>
+        <property name="commonMessages" value="messages"/>
+    </bean>
+
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.pc.dao"/>
+        <property name="annotationClass" value="org.springframework.stereotype.Repository"/>
+        <!--<property name="markerInterface" ref=""/>-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:configuration.xml"></property>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath*:mapping/*.xml"/>
+        <!--<property name="typeAliasesPackage" value="com.pc.pojo"/>-->
+    </bean>
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate" c:sqlSessionFactory-ref="sqlSessionFactory" />
+</beans>
