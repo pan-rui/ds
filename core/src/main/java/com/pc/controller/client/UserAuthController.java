@@ -1,9 +1,21 @@
 package com.pc.controller.client;
 
-import java.util.*;
-
-import com.pc.core.*;
+import com.pc.annotation.EncryptProcess;
+import com.pc.base.BaseResult;
+import com.pc.base.Constants;
+import com.pc.base.ReturnCode;
+import com.pc.controller.BaseController;
+import com.pc.core.ColumnConstants;
+import com.pc.core.ColumnProcess;
+import com.pc.core.DataConstants;
+import com.pc.core.ParamsMap;
+import com.pc.core.TableConstants;
+import com.pc.service.auth.DataTypeService;
+import com.pc.service.auth.UserDataPrivilegesService;
+import com.pc.service.auth.UserOperatPrivilegesService;
+import com.pc.service.procedure.impl.ProcedureTypeService;
 import com.pc.util.TreeUtil;
+import com.pc.vo.ParamsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -11,20 +23,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.pc.annotation.EncryptProcess;
-import com.pc.base.BaseResult;
-import com.pc.base.Constants;
-import com.pc.base.ReturnCode;
-import com.pc.controller.BaseController;
-import com.pc.service.auth.DataTypeService;
-import com.pc.service.auth.UserDataPrivilegesService;
-import com.pc.service.auth.UserOperatPrivilegesService;
-import com.pc.vo.ParamsVo;
-
-import com.pc.service.procedure.impl.ProcedureTypeService;
-
-import com.pc.core.ParamsMap;
-import com.pc.core.TableConstants;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/client")

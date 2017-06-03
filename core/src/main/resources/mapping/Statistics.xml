@@ -3,21 +3,49 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.sys.StatisticsDao">
-    <select id="queryAccessStatByPage" parameterType="map" resultType="map" statementType="PREPARED">
-        SELECT i.cou,u.ID,u.PHONE,u.USER_NAME,u.REAL_NAME ,i.ACCESS_TIME from USER u ,
-        (SELECT count(1) cou,USER_ID,ACCESS_TIME FROM ACCESS_STATISTICS a
+    <select id="queryAccessByPageTab" parameterType="map" resultType="map" statementType="PREPARED">
+        SELECT u.*,IFNULL(i.cou,0) cou,IFNULL(i.ACCESS_TIME,'-') accessTime,pi.POST_NAME postName,pi.POST_CODE postCode,pi.ORGANIZATION_ID organizationId from ${ddBB}.USER u LEFT JOIN
+        (SELECT count(1) cou,USER_ID,ACCESS_TIME FROM ${ddBB}.ACCESS_STATISTICS a
         <trim prefix="WHERE" prefixOverrides="AND | OR">
-        <if test='null != sDate'>
-            AND a.ACCESS_TIME &gt;=#{sDate}
+        <if test='null != page.params.S_DATE'>
+            AND a.ACCESS_TIME &gt;=#{page.params.S_DATE}
         </if>
-        <if test="null != eDate">
-            AND a.ACCESS_TIME &lt;=#{eDate}
+        <if test="null != page.params.E_DATE">
+            AND a.ACCESS_TIME &lt;=#{page.params.E_DATE}
         </if>
         </trim>
         group by a.USER_ID,date_format(a.ACCESS_TIME,
-        <if test=' 1=type'>'%Y-%m')</if>
-        <if test=' 2=type'>'%Y-%m-%d')</if>
-        ) i
-        WHERE u.ID=i.USER_ID
+        <if test=' "1"==page.params.TYPE'>'%Y-%m')</if>
+        <if test=' "2"==page.params.TYPE'>'%Y-%m-%d')</if>
+        ) i ON  u.ID=i.USER_ID JOIN ${ddBB}.POST_INFO pi ON u.POST_ID=pi.ID
+        <if test="page.params.USERS!= null">
+            <foreach collection="page.params.USERS" item="userId" separator="," open="where u.ID in (" close=")">
+                  #{userId}
+            </foreach>
+        </if>
+        ORDER BY i.ACCESS_TIME
+    </select>
+
+    <select id="queryAccessTByPageTab" parameterType="map" resultType="map" statementType="PREPARED">
+        SELECT t.*,IFNULL(i.cou,0) cou,IFNULL(i.ACCESS_TIME,'-') accessTime from ${ddBB}.TENANT t left join
+        (SELECT count(1) cou,TENANT_ID,ACCESS_TIME FROM ${ddBB}.ACCESS_STATISTICS a
+        <trim prefix="WHERE" prefixOverrides="AND | OR">
+            <if test='null != page.params.S_DATE'>
+                AND a.ACCESS_TIME &gt;=#{page.params.S_DATE}
+            </if>
+            <if test="null != page.params.E_DATE">
+                AND a.ACCESS_TIME &lt;=#{page.params.E_DATE}
+            </if>
+        </trim>
+        group by a.TENANT_ID,date_format(a.ACCESS_TIME,
+        <if test=' "1"==page.params.TYPE'>'%Y-%m')</if>
+        <if test=' "2"==page.params.TYPE'>'%Y-%m-%d')</if>
+        ) i ON t.ID=i.TENANT_ID
+        <if test="page.params.USERS!= null">
+            <foreach collection="page.params.USERS" item="tenantId" separator="," open="where t.ID in (" close=")">
+                #{tenantId}
+            </foreach>
+        </if>
+        ORDER BY i.ACCESS_TIME
     </select>
 </mapper>

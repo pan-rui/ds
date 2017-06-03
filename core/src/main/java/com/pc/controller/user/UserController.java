@@ -33,7 +33,17 @@ public class UserController extends BaseController {
 
 	@Autowired
 	private TokenService tokenService;
-
+	
+	
+	@RequestMapping("/user/getDetailPage")
+	@ResponseBody
+	public BaseResult getDetailPage(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess Page page,
+			@RequestAttribute String ddBB) {
+		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
+		map.put(TableConstants.TENANT_ID, tenantId);
+		page.setParams(map);
+		return new BaseResult(ReturnCode.OK, userService.getUserDetailPage(page, ddBB));
+	}
 
 	@RequestMapping("/user/getPage")
 	@ResponseBody

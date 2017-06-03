@@ -1,5 +1,8 @@
 package com.pc.util;
 
+import com.pc.core.DataConstants;
+import com.pc.core.TableConstants;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,9 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.pc.core.DataConstants;
-import com.pc.core.TableConstants;
 
 public class TreeUtil {
 
@@ -311,6 +311,12 @@ public class TreeUtil {
 						return result;
 					}
 				});
+				if(isContains){
+					Map<String, Object> period=new HashMap<String, Object>();
+					period.put(TableConstants.ProjectBuilding.buildingName.name(), DataConstants.REGION_PERIOD_KEY);
+					period.put(TableConstants.ProjectBuilding.id.name(), listBuildingsByPeriod.get(0).get(TableConstants.ProjectBuilding.projectPeriodId.name()));
+					listBuildingsByPeriod.add(0,period);
+				}
 				regionTrees = listBuildingsByPeriod;
 			}
 		}

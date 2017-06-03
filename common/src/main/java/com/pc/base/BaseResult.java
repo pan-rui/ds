@@ -1,7 +1,5 @@
 package com.pc.base;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 import java.io.Serializable;
 
 /**

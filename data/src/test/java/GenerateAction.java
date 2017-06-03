@@ -1,5 +1,3 @@
-
-import com.mysql.cj.api.MysqlConnection;
 import com.pc.core.ColumnProcess;
 import org.apache.commons.lang.StringUtils;
 
@@ -7,7 +5,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @Description: ${Description}

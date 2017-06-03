@@ -3,7 +3,6 @@ package com.pc.service.project.impl;
 import com.pc.core.Page;
 import com.pc.core.ParamsMap;
 import com.pc.core.TableConstants;
-import com.pc.dao.project.ProjectHouseholdDao;
 import com.pc.dao.project.ProjectInfoDao;
 import com.pc.service.BaseService;
 import org.apache.logging.log4j.LogManager;

@@ -1,17 +1,22 @@
 package com.pc.controller.sys;
 
- 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
+import com.pc.annotation.EncryptProcess;
+import com.pc.base.BaseResult;
+import com.pc.base.Constants;
+import com.pc.base.ReturnCode;
+import com.pc.controller.BaseController;
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.service.sys.impl.AppInfoService;
+import com.pc.service.sys.impl.PublishPhotosService;
+import com.pc.service.tenant.impl.UpdateVesionInfoService;
+import com.pc.util.DateUtil;
+import com.pc.util.ImgUtil;
+import com.pc.vo.ParamsVo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -19,22 +24,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.pc.controller.BaseController;
-import com.pc.annotation.EncryptProcess;
-import com.pc.base.BaseResult;
-import com.pc.base.Constants;
-import com.pc.base.ReturnCode;
-import com.pc.core.Page;
-import com.pc.core.ParamsMap;
-import com.pc.util.DateUtil;
-import com.pc.util.ImgUtil;
-import com.pc.vo.ParamsVo;
-
-import com.pc.core.TableConstants;
- 
-import com.pc.service.sys.impl.AppInfoService;
-import com.pc.service.sys.impl.PublishPhotosService;
-import com.pc.service.tenant.impl.UpdateVesionInfoService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Description: 
@@ -80,17 +75,24 @@ public class AppInfoController extends BaseController {
 		String fileName=(String) params.getParams().get("FILE_NAME");
 		List<Map<String, Object>> photos=(List<Map<String, Object>>) params.getParams().get(TableConstants.PUBLISH_PHOTOS);
 		
+		if(StringUtils.isBlank(versionCode)||StringUtils.isBlank(versionName)||StringUtils.isBlank(appId)){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_MISSING_ERROR);
+		}
+		
 		Map<String, Object> appInfo=appInfoService.getByID(appId, ddBB);
 		if(appInfo==null){
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 		}
-		Map<String, Object> versionInfo=updateVesionInfoService.getByID((String) appInfo.get(TableConstants.AppInfo.latestVersionId.name()), ddBB);
+		String versionId=(String) appInfo.get(TableConstants.AppInfo.latestVersionId.name());
+		Map<String, Object> versionInfo=null;
+		if(versionId!=null){
+			versionInfo=updateVesionInfoService.getByID(versionId, ddBB);
+		}
 		
-		String versionId=null;
 		boolean isUpdateVersion=true;
-		if(versionCode.equals((String)versionInfo.get(TableConstants.UpdateVesionInfo.versionCode.name()))&&
+		
+		if(versionInfo!=null&&versionCode.equals((String)versionInfo.get(TableConstants.UpdateVesionInfo.versionCode.name()))&&
 				versionName.equals((String)versionInfo.get(TableConstants.UpdateVesionInfo.versionName.name()))){
-			versionId=(String) versionInfo.get(TableConstants.UpdateVesionInfo.id.name());
 			isUpdateVersion=false;
 		}else{
 			versionId=UUID.randomUUID().toString().replace("-", "");
@@ -101,16 +103,15 @@ public class AppInfoController extends BaseController {
         updateAppInfo.put(TableConstants.UPDATE_USER_ID, userId);
         updateAppInfo.put(TableConstants.AppInfo.NAME.name(), appName);
         updateAppInfo.put(TableConstants.AppInfo.REMARK.name(), appRemark);
-        updateAppInfo.put(TableConstants.AppInfo.APP_TYPE.name(), appType);
-        updateAppInfo.put(TableConstants.AppInfo.APP_PACKAGE_NAME.name(), appPackageName);
         updateAppInfo.put(TableConstants.AppInfo.APP_IOS_PATH.name(), appIosPath);
+        updateAppInfo.put(TableConstants.AppInfo.APP_PACKAGE_NAME.name(), appPackageName);
         updateAppInfo.put(TableConstants.AppInfo.LATEST_VERSION_ID.name(), versionId);
         if(appIcon.contains(ImgUtil.TEMP_PATH)){
         	String iocn = ImgUtil.saveAndUpdateFile(null,appIcon, null,ImgUtil.APK_PATH, appId);
         	updateAppInfo.put(TableConstants.AppInfo.APP_ICON.name(), iocn);
         }
         String path = appAndroidPath;
-        if(appAndroidPath.contains(ImgUtil.TEMP_APK_PATH)){
+        if(StringUtils.isNotBlank(appAndroidPath)&&appAndroidPath.contains(ImgUtil.TEMP_APK_PATH)){
 			path = ImgUtil.saveAndUpdateFile(fileName,appAndroidPath, null,ImgUtil.APK_PATH, appId+"/"+versionId);
 			updateAppInfo.put(TableConstants.AppInfo.APP_ANDROID_PATH.name(), path);
         }
@@ -124,16 +125,16 @@ public class AppInfoController extends BaseController {
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.PUBLISH_PERSON.name(), userId);
 			newVersionInfo.put(TableConstants.IS_SEALED, 0); 
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.NAME.name(), appName);
-			newVersionInfo.put(TableConstants.UpdateVesionInfo.APP_ID.name(), appInfo.get(TableConstants.AppInfo.ID.name()));
+			newVersionInfo.put(TableConstants.UpdateVesionInfo.APP_ID.name(), appId);
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.VERSION_CODE.name(), versionCode);
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.VERSION_NAME.name(), versionName);
-			newVersionInfo.put(TableConstants.UpdateVesionInfo.FILE_SIZE.name(), fileSize);
+			newVersionInfo.put(TableConstants.UpdateVesionInfo.FILE_SIZE.name(), fileSize.replace("MB", ""));
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.UPDATE_TYPE.name(), updateType);
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.UPDATE_CONTENT.name(), updateContent);
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.DOWNLOAD_COUNT.name(), 0);
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.DOWNLOAD_URL.name(), path);
 			newVersionInfo.put(TableConstants.UpdateVesionInfo.ID.name(), versionId);
-			updateVesionInfoService.addUpdateVesionInfo(versionInfo, ddBB);
+			updateVesionInfoService.addUpdateVesionInfo(newVersionInfo, ddBB);
 		}else{
 			Map<String, Object> updateVersionInfo = new LinkedHashMap<>();
 			updateVersionInfo.put(TableConstants.UpdateVesionInfo.PUBLISH_TIME.name(), DateUtil.convertDateTimeToString(new Date(), null));
@@ -146,7 +147,7 @@ public class AppInfoController extends BaseController {
 			updateVersionInfo.put(TableConstants.UpdateVesionInfo.UPDATE_CONTENT.name(), updateContent);
 			updateVersionInfo.put(TableConstants.UpdateVesionInfo.DOWNLOAD_URL.name(), path);
 			updateVersionInfo.put(TableConstants.UpdateVesionInfo.ID.name(), versionId);
-			updateVesionInfoService.updateUpdateVesionInfo(versionInfo, ddBB);
+			updateVesionInfoService.updateUpdateVesionInfo(updateVersionInfo, ddBB);
 		}
 		
 		List<Map<String, Object>> list=new ArrayList<>();
@@ -162,7 +163,9 @@ public class AppInfoController extends BaseController {
 				list.add(photo);
 			}
 		}
-		publishPhotosService.addPublishPhotosList(list, ddBB);
+		if(list.size()>0){
+			publishPhotosService.addPublishPhotosList(list, ddBB);
+		}
 		
 		return new BaseResult(ReturnCode.OK);
 	}
@@ -198,9 +201,9 @@ public class AppInfoController extends BaseController {
         appInfo.put(TableConstants.IS_SEALED, 0); 
         appInfo.put(TableConstants.AppInfo.NAME.name(), appName);
         appInfo.put(TableConstants.AppInfo.REMARK.name(), appRemark);
-        appInfo.put(TableConstants.AppInfo.APP_TYPE.name(), appType);
+    	appInfo.put(TableConstants.AppInfo.APP_TYPE.name(), appType);
+    	appInfo.put(TableConstants.AppInfo.APP_IOS_PATH.name(), appIosPath);
         appInfo.put(TableConstants.AppInfo.APP_PACKAGE_NAME.name(), appPackageName);
-        appInfo.put(TableConstants.AppInfo.APP_IOS_PATH.name(), appIosPath);
         appInfo.put(TableConstants.AppInfo.PUBLISH_TIMES.name(), 0);
         appInfo.put(TableConstants.AppInfo.DOWNLOAD_TIMES.name(), 0);
         appInfo.put(TableConstants.AppInfo.TOP_FIXED_SQNO.name(), 1);
@@ -218,7 +221,7 @@ public class AppInfoController extends BaseController {
 		versionInfo.put(TableConstants.UpdateVesionInfo.PUBLISH_PERSON.name(), userId);
 		versionInfo.put(TableConstants.IS_SEALED, 0); 
 		versionInfo.put(TableConstants.UpdateVesionInfo.NAME.name(), appName);
-		versionInfo.put(TableConstants.UpdateVesionInfo.APP_ID.name(), appInfo.get(TableConstants.AppInfo.ID.name()));
+		versionInfo.put(TableConstants.UpdateVesionInfo.APP_ID.name(), appId);
 		versionInfo.put(TableConstants.UpdateVesionInfo.VERSION_CODE.name(), versionCode);
 		versionInfo.put(TableConstants.UpdateVesionInfo.VERSION_NAME.name(), versionName);
 		versionInfo.put(TableConstants.UpdateVesionInfo.FILE_SIZE.name(), fileSize);

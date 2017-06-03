@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Description: 
@@ -47,11 +48,15 @@ public class ProjectPeriodController extends BaseController {
 			@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
 			@RequestAttribute String ddBB) {
 		
-                Map<String, Object> map = new LinkedHashMap<>(params.getParams());
+        Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_SEALED, 0); 
+		map.put(TableConstants.IS_SEALED, 0);
+		String id=UUID.randomUUID().toString().replace("-", "");
+		map.put(TableConstants.ProjectPeriod.ID_TREE.name(), id);
+		map.put(TableConstants.ProjectPeriod.NAME_TREE.name(), map.get(TableConstants.ProjectPeriod.PERIOD_NAME.name()));
+		map.put(TableConstants.ProjectPeriod.ID.name(), id);
 		projectPeriodService.addProjectPeriod(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
 	}
@@ -129,6 +134,9 @@ public class ProjectPeriodController extends BaseController {
 		page.setParams(map);
 
 		if(page.getParams() != null) {
+			if (page.getParams().containsKey(TableConstants.ProjectPeriod.PERIOD_NAME.name())) {
+				page.getParams().put(TableConstants.ProjectPeriod.PERIOD_NAME.name(), "%"+page.getParams().get(TableConstants.ProjectPeriod.PERIOD_NAME.name())+"%");
+			}
 			if (page.getParams().containsKey(TableConstants.ProjectInfo.PROJECT_NAME.name())) {
 				page.getParams().put(TableConstants.ProjectInfo.PROJECT_NAME.name(), String.format("%%%s%%", page.getParams().get(TableConstants.ProjectInfo.PROJECT_NAME.name())));
 			}

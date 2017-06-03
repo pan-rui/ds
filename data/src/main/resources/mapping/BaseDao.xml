@@ -113,7 +113,7 @@
 	        <trim prefix="where" prefixOverrides="or | and">
 	            <foreach collection="page.params" item="item" index="key" separator=" and ">
 	                <if test="null != item">
-	                            ${key}='${item}'
+	                	${key} LIKE '${item}'
 	                </if>
 	            </foreach>
 	        </trim>

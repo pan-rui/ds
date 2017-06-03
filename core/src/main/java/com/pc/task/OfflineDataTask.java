@@ -8,14 +8,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-21 18:04)
- * @version: \$Rev: 2282 $
+ * @version: \$Rev: 2691 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-15 14:11:40 +0800 (周一, 15 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-05-31 21:03:22 +0800 (周三, 31 5月 2017) $
  */
 @Component
 public class OfflineDataTask {
@@ -53,7 +56,7 @@ public class OfflineDataTask {
                 String projectPeriodId=(String)project.get("id");
                 List<Map<String, Object>> charts = offlineDao.queryChart(ddBB, (String) tentant.get("id"), projectPeriodId, null);
                 project.put("charts", charts);
-               List<Map<String,Object>> procedureList= offlineDao.queryOfflineProcedure(ddBB,(String)tentant.get("id"),projectPeriodId , Arrays.asList("4","14"));            //验收记录可过滤时间范围
+               List<Map<String,Object>> procedureList= offlineDao.queryOfflineProcedure(ddBB,(String)tentant.get("id"),projectPeriodId , null);            //验收记录可过滤时间范围
                 //工序部位分类
                 List<Map<String, Object>> periodProcedures = new ArrayList<>();
                 project.put("periodProcedures", periodProcedures);

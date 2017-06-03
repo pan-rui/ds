@@ -1,5 +1,6 @@
 package com.pc.dao.sys;
 
+import com.pc.core.Page;
 import com.pc.core.ParamsMap;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-05-17 17:52)
- * @version: \$Rev: 2400 $
+ * @version: \$Rev: 2485 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-18 15:07:05 +0800 (周四, 18 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-05-22 17:03:00 +0800 (周一, 22 5月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache")
@@ -37,9 +38,12 @@ public class StatisticsDao {
         return sqlSessionTemplate;
     }
 
-    public List<Map<String, Object>> queryAccessStat(ParamsMap<String, Object> paramsMap) {
+    public List<Map<String, Object>> queryAccessByPageTab(String ddBB,final Page page) {
+        return sqlSessionTemplate.selectList(className + ".queryAccessByPageTab",ParamsMap.newMap("page",page).addParams("ddBB",ddBB));
+    }
 
-        return sqlSessionTemplate.selectList(className + ".queryAccessStat",paramsMap);
+    public List<Map<String, Object>> queryAccessTByPageTab(String ddBB,final Page page) {
+        return sqlSessionTemplate.selectList(className + ".queryAccessTByPageTab",ParamsMap.newMap("page",page).addParams("ddBB",ddBB));
     }
 
 }

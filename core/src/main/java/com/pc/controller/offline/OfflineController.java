@@ -13,7 +13,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -23,15 +27,20 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.CRC32;
 
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-21 19:00)
- * @version: \$Rev: 2351 $
+ * @version: \$Rev: 2691 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-16 18:07:26 +0800 (周二, 16 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-05-31 21:03:22 +0800 (周三, 31 5月 2017) $
  */
 @Controller
 @RequestMapping("/offline")
@@ -66,7 +75,7 @@ public class OfflineController extends BaseController {
             }
         if (dataMap == null || dataMap.isEmpty()) {
             List<Map<String, Object>> projectList = offlineDao.queryOffLineProject(ddBB, tenantId,projectPeriodId,date);       //TODO:项目期, 层/户 可过滤时间范围
-            List<Map<String, Object>> procedureList = offlineDao.queryOfflineProcedure(ddBB,tenantId, projectPeriodId, Arrays.asList("4", "14"));            //验收记录可过滤时间范围  ,部位工序分类
+            List<Map<String, Object>> procedureList = offlineDao.queryOfflineProcedure(ddBB,tenantId, projectPeriodId, null);            //验收记录可过滤时间范围  ,部位工序分类
             if (!procedureList.isEmpty()) {
                 Map<String, Object> project = projectList.get(0);
 /*                List<Map<String,Object>> projectBuildings= (List<Map<String, Object>>) project.get("projectBuilding");

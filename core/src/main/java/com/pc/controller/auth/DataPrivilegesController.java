@@ -106,6 +106,9 @@ public class DataPrivilegesController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.DataPrivileges.DATA_PRIVILEGES_NAME.name())){
+			map.put(TableConstants.DataPrivileges.DATA_PRIVILEGES_NAME.name(), "%"+map.get(TableConstants.DataPrivileges.DATA_PRIVILEGES_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, dataPrivilegesService.getDataPrivilegesPage(page, ddBB));
 	}

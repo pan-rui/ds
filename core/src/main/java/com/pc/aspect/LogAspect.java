@@ -3,19 +3,22 @@ package com.pc.aspect;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.pc.annotation.OperationLog;
-import com.pc.annotation.TradeLog;
-import com.pc.base.*;
 import com.pc.base.Constants;
 import com.pc.controller.BaseController;
-import com.pc.core.*;
+import com.pc.core.DataSource;
+import com.pc.core.DataSourceHolder;
+import com.pc.core.ParamsMap;
+import com.pc.core.TableConstants;
 import com.pc.dao.BaseDao;
 import com.pc.service.BaseService;
 import com.pc.util.SendMail;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lenovo on 2014/12/18. 用户操作记录和管理员操作记录
@@ -133,8 +140,10 @@ public class LogAspect extends BaseController {
 				e.getMessage(), params));
 	}
 
-	@AfterReturning(pointcut = "operationLog()", returning = "returnObj")
-	public void doAfterReturn(JoinPoint joinPoint, Object returnObj) {
+/*	@AfterReturning(pointcut = "operationLog()", returning = "returnObj")
+	public void doAfterReturn(JoinPoint joinPoint, Object returnObj) {*/
+@Before("operationLog()")
+public void logBefore(JoinPoint joinPoint) {
 		MethodSignature sig = (MethodSignature) joinPoint.getSignature();
 		Method method = sig.getMethod();
 		Parameter[] parameters = method.getParameters();

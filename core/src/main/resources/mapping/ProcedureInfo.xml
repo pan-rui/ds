@@ -4,40 +4,70 @@
 
 <mapper namespace="com.pc.dao.procedure.ProcedureInfoDao">
 
+	<select id="queryProcedureDetailByPageInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.ID AS id,a.`PROCEDURE_NAME` AS
+		procedureName,a.`PROCEDURE_CODE` AS
+		procedureCode,a.`PROCEDURE_TYPE_ID` AS procedureTypeId,a.`UPDATE_TIME`
+		AS updateTime,b.`PROCEDURE_TYPE_NAME` AS procedureTypeName FROM
+		PROCEDURE_INFO
+		a,PROCEDURE_TYPE b WHERE a.`PROCEDURE_TYPE_ID`=b.`ID`
+		AND
+		a.`IS_SEALED`=#{IS_SEALED} AND b.`IS_SEALED`=#{IS_SEALED} AND
+		a.`TENANT_ID`=#{TENANT_ID}
+		<if test="PROCEDURE_NAME !=null">
+			AND a.PROCEDURE_NAME LIKE #{PROCEDURE_NAME}
+		</if>
+	</select>
+
 	<select id="queryProcedureTreeInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
-		SELECT a.ID as id,a.PROCEDURE_TYPE_NAME as name,a.PARENT_ID as parentId,a.IS_LEAF as isLeaf 
-		FROM ${ptTableName} a WHERE a.IS_SEALED=0 AND a.TENANT_ID=#{tenantId} UNION ALL 
-		SELECT b.ID as id,b.PROCEDURE_NAME as name,b.PROCEDURE_TYPE_ID as parentId,3 as isLeaf 
-		FROM ${pTableName} b WHERE b.IS_SEALED=0 AND b.TENANT_ID=#{tenantId}
+		SELECT a.ID as id,a.PROCEDURE_TYPE_NAME
+		as name,a.PARENT_ID as parentId,a.IS_LEAF as isLeaf
+		FROM ${ptTableName}
+		a WHERE a.IS_SEALED=0 AND a.TENANT_ID=#{tenantId}
+		UNION ALL
+		SELECT b.ID
+		as id,b.PROCEDURE_NAME as name,b.PROCEDURE_TYPE_ID as parentId,3
+		as
+		isLeaf
+		FROM ${pTableName} b WHERE b.IS_SEALED=0 AND
+		b.TENANT_ID=#{tenantId}
 	</select>
 
 	<select id="queryListByUserInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT DISTINCT a.* FROM ${pTableName}
-		a,${prprTableName} b,${rdprTableName}
-		c,${dpTableName} d,${rTableName} e,${urrTableName} f WHERE
+		a,${prprTableName}
+		b,${rdprTableName}
+		c,${dpTableName} d,${rTableName} e,${urrTableName} f
+		WHERE
 		a.`ID`=b.`PROCEDURE_ID` AND a.`ID`=d.`DATA_ID` AND
 		c.`DATA_PRIVILEGE_ID`=d.`ID` AND c.`ROLE_ID`=e.`ID` AND
 		e.`ID`=f.`ROLE_ID` AND
-		a.`IS_SEALED`=0 AND e.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND a.TENANT_ID=#{tenantId} AND
-		b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
-		AND f.`USER_ID`=#{userId} AND d.`DATA_TYPE_ID`=#{dataTypeId}
-		<if test="regionTypeId !=null" >
-           AND b.REGION_TYPE_ID=#{regionTypeId}
-        </if>
+		a.`IS_SEALED`=0 AND e.`IS_SEALED`=0 AND
+		d.`IS_SEALED`=0 AND a.TENANT_ID=#{tenantId} AND
+		b.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		AND f.`USER_ID`=#{userId} AND
+		d.`DATA_TYPE_ID`=#{dataTypeId}
+		<if test="regionTypeId !=null">
+			AND b.REGION_TYPE_ID=#{regionTypeId}
+		</if>
 	</select>
 
 	<select id="queryListByRegionInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT DISTINCT a.* FROM ${pTableName}
-		a,${prprTableName} b
-		WHERE a.`ID`=b.`PROCEDURE_ID` AND a.`IS_SEALED`=0
+		a,${prprTableName} b WHERE
+		a.`ID`=b.`PROCEDURE_ID` AND a.`IS_SEALED`=0
 		AND a.TENANT_ID=#{tenantId}
-		AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
-		<if test="regionTypeId !=null" >
-           AND b.REGION_TYPE_ID=#{regionTypeId}
-        </if>
+		AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		<if test="regionTypeId !=null and forAcceptance != null">
+			AND (b.REGION_TYPE_ID=#{regionTypeId} OR b.REGION_TYPE_ID=#{regionType})
+		</if>
+		<if test="regionTypeId !=null and forAcceptance == null">
+			AND b.REGION_TYPE_ID=#{regionTypeId}
+		</if>
 	</select>
 
 </mapper>

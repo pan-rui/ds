@@ -106,6 +106,9 @@ public class HouseholdTypeController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.HouseholdType.NAME.name())){
+			map.put(TableConstants.HouseholdType.NAME.name(), "%"+map.get(TableConstants.HouseholdType.NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, householdTypeService.getHouseholdTypePage(page, ddBB));
 	}

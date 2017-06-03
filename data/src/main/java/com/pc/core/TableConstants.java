@@ -36,6 +36,10 @@ public class TableConstants {
 	//
 	public static final String ACCEPTANCE_PROCEDURE_PROGRESS="ACCEPTANCE_PROCEDURE_PROGRESS";
 	//
+	public static final String ACCESS_LOG="ACCESS_LOG";
+	//
+	public static final String ACCESS_STATISTICS="ACCESS_STATISTICS";
+	//
 	public static final String APP_INFO="APP_INFO";
 	//
 	public static final String APP_SYS_SETTING="APP_SYS_SETTING";
@@ -72,6 +76,8 @@ public class TableConstants {
 	//
 	public static final String ELEVATION_CHART_BATCH_GEN_NOTE="ELEVATION_CHART_BATCH_GEN_NOTE";
 	//
+	public static final String FEEDBACK_INFO="FEEDBACK_INFO";
+	//
 	public static final String FLOOR_ROOM_BATCH_GEN_NOTE="FLOOR_ROOM_BATCH_GEN_NOTE";
 	//
 	public static final String FLOOR_TYPE="FLOOR_TYPE";
@@ -100,6 +106,46 @@ public class TableConstants {
 	//
 	public static final String HOUSEHOLD_TYPE="HOUSEHOLD_TYPE";
 	//
+	public static final String LABOR_ATTENDANCE_DETAIL_RECORD="LABOR_ATTENDANCE_DETAIL_RECORD";
+	//
+	public static final String LABOR_ATTENDANCE_RECORD="LABOR_ATTENDANCE_RECORD";
+	//
+	public static final String LABOR_COMPANY_TYPE_INFO="LABOR_COMPANY_TYPE_INFO";
+	//
+	public static final String LABOR_CONTRACTOR_COMPANY_INFO="LABOR_CONTRACTOR_COMPANY_INFO";
+	//
+	public static final String LABOR_DEVICE_INFO="LABOR_DEVICE_INFO";
+	//
+	public static final String LABOR_EMP_CATEGORY_INFO="LABOR_EMP_CATEGORY_INFO";
+	//
+	public static final String LABOR_JOB_NAME_INFO="LABOR_JOB_NAME_INFO";
+	//
+	public static final String LABOR_JOB_TYPENAME_INFO="LABOR_JOB_TYPENAME_INFO";
+	//
+	public static final String LABOR_ORG_INFO="LABOR_ORG_INFO";
+	//
+	public static final String LABOR_PAY_WAGES_INFO="LABOR_PAY_WAGES_INFO";
+	//
+	public static final String LABOR_PAY_WAGES_RECORD="LABOR_PAY_WAGES_RECORD";
+	//
+	public static final String LABOR_PAY_WAGES_VOUCHER_INFO="LABOR_PAY_WAGES_VOUCHER_INFO";
+	//
+	public static final String LABOR_PERSON_INFO="LABOR_PERSON_INFO";
+	//
+	public static final String LABOR_PROJECT_INFO="LABOR_PROJECT_INFO";
+	//
+	public static final String LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE="LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE";
+	//
+	public static final String LABOR_PROJECT_PERSON_INFO="LABOR_PROJECT_PERSON_INFO";
+	//
+	public static final String LABOR_TRAINING_DETAIL_INFO="LABOR_TRAINING_DETAIL_INFO";
+	//
+	public static final String LABOR_TRAINING_INFO="LABOR_TRAINING_INFO";
+	//
+	public static final String LABOR_USER_CONSTANTS_DATA="LABOR_USER_CONSTANTS_DATA";
+	//
+	public static final String LABOR_WORK_TYPENAME_INFO="LABOR_WORK_TYPENAME_INFO";
+	//
 	public static final String OPERATE_MODULES="OPERATE_MODULES";
 	//
 	public static final String OPERATE_PRIVILEGES="OPERATE_PRIVILEGES";
@@ -107,6 +153,8 @@ public class TableConstants {
 	public static final String OPERATE_ROLE="OPERATE_ROLE";
 	//
 	public static final String OPERATE_ROLE_PRIVILEGES_RELATE="OPERATE_ROLE_PRIVILEGES_RELATE";
+	//
+	public static final String OPERATION_LOG="OPERATION_LOG";
 	//
 	public static final String ORGANIZATION_INFO="ORGANIZATION_INFO";
 	//
@@ -203,6 +251,8 @@ public class TableConstants {
 		ACCEPTANCE_NOTE_MODIFY,	//
 		ACCEPTANCE_POINT,	//
 		ACCEPTANCE_PROCEDURE_PROGRESS,	//
+		ACCESS_LOG,	//
+		ACCESS_STATISTICS,	//
 		APP_INFO,	//
 		APP_SYS_SETTING,	//
 		BUILDING_BATCH_GEN_NOTE,	//
@@ -221,6 +271,7 @@ public class TableConstants {
 		DOMINANT_ITEM,	//
 		ELEVATION_CHART,	//
 		ELEVATION_CHART_BATCH_GEN_NOTE,	//
+		FEEDBACK_INFO,	//
 		FLOOR_ROOM_BATCH_GEN_NOTE,	//
 		FLOOR_TYPE,	//
 		FLOOR_TYPE_BATCH_NOTE,	//
@@ -235,10 +286,31 @@ public class TableConstants {
 		HOUSEHOLD_CHART_AREA_TYPE,	//
 		HOUSEHOLD_CHART_BATCH_GEN_NOTE,	//
 		HOUSEHOLD_TYPE,	//
+		LABOR_ATTENDANCE_DETAIL_RECORD,	//
+		LABOR_ATTENDANCE_RECORD,	//
+		LABOR_COMPANY_TYPE_INFO,	//
+		LABOR_CONTRACTOR_COMPANY_INFO,	//
+		LABOR_DEVICE_INFO,	//
+		LABOR_EMP_CATEGORY_INFO,	//
+		LABOR_JOB_NAME_INFO,	//
+		LABOR_JOB_TYPENAME_INFO,	//
+		LABOR_ORG_INFO,	//
+		LABOR_PAY_WAGES_INFO,	//
+		LABOR_PAY_WAGES_RECORD,	//
+		LABOR_PAY_WAGES_VOUCHER_INFO,	//
+		LABOR_PERSON_INFO,	//
+		LABOR_PROJECT_INFO,	//
+		LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE,	//
+		LABOR_PROJECT_PERSON_INFO,	//
+		LABOR_TRAINING_DETAIL_INFO,	//
+		LABOR_TRAINING_INFO,	//
+		LABOR_USER_CONSTANTS_DATA,	//
+		LABOR_WORK_TYPENAME_INFO,	//
 		OPERATE_MODULES,	//
 		OPERATE_PRIVILEGES,	//
 		OPERATE_ROLE,	//
 		OPERATE_ROLE_PRIVILEGES_RELATE,	//
+		OPERATION_LOG,	//
 		ORGANIZATION_INFO,	//
 		PARTNER_INFO,	//
 		POST_INFO,	//
@@ -246,6 +318,7 @@ public class TableConstants {
 		POST_USER_RELATE,	//
 		PROCEDURE_BATCH_STATUS,	//
 		PROCEDURE_INFO,	//
+		PROCEDURE_SCHEDULE_RELATE,	//
 		PROCEDURE_TYPE,	//
 		PROJECT_BUILDING,	//
 		PROJECT_HOUSEHOLD,	//
@@ -665,6 +738,56 @@ public class TableConstants {
 		tenantId,	//租户ID
 	}
 
+	public enum AccessLog{
+		ID,	//
+		id,	//
+		REMOTE_ADDR,	//
+		remoteAddr,	//
+		ACCESS_TIME,	//
+		accessTime,	//
+		RESPONSE_TIME,	//响应耗时
+		responseTime,	//响应耗时
+		REQUEST_TYPE,	//
+		requestType,	//
+		REQUEST_BODY,	//
+		requestBody,	//
+		REQUEST_URI,	//
+		requestUri,	//
+		QUERY_STRING,	//GET参数
+		queryString,	//GET参数
+		STATUS,	//HTTP状态码
+		status,	//HTTP状态码
+		REFERER,	//
+		referer,	//
+		USER_AGENT,	//
+		userAgent,	//
+		CREATE_TIME,	//
+		createTime,	//
+		OPERATE,	//
+		operate,	//
+	}
+
+	public enum AccessStatistics{
+		ID,	//主键
+		id,	//主键
+		URI,	//访问URI
+		uri,	//访问URI
+		REFER,	//来源URL
+		refer,	//来源URL
+		USER_ID,	//用户ID	
+		userId,	//用户ID	
+		USER_NAME,	//用户名	
+		userName,	//用户名	
+		TENANT_ID,	//租户ID	
+		tenantId,	//租户ID	
+		ACCESS_TIME,	//访问时间
+		accessTime,	//访问时间
+		REQ_IP,	//请求IP	
+		reqIp,	//请求IP	
+		CLIENT_TYPE,	//客户端类型
+		clientType,	//客户端类型
+	}
+
 	public enum AppInfo{
 		ID,	//应用ID
 		id,	//应用ID
@@ -684,12 +807,12 @@ public class TableConstants {
 		topFixedSqno,	//应用制定排序号
 		REMARK,	//应用描述
 		remark,	//应用描述
-		LATEST_VERSION_ID,	//最新版本
-		latestVersionId,	//最新版本
+		LATEST_VERSION_ID,	//最新版本编号
+		latestVersionId,	//最新版本编号
 		PUBLISH_TIMES,	//发布次数
 		publishTimes,	//发布次数
-		DOWNLOAD_TIMES,	//更新内容
-		downloadTimes,	//更新内容
+		DOWNLOAD_TIMES,	//下载次数
+		downloadTimes,	//下载次数
 		UPDATE_USER_ID,	//更新人编号
 		updateUserId,	//更新人编号
 		UPDATE_TIME,	//更新时间
@@ -1149,8 +1272,6 @@ public class TableConstants {
 	public enum DominantItem{
 		ID,	//主控项目ID
 		id,	//主控项目ID
-		ITEM_NAME,	//主控名称
-		itemName,	//主控名称
 		PROCEDURE_ID,	//工序ID
 		procedureId,	//工序ID
 		IS_GENERAL,	//是否为一般项（1为是）
@@ -1233,6 +1354,29 @@ public class TableConstants {
 		sealedTime,	//封存时间
 		TENANT_ID,	//租户ID
 		tenantId,	//租户ID
+	}
+
+	public enum FeedbackInfo{
+		ID,	//编号
+		id,	//编号
+		FEEDBACK_TYPE,	//反馈来源（质检1）
+		feedbackType,	//反馈来源（质检1）
+		FEEDBACK_CONTENT,	//反馈内容
+		feedbackContent,	//反馈内容
+		FEEDBACK_USER_ID,	//反馈人
+		feedbackUserId,	//反馈人
+		FEEDBACK_TIME,	//反馈时间
+		feedbackTime,	//反馈时间
+		UPDATE_TIME,	//更新时间
+		updateTime,	//更新时间
+		UPDATE_USER_ID,	//更新人
+		updateUserId,	//更新人
+		IS_SEALED,	//是否封存
+		isSealed,	//是否封存
+		SEALED_USER_ID,	//封存人
+		sealedUserId,	//封存人
+		TENANT_ID,	//租户编号
+		tenantId,	//租户编号
 	}
 
 	public enum FloorRoomBatchGenNote{
@@ -1437,8 +1581,6 @@ public class TableConstants {
 	public enum GeneralItem{
 		ID,	//一般项目ID
 		id,	//一般项目ID
-		ITEM_NAME,	//一般名称
-		itemName,	//一般名称
 		PROCEDURE_ID,	//工序ID
 		procedureId,	//工序ID
 		ALLOW_MAX_VALUE,	//允许最大值
@@ -1623,6 +1765,680 @@ public class TableConstants {
 		tenantId,	//租户ID
 	}
 
+	public enum LaborAttendanceDetailRecord{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		DEVICE_ID,	//
+		deviceId,	//
+		PERSON_TYPE,	//
+		personType,	//
+		PERSON_ID,	//
+		personId,	//
+		PASSED_TIME,	//
+		passedTime,	//
+		DIRECTION,	//
+		direction,	//
+		WAY,	//
+		way,	//
+		SITE_PHOTO,	//
+		sitePhoto,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborAttendanceRecord{
+		ID,	//
+		id,	//
+		PROJECT_PERSON_ID,	//
+		projectPersonId,	//
+		IN_TIME,	//
+		inTime,	//
+		OUT_TIME,	//
+		outTime,	//
+		DATE,	//
+		date,	//
+		WORK_DURATION,	//
+		workDuration,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborCompanyTypeInfo{
+		ID,	//
+		id,	//
+		CODE,	//
+		code,	//
+		NAME,	//
+		name,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborContractorCompanyInfo{
+		ID,	//
+		id,	//
+		COMPANY_NAME,	//
+		companyName,	//
+		PROJECT_ID,	//
+		projectId,	//
+		ORG_ID,	//
+		orgId,	//
+		COMPANY_CREDIT_CODE,	//
+		companyCreditCode,	//
+		COMPANY_TYPE_ID,	//
+		companyTypeId,	//
+		COMPANY_LEADER,	//
+		companyLeader,	//
+		COMPANY_CODE,	//
+		companyCode,	//
+		COMPANY_COMMENT,	//
+		companyComment,	//
+		COMPANY_LEGAL_ISPERSON,	//
+		companyLegalIsperson,	//
+		COMPANY_LEGAL_PERSON,	//
+		companyLegalPerson,	//
+		COMPANY_LINKER,	//
+		companyLinker,	//
+		COMPANY_PHONE,	//
+		companyPhone,	//
+		COMPANY_ADDR,	//
+		companyAddr,	//
+		ISSUED_CAPITAL_STOCK,	//ʵ
+		issuedCapitalStock,	//ʵ
+		COMPANY_EMAIL,	//
+		companyEmail,	//
+		OPEN_BANK_NAME,	//
+		openBankName,	//
+		BANK_ACCOUNT,	//
+		bankAccount,	//
+		REMARK,	//
+		remark,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborDeviceInfo{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		DEVICE_NAME,	//
+		deviceName,	//
+		DEVICE_CODE,	//
+		deviceCode,	//
+		DEVICE_TYPE,	//
+		deviceType,	//
+		DEVICE_STATUS,	//
+		deviceStatus,	//
+		DEVICE_BRANK,	//
+		deviceBrank,	//
+		DEVICE_SUPPLIER,	//
+		deviceSupplier,	//
+		SERVICE_PHONE,	//
+		servicePhone,	//
+		INSTALL_TIME,	//
+		installTime,	//
+		AUTHORIZE_NUM,	//
+		authorizeNum,	//
+		AUTHORIZE_KEY,	//
+		authorizeKey,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborEmpCategoryInfo{
+		ID,	//
+		id,	//
+		CODE,	//
+		code,	//
+		NAME,	//
+		name,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborJobNameInfo{
+		ID,	//
+		id,	//
+		CODE,	//
+		code,	//
+		NAME,	//
+		name,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborJobTypenameInfo{
+		ID,	//
+		id,	//
+		CODE,	//
+		code,	//
+		NAME,	//
+		name,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborOrgInfo{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		ORGANIZATION_NAME,	//
+		organizationName,	//
+		ORGANIZATION_ABBREV_NAME,	//
+		organizationAbbrevName,	//
+		ORGANIZATION_ADDR,	//
+		organizationAddr,	//
+		ORGANIZATION_MANAGER,	//
+		organizationManager,	//
+		ORGANIZATION_CODE,	//
+		organizationCode,	//
+		IS_ENTITY,	//
+		isEntity,	//
+		PARENT_ID,	//
+		parentId,	//
+		ID_TREE,	//
+		idTree,	//
+		NAME_TREE,	//
+		nameTree,	//
+		IS_LEAF,	//Ҷ
+		isLeaf,	//Ҷ
+		SEQ_NO,	//
+		seqNo,	//
+		LEVEL,	//
+		level,	//
+		REMARK,	//
+		remark,	//
+		IS_ENABLED,	//
+		isEnabled,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		UPDATE_TIME,	//
+		updateTime,	//
+		IS_SEALED,	//0
+		isSealed,	//0
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborPayWagesInfo{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		COMPANY_NAME,	//
+		companyName,	//
+		PROJECT_PERSON_ID,	//
+		projectPersonId,	//
+		PAY_YEAR,	//
+		payYear,	//
+		PAY_MONTH,	//
+		payMonth,	//
+		PAY_GROSS,	//
+		payGross,	//
+		PAY_NET,	//
+		payNet,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborPayWagesRecord{
+		ID,	//
+		id,	//
+		PAY_WAGES_ID,	//
+		payWagesId,	//
+		PAY_NET,	//
+		payNet,	//
+		PAY_STATUS,	//
+		payStatus,	//
+		PAY_TIME,	//
+		payTime,	//
+		PAY_BANKNAME,	//
+		payBankname,	//
+		PAY_CARDNUM,	//
+		payCardnum,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborPayWagesVoucherInfo{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		PAY_YEAR,	//
+		payYear,	//
+		PAY_MONTH,	//
+		payMonth,	//
+		PAY_REMARK,	//
+		payRemark,	//
+		WAGES_VOUCHER,	//
+		wagesVoucher,	//
+		BANK_VOUCHER,	//
+		bankVoucher,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborPersonInfo{
+		ID,	//
+		id,	//
+		USER_ID,	//
+		userId,	//
+		ID_CODE,	//
+		idCode,	//
+		ID_PHOTO,	//
+		idPhoto,	//
+		EMP_NAME,	//
+		empName,	//
+		EMP_PHONE,	//
+		empPhone,	//
+		EMP_NATIVEPLACE,	//
+		empNativeplace,	//
+		EMP_BIRTHDATE,	//
+		empBirthdate,	//
+		EMP_NATION,	//
+		empNation,	//
+		EMP_NATIVE_PROVINCE,	//
+		empNativeProvince,	//
+		ID_AGENCY,	//
+		idAgency,	//
+		ID_VALIDDATE,	//
+		idValiddate,	//
+		MARRIAGE_STATUS,	//
+		marriageStatus,	//
+		HOME_ADDR,	//
+		homeAddr,	//
+		GRADUATE_DATE,	//
+		graduateDate,	//
+		USER_DISCIPLINE,	//
+		userDiscipline,	//
+		USER_EDUCATION,	//
+		userEducation,	//
+		GRADUATE_SCHOOL,	//
+		graduateSchool,	//
+		POLITICAL_STATUS,	//
+		politicalStatus,	//
+		HAS_CERTIFICATE,	//
+		hasCertificate,	//
+		CERTIFICATE_NAME,	//
+		certificateName,	//
+		IDPHOTO_SCAN,	//
+		idphotoScan,	//
+		IDPHOTO_SCAN2,	//
+		idphotoScan2,	//
+		IS_BLACKLIST,	//
+		isBlacklist,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborProjectInfo{
+		ID,	//
+		id,	//
+		ITEM_NAME,	//
+		itemName,	//
+		ITEM_CODE,	//
+		itemCode,	//
+		ITEM_ADDR,	//
+		itemAddr,	//
+		CONSTRUCTION_UNIT,	//
+		constructionUnit,	//
+		PLAN_TO_INVEST,	//
+		planToInvest,	//
+		REPORTED_TIME,	//
+		reportedTime,	//
+		PROJECT_NAME,	//
+		projectName,	//
+		PROJECT_CODE,	//
+		projectCode,	//
+		PROJECT_ADDR,	//
+		projectAddr,	//
+		MANAGER_DEPT,	//
+		managerDept,	//
+		PROJECT_TYPE_LEVEL,	//
+		projectTypeLevel,	//
+		PROJECT_TYPE,	//
+		projectType,	//
+		RED_AREA,	//
+		redArea,	//
+		DESIGN_COMPANY,	//
+		designCompany,	//
+		SUPERVISION_COMPANY,	//
+		supervisionCompany,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborProjectPersonnelContractRelate{
+		ID,	//
+		id,	//
+		PROJECT_PERSON_ID,	//
+		projectPersonId,	//
+		CONTRACT_NO,	//
+		contractNo,	//
+		CONTRACT_DATE,	//
+		contractDate,	//
+		CONTRACT_FILE,	//
+		contractFile,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborProjectPersonInfo{
+		ID,	//
+		id,	//
+		EMP_COMPANT_ID,	//
+		empCompantId,	//
+		PROJECT_ID,	//
+		projectId,	//
+		PERSON_ID,	//
+		personId,	//
+		PASS_PERIOD,	//
+		passPeriod,	//
+		MATCH_FLAG,	//
+		matchFlag,	//
+		FACEPHOTO,	//
+		facephoto,	//
+		WORK_TYPENAME_ID,	//
+		workTypenameId,	//
+		EMP_CATEGORY_ID,	//
+		empCategoryId,	//
+		CWR_ISKEYPSN,	//
+		cwrIskeypsn,	//
+		EMP_DEPT,	//
+		empDept,	//
+		JOB_TYPENAME_ID,	//
+		jobTypenameId,	//
+		JOB_NAME_ID,	//
+		jobNameId,	//
+		CONTRACT_STATUS,	//
+		contractStatus,	//
+		CONTRACT_SIGN_TIME,	//
+		contractSignTime,	//
+		HAS_SAFE_EDUCATION_CARD,	//
+		hasSafeEducationCard,	//
+		HAS_SAFE_EDUCATION_CARD_TIME,	//
+		hasSafeEducationCardTime,	//
+		SAFE_EDUCATION_SCORE,	//
+		safeEducationScore,	//
+		HAS_INSURANCE,	//
+		hasInsurance,	//
+		EMP_BANKNAME,	//
+		empBankname,	//
+		EMP_CARDNUM,	//
+		empCardnum,	//
+		JOB_DEPT,	//
+		jobDept,	//
+		LEAVE_TIME,	//
+		leaveTime,	//
+		LEAVE_ATTACH,	//
+		leaveAttach,	//
+		EMP_STATUS,	//
+		empStatus,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborTrainingDetailInfo{
+		ID,	//
+		id,	//
+		TRAINING_ID,	//
+		trainingId,	//
+		PROJECT_PERSON_ID,	//
+		projectPersonId,	//
+		EDU_TIME,	//
+		eduTime,	//
+		EDU_PHOTO,	//
+		eduPhoto,	//
+		EDU_ATTACH,	//
+		eduAttach,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborTrainingInfo{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		EDU_COURSENAME,	//
+		eduCoursename,	//
+		EDU_ORGANIZATION,	//
+		eduOrganization,	//
+		EDU_TEACHER,	//
+		eduTeacher,	//
+		EDU_ADDR,	//
+		eduAddr,	//
+		EDU_CLASSHOUR,	//
+		eduClasshour,	//
+		EDU_CONTENT,	//
+		eduContent,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
+	public enum LaborUserConstantsData{
+		ID,	//
+		id,	//
+		DATA_TYPE,	//
+		dataType,	//
+		DATA_VALUE,	//
+		dataValue,	//
+	}
+
+	public enum LaborWorkTypenameInfo{
+		ID,	//
+		id,	//
+		PROJECT_ID,	//
+		projectId,	//
+		NAME,	//
+		name,	//
+		UPTATE_TIME,	//
+		uptateTime,	//
+		UPDATE_USER_ID,	//
+		updateUserId,	//
+		IS_SEALED,	//
+		isSealed,	//
+		SEALED_USER_ID,	//
+		sealedUserId,	//
+		SEALED_TIME,	//
+		sealedTime,	//
+		TENANT_ID,	//
+		tenantId,	//
+	}
+
 	public enum OperateModules{
 		ID,	//模块编号
 		id,	//模块编号
@@ -1725,6 +2541,33 @@ public class TableConstants {
 		updateTime,	//更新时间
 		TENANT_ID,	//
 		tenantId,	//
+	}
+
+	public enum OperationLog{
+		ID,	//主键
+		id,	//主键
+		URI,	//访问URI
+		uri,	//访问URI
+		CLIENT_TYPE,	//客户端类型
+		clientType,	//客户端类型
+		REFER,	//来源URL
+		refer,	//来源URL
+		ARGS,	//请求参数	
+		args,	//请求参数	
+		USERNAME,	//用户ID
+
+		username,	//用户ID
+
+		TENANT_ID,	//租户ID	
+		tenantId,	//租户ID	
+		OPERATION_TIME,	//操作时间
+		operationTime,	//操作时间
+		DESCRIPTION,	//操作描述
+		description,	//操作描述
+		OPERATION_TABLE,	//操作库表	
+		operationTable,	//操作库表	
+		REQ_IP,	//请求IP	
+		reqIp,	//请求IP	
 	}
 
 	public enum OrganizationInfo{
@@ -1933,19 +2776,18 @@ public class TableConstants {
 		IS_MATERIAL,	//是否是材料类型,0:非材料类型；1:材料类型
 		isMaterial,	//是否是材料类型,0:非材料类型；1:材料类型
 	}
-	
+
 	public enum ProcedureScheduleRelate{
-		ID,	//ID
-		id,	//ID
+		ID,	//编号
+		id,	//编号
 		ROOM_ID,	//户编号
 		roomId,	//户编号
-		PROCEDURE_TYPE_ID,	//工序类型ID
-		procedureTypeId,	//工序类型ID
-		UPDATE_USER_ID,	//更新人ID
-		updateUserId,	//更新人ID
+		PROCEDURE_TYPE_ID,	//户验收工序类型
+		procedureTypeId,	//户验收工序类型
+		UPDATE_USER_ID,	//更新人
+		updateUserId,	//更新人
 		UPDATE_TIME,	//更新时间
 		updateTime,	//更新时间
-		
 	}
 
 	public enum ProcedureType{
@@ -2648,18 +3490,18 @@ public class TableConstants {
 	public enum UpdateVesionInfo{
 		ID,	//信息ID
 		id,	//信息ID
-		APP_ID,
-		appId,
+		APP_ID,	//应用编号
+		appId,	//应用编号
 		NAME,	//APP名称
 		name,	//APP名称
 		APP_TYPE,	//ios,android
 		appType,	//ios,android
 		UPDATE_TYPE,	//强制，非强制
 		updateType,	//强制，非强制
-		VERSION_CODE,	//版本号
-		versionCode,	//版本号
 		VERSION_NAME,	//版本名称
 		versionName,	//版本名称
+		VERSION_CODE,	//版本号
+		versionCode,	//版本号
 		DOWNLOAD_COUNT,	//更新下载次数
 		downloadCount,	//更新下载次数
 		DOWNLOAD_URL,	//下载地址

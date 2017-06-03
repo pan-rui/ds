@@ -3,8 +3,44 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.acceptance.AcceptanceBatchDao">
+	<select id="queryAllAcceptanceBatchByPostInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT e.ID AS id,IFNULL(e.BATCH_NO,1) AS batchNo,a.NAME_TREE AS regionName,
+		a.${regionMinName} AS regionMinName, a.ID AS regionId,b.ID AS procedureId,
+		IFNULL(e.BATCH_STATUS_ID,'${batchStatusId}') AS statementId,IFNULL(e.PROJECT_PERIOD_ID,'${projectPeriodId}') as projectPeriodId,
+		e.ACCEPTANCE_NOTE_ID AS acceptanceNoteId,
+		<if test="regionType != null">
+			IFNULL(e.REGION_TYPE,'${regionType}') AS regionType,
+		</if>
+		<if test="regionType == null">
+			IFNULL(e.REGION_TYPE,a.REGION_TYPE_ID) AS regionType,
+		</if>
+		b.PROCEDURE_NAME AS procedureName, IFNULL(e.BATCH_TIMES,1) AS batchTimes,
+		IFNULL(e.INSPECTOR_ROLE,'${inspectorRole}') AS inspectorRole, IFNULL(e.STATEMENT_ID,'${statementId}') AS stateId 
+		FROM ${tableName} a LEFT JOIN ${pTableName} b ON a.`IS_SEALED`=0 LEFT JOIN (
+		SELECT a.ID,a.BATCH_NO,b.REGION_NAME,b.REGION_MIN_NAME,a.BATCH_STATUS_ID, a.ACCEPTANCE_NOTE_ID,
+		b.PROCEDURE_ID, b.BATCH_TIMES,a.INSPECTOR_ROLE,c.STATEMENT_ID,b.REGION_ID,b.PROJECT_PERIOD_ID,b.REGION_TYPE 
+		FROM ${abTableName} a, ${anTableName} b, ${pbsTableName} c 
+		WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		c.`BATCH_NO`=a.`BATCH_NO` AND c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
+		AND a.BATCH_STATUS=#{batchStatus} AND a.`INSPECTOR_ROLE`=#{inspectorRole} 
+		) e ON e.PROCEDURE_ID=b.`ID` AND e.REGION_ID=a.`ID` WHERE 1=1 
+		<if test="procedureId != null and procedureId != ''">
+			AND b.ID=#{procedureId} 
+		</if>
+		<if test="tid != null">
+			AND a.`ID`=#{tid} 
+		</if>
+		<if test="buildingId != null and floor != null">
+			AND a.`BUILDING_ID`=#{buildingId} AND a.`FLOOR`=#{floor}
+			<if test="regionType != null">
+				AND a.`REGION_TYPE_ID`=#{regionType} 
+			</if> 
+		</if>
+		ORDER BY regionMinName ASC,batchNo ASC
+	</select>
 
-	<select id="queryAllAcceptanceBatchByNoticeInTab" parameterType="map"
+	<select id="queryAllAcceptanceBatchByNoticePageInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT a.ID as id, b.`PROJECT_NAME` AS projectName, 
 		b.`REGION_NAME` AS regionName,b.PROCEDURE_NAME as procedureName,
@@ -17,33 +53,7 @@
 		a.`ACCEPTANCE_PERSON_ID`=#{userId} AND a.`BATCH_STATUS_ID`=#{batchStatusId} AND 
 		a.`INSPECTOR_ROLE`=#{inspectorRole} AND a.`BATCH_STATUS`=#{batchStatus} AND 
 		c.STATEMENT_ID=#{statementId} 
-		ORDER BY b.`PROJECT_NAME`,b.`REGION_NAME` ASC
-	</select>
-
-	<select id="queryAllAcceptanceBatchByPostInTab" parameterType="map"
-		resultType="map" statementType="PREPARED">
-		SELECT a.ID as id,a.BATCH_NO as batchNo,b.REGION_NAME as
-		regionName,b.REGION_MIN_NAME as regionMinName,
-		a.BATCH_STATUS_ID as statementId, 
-		a.ACCEPTANCE_NOTE_ID as acceptanceNoteId,
-		b.PROCEDURE_NAME as procedureName, b.BATCH_TIMES as batchTimes,
-		a.INSPECTOR_ROLE as inspectorRole, c.STATEMENT_ID as stateId 
-		FROM ${abTableName} a, ${anTableName}
-		b, ${pbsTableName} c WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
-		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
-		c.`BATCH_NO`=a.`BATCH_NO` AND c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND
-		b.`PROJECT_PERIOD_ID`=#{projectPeriodId} AND
-		b.`PROCEDURE_ID`=#{procedureId}
-		AND a.BATCH_STATUS=#{batchStatus} AND a.`INSPECTOR_ROLE`=#{inspectorRole}
-		<if test="procedureId != null and procedureId != ''">
-			AND b.PROCEDURE_ID=#{procedureId}
-		</if>
-		<if test="regionId != null and regionId != ''">
-			AND b.REGION_ID=#{regionId}
-		</if>
-		<if test="idTree != null and idTree != ''">
-			AND b.REGION_ID_TREE LIKE #{idTree}
-		</if>
+		ORDER BY a.`UPDATE_TIME` DESC
 	</select>
 
 	<select id="queryAcceptanceBatchByStatusPageInTab"
@@ -63,8 +73,9 @@
 		c.PROJECT_PERIOD_ID=#{projectPeriodId} AND
 		a.BATCH_STATUS=#{batchStatus}
 		<if test="pbsStatementId != null and pbsStatementId != ''">
-			AND b.`STATEMENT_ID`=#{pbsStatementId}
+			AND b.`STATEMENT_ID`=#{pbsStatementId} 
 		</if>
+		ORDER BY a.`UPDATE_TIME` DESC
 	</select>
 
 	<select id="queryBatchInfoInTab" parameterType="map" resultType="map"

@@ -1,14 +1,19 @@
 package com.pc.controller.client;
 
- 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
+import com.pc.annotation.EncryptProcess;
+import com.pc.base.BaseResult;
+import com.pc.base.Constants;
+import com.pc.base.ReturnCode;
+import com.pc.controller.BaseController;
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.service.sys.impl.AppInfoService;
+import com.pc.service.sys.impl.PublishPhotosService;
+import com.pc.service.tenant.impl.UpdateVesionInfoService;
+import com.pc.vo.ParamsVo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -16,21 +21,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.pc.controller.BaseController;
-import com.pc.annotation.EncryptProcess;
-import com.pc.base.BaseResult;
-import com.pc.base.Constants;
-import com.pc.base.ReturnCode;
-import com.pc.core.Page;
-import com.pc.core.ParamsMap;
-import com.pc.util.DateUtil;
-import com.pc.vo.ParamsVo;
-
-import com.pc.core.TableConstants;
- 
-import com.pc.service.sys.impl.AppInfoService;
-import com.pc.service.sys.impl.PublishPhotosService;
-import com.pc.service.tenant.impl.UpdateVesionInfoService;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -74,7 +67,10 @@ public class AppClientController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
-		return new BaseResult(ReturnCode.OK, appInfoService.getAppInfoList(map, ddBB));
+		if(map.containsKey(TableConstants.AppInfo.NAME.name())){
+			map.put(TableConstants.AppInfo.NAME.name(), "%"+map.get(TableConstants.AppInfo.NAME.name())+"%");
+		}
+		return new BaseResult(ReturnCode.OK, appInfoService.getAppInfoDeatilList(map, ddBB));
 	}
 
 	@RequestMapping("/appInfo/getPage")

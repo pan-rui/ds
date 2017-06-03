@@ -1,6 +1,7 @@
 package com.pc.util;
 
 import android.content.res.AXmlResourceParser;
+
 import java.io.InputStream;
 
 public class AXMLPrinter {

@@ -117,9 +117,12 @@ public class PartnerInfoController extends BaseController {
 
 		// 合作伙伴信息新增
 		Map<String, Object> partnerMap = new LinkedHashMap<>((Map) paramsmMap.get(PARTNER_PARAM_KEY.PARTNER.name()));
-
+		if(corporateId!=null){
+			partnerMap.put(TableConstants.PartnerInfo.CORPORATE_ID.name(), corporateId);
+		}
 		partnerMap.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		partnerMap.put(TableConstants.UPDATE_USER_ID, userId);
+		
 		boolean b = partnerInfoService.updatePartnerInfo(partnerMap, ddBB);
 		if (b) {
 			return new BaseResult(ReturnCode.OK);
@@ -152,6 +155,9 @@ public class PartnerInfoController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.PartnerInfo.PARTNER_NAME.name())){
+			map.put(TableConstants.PartnerInfo.PARTNER_NAME.name(), "%"+map.get(TableConstants.PartnerInfo.PARTNER_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, partnerInfoService.getPartnerInfoPage(page, ddBB));
 	}

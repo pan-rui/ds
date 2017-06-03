@@ -13,6 +13,7 @@ import com.pc.service.organization.impl.TeamInfoService;
 import com.pc.service.project.impl.ProjectPeriodService;
 import com.pc.util.TreeUtil;
 import com.pc.vo.ParamsVo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,9 +60,12 @@ public class OrganizationClientController extends BaseController  {
 		params.put(TableConstants.UserRoleRelate.userId.name(), userId);
 		params.put(TableConstants.DataPrivilegesInfo.dataTypeId.name(), dataTypeId);
 		
-		List<Map<String, Object>> projectOrganizationInfoList=organizationInfoService.getProjectOrganizationInfoList(params, ddBB);
-		
 		List<Map<String, Object>> projectPeriodList=projectPeriodService.getProjectPeriodListByUser(params, ddBB);
+		
+		Map<String, Object> orgParams = new HashMap<>();
+		orgParams.put("list", projectPeriodList);
+		
+		List<Map<String, Object>> projectOrganizationInfoList=organizationInfoService.getProjectOrganizationInfoList(orgParams, ddBB);
 		
 		return new BaseResult(ReturnCode.OK,TreeUtil.getTree(projectOrganizationInfoList, projectPeriodList, TableConstants.ProjectPeriod.comId.name()));
 	}

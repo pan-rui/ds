@@ -10,6 +10,7 @@ import com.pc.core.Page;
 import com.pc.core.TableConstants;
 import com.pc.service.project.impl.UnitChartService;
 import com.pc.util.DateUtil;
+import com.pc.util.ImgUtil;
 import com.pc.vo.ParamsVo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,11 +47,21 @@ public class UnitChartController extends BaseController {
 			@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
 			@RequestAttribute String ddBB) {
 		
-                Map<String, Object> map = new LinkedHashMap<>(params.getParams());
+        Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_SEALED, 0); 
+		map.put(TableConstants.IS_SEALED, 0);
+		String id=UUID.randomUUID().toString().replace("-", "");
+		if(map.containsKey(TableConstants.UnitChart.UNIT_CHART_IMAGE_PATH.name())&&
+				((String)map.get(TableConstants.UnitChart.UNIT_CHART_IMAGE_PATH.name())).contains(ImgUtil.TEMP_PATH)){
+			String path = ImgUtil.saveAndUpdateFile(null,
+					(String) map.get(TableConstants.UnitChart.UNIT_CHART_IMAGE_PATH.name()), null,
+					ImgUtil.UNIT_CHART_IMG_PATH, id);
+			
+			map.put(TableConstants.UnitChart.UNIT_CHART_IMAGE_PATH.name(),path);
+		}
+		map.put(TableConstants.UnitChart.ID.name(), id);
 		unitChartService.addUnitChart(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
 	}
@@ -109,6 +120,9 @@ public class UnitChartController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.UnitChart.HOUSEHOLD_NAME.name())){
+			map.put(TableConstants.UnitChart.HOUSEHOLD_NAME.name(), "%"+map.get(TableConstants.UnitChart.HOUSEHOLD_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, unitChartService.getUnitChartPage(page, ddBB));
 	}

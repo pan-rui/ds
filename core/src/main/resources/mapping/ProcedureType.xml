@@ -21,14 +21,17 @@
 
     <select id="queryProcedureTypeByProjectRegionInTab" parameterType="map"
             resultType="map" statementType="PREPARED">
-        SELECT DISTINCT a.* FROM ${procTypeTab} a, ${procTypeTab} b, ${procInfoTab} c,  ${prprTab} d
+        SELECT DISTINCT a.* FROM ${procTypeTab} a, ${procTypeTab} b, ${procInfoTab} c, ${prprTab} d
         WHERE INSTR(b.ID_TREE, a.ID_TREE)>0  AND b.ID = c.PROCEDURE_TYPE_ID and c.ID = d.PROCEDURE_ID 
         <if test="projectPeriodId !=null" >
             AND d.PROJECT_PERIOD_ID = #{projectPeriodId} 
         </if>
-        <if test="regionTypeId !=null" >
-            AND d.REGION_TYPE_ID = #{regionTypeId} 
-        </if>
+        <if test="regionTypeId !=null and forAcceptance != null">
+			AND (d.REGION_TYPE_ID=#{regionTypeId} OR d.REGION_TYPE_ID=#{regionType})
+		</if>
+		<if test="regionTypeId !=null and forAcceptance == null">
+			AND d.REGION_TYPE_ID=#{regionTypeId}
+		</if>
         <if test="tenantId !=null" >
             AND c.TENANT_ID = #{tenantId}
         </if>

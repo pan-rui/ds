@@ -1,22 +1,13 @@
 package com.pc.dao.acceptance;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
-import com.pc.core.DataSource;
-import com.pc.core.Page;
-import com.pc.core.ParamsMap;
+import java.sql.Connection;
 
 /**
  * @Description: ${Description}

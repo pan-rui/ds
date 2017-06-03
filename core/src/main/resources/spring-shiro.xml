@@ -84,7 +84,7 @@
         <property name="baseImpl" ref="baseImpl"/>
         <property name="userService" ref="userService"/>
     </bean>-->
-    <bean id="sysUserFilter" class="com.pc.security.SysUserFilter" p:baseImpl-ref="baseImpl" p:filterChainManager-ref="filterChainManager" p:jedisPool-ref="jedisPool" p:excludeReg="(^/login$)|(^/druid/.+)"/>
+    <bean id="sysUserFilter" class="com.pc.security.SysUserFilter" p:baseImpl-ref="baseImpl" p:filterChainManager-ref="filterChainManager" p:jedisPool-ref="jedisPool" p:excludeReg="(^/login$)|(^/manage/.+)"/>
     <bean id="filterChainManager" class="com.pc.security.CustomDefaultFilterChainManager" init-method="init">
         <property name="loginUrl" value="/login"/>
         <property name="successUrl" value="/success"/>
@@ -100,6 +100,7 @@
                 <!--/login = authc-->
                 <!--/logout = logout-->
                 <!--/unauthorized = authc-->
+                <!--/manager/** = anon-->
                 /druid/** = anon
                 /** = sysUser
             </value>

@@ -40,14 +40,16 @@ public class AdminAction extends BaseController {
 
 	@RequestMapping("/cleans")
 	@ResponseBody
-	public BaseResult bb(HttpSession session, @RequestAttribute String ddBB) {
+	public BaseResult bb(HttpSession session, @RequestAttribute String ddBB,String cN) {
 		logger.debug("in............clearColumns cache....");
 		if (ddBB.equals("dems")) {
 			tokenService.clearAllCache();
 			baseImpl.initColumns();
-			return new BaseResult(ReturnCode.OK);
 		}
-		return new BaseResult(ReturnCode.FAIL);
+		if ("offline".equals(cN)) {
+			tokenService.clearOfflineCache();
+		}
+			return new BaseResult(ReturnCode.OK);
 	}
 
 	@RequestMapping("/login")

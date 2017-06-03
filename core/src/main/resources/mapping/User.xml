@@ -22,4 +22,19 @@
 		d.`IS_SEALED`=0 AND f.`IS_SEALED`=0 AND f1.`IS_SEALED`=0 AND g.`IS_SEALED`=0 AND
 		g1.`IS_SEALED`=0 AND a.`TENANT_ID`=#{tenantId} AND a.`POST_ID`=#{postId}
 	</select>
+	
+	<select id="queryUserDetailPageInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.*,b.`POST_NAME` AS postName,c.`CORPORATE_NAME` AS corporateName FROM ${uTableName} a,${pTableName} b,${cTableName} c WHERE
+		a.`POST_ID`=b.`ID` AND a.`COMPANY_ID`=c.`ID` AND a.`IS_SEALED`=0 
+		<if  test="TENANT_ID != null">
+        	AND a.`TENANT_ID`=#{TENANT_ID} 
+        </if>
+        <if  test="REAL_NAME != null">
+        	AND a.`REAL_NAME` LIKE #{REAL_NAME} 
+        </if>
+        <if  test="PHONE != null">
+        	AND a.`PHONE` LIKE #{PHONE} 
+        </if>
+	</select>
 </mapper>

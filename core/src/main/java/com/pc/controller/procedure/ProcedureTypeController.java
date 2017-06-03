@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Description:
@@ -51,6 +52,7 @@ public class ProcedureTypeController extends BaseController {
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
 		map.put(TableConstants.IS_SEALED, 0);
+		map.put(TableConstants.ProcedureType.ID.name(), UUID.randomUUID().toString().replace("-", ""));
 
 		Map<String, Object> parentMap = null;
 

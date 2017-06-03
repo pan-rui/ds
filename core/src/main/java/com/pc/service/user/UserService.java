@@ -5,10 +5,10 @@ import com.pc.core.ParamsMap;
 import com.pc.core.TableConstants;
 import com.pc.dao.privilege.UserDao;
 import com.pc.service.BaseService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +16,22 @@ import java.util.Map;
 public class UserService extends BaseService {
 	@Autowired
 	private UserDao userDao;
+	
+	public Page<Map<String, Object>> getUserDetailPage(Page page, String ddBB) {
+		Map<String, Object> params=new HashMap<String, Object>(page.getParams());
+		if(params.containsKey(TableConstants.User.REAL_NAME.name())){
+			params.put(TableConstants.User.REAL_NAME.name(), "%"+params.get(TableConstants.User.REAL_NAME.name())+"%");
+		}
+		if(params.containsKey(TableConstants.User.PHONE.name())){
+			params.put(TableConstants.User.PHONE.name(), "%"+params.get(TableConstants.User.PHONE.name())+"%");
+		}
+		params.put("page", page);
+		params.put("uTableName", ddBB + TableConstants.SEPARATE + TableConstants.USER);
+		params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.POST_INFO);
+		params.put("cTableName", ddBB + TableConstants.SEPARATE + TableConstants.COMPANY);
+		page.setResults(userDao.queryUserDetailPageInTab(params));
+		return page;
+	}
 	
 	public List<Map<String, Object>> getUserListByPostAuth(Map<String, Object> params, String ddBB) {
 		params.put("uTableName", ddBB + TableConstants.SEPARATE + TableConstants.USER);

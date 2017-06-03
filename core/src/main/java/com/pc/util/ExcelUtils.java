@@ -21,14 +21,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-26 16:44)
- * @version: \$Rev: 1981 $
+ * @version: \$Rev: 2741 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-08 10:54:28 +0800 (周一, 08 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-01 20:22:38 +0800 (周四, 01 6月 2017) $
  */
 @Service
 public class ExcelUtils {
@@ -130,17 +136,18 @@ public class ExcelUtils {
             return cellValue;
         }
         //把数字当成String来读，避免出现1读成1.0的情况
-        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+/*        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
             cell.setCellType(Cell.CELL_TYPE_STRING);
-        }
+        }*/
         //判断数据的类型
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_NUMERIC: //数字
-//                cellValue = String.valueOf(cell.getNumericCellValue());
-                cellValue = String.valueOf(cell.getStringCellValue());
+                cellValue = String.valueOf(cell.getNumericCellValue());
+                if(cellValue.endsWith(".0"))
+                    cellValue = cellValue.substring(0, cellValue.length() - 2);
                 break;
             case Cell.CELL_TYPE_STRING: //字符串
-                cellValue = String.valueOf(cell.getStringCellValue());
+                cellValue=cell.getStringCellValue();
                 break;
             case Cell.CELL_TYPE_BOOLEAN: //Boolean
                 cellValue = String.valueOf(cell.getBooleanCellValue());
@@ -230,7 +237,6 @@ public class ExcelUtils {
             //获得当前sheet的开始行
             int firstRowNum = sheet.getFirstRowNum();
             int lastRowNum = sheet.getLastRowNum();
-            ParamsMap<String, Object> fieldMap = new ParamsMap<>();
             List<String> procedureIdList = null;
             String tableName = null;
             //获得行的开始列
@@ -238,6 +244,7 @@ public class ExcelUtils {
             int lastCellNum = sheet.getRow(firstRowNum).getLastCellNum();
             //循环除了第一行的所有行
            a: for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
+                ParamsMap<String, Object> fieldMap = new ParamsMap<>();
                 //获得当前行
                 Row row = sheet.getRow(rowNum);
                 if (row == null)
@@ -264,9 +271,16 @@ public class ExcelUtils {
                             if(StringUtils.isEmpty((String)fieldMap.get("GRADING_STANDARD"))) break a;
                             fieldMap.addParams("UPDATE_TIME", new Date()).addParams("ID", UUID.randomUUID().toString().replace("-", "")).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId);
                             if(StringUtils.isNotEmpty(tableName)&&!procedureIdList.isEmpty()) {
+                                String tName=tableName;
+                                //一般项目在主控
+                                if(!StringUtils.isEmpty((String)fieldMap.get("PASS_TEXT"))){
+                                        if(tName.equals(tableMap.get("一般")))
+                                            fieldMap.put("IS_GENERAL", "1");
+                                    tName=TableConstants.DOMINANT_ITEM;
+                                }
                                 for(String procedureId:procedureIdList) {
                                     fieldMap.addParams(relateField, procedureId);
-                                    baseDao.insertByProsInTab(tableName, fieldMap);
+                                    baseDao.insertByProsInTab(tName, fieldMap);
                                 }
                             }
                         } else {

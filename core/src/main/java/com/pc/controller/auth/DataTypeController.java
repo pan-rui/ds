@@ -106,6 +106,9 @@ public class DataTypeController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.DataType.DATA_TYPE_NAME.name())){
+			map.put(TableConstants.DataType.DATA_TYPE_NAME.name(), "%"+map.get(TableConstants.DataType.DATA_TYPE_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, dataTypeService.getDataTypePage(page, ddBB));
 	}

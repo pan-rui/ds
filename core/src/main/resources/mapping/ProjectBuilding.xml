@@ -80,7 +80,7 @@
 
     <select id="queryProjectBuildingDetailPageInTab" parameterType="map" resultType="map"
             statementType="PREPARED">
-        SELECT a.*, b.USER_NAME buildingManagerName  FROM ${projectBuildingTableName} a
+        SELECT a.*, b.REAL_NAME buildingManagerName FROM ${projectBuildingTableName} a
         LEFT JOIN ${userTableName} b ON a.BUILDING_MANAGER_ID = b.ID
         WHERE  1=1
 

@@ -15,12 +15,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @Description:
@@ -117,15 +124,17 @@ public class ProcedureInfoController extends BaseController {
         Map<String, Object> map = new LinkedHashMap<>(page.getParams());
         map.put(TableConstants.TENANT_ID, tenantId);
         map.put(TableConstants.IS_SEALED, 0);
-        page.setParams(map);
-        return new BaseResult(ReturnCode.OK, procedureInfoService.getProcedureInfoPage(page, ddBB));
+        if(map.containsKey(TableConstants.ProcedureInfo.PROCEDURE_NAME.name())){
+			map.put(TableConstants.ProcedureInfo.PROCEDURE_NAME.name(), "%"+map.get(TableConstants.ProcedureInfo.PROCEDURE_NAME.name())+"%");
+		}
+        return new BaseResult(ReturnCode.OK, procedureInfoService.getProcedureInfoDetailByPage(page, map, ddBB));
     }
 
     @RequestMapping(value = "/procedure/load", method = RequestMethod.POST)
     @ResponseBody
     public BaseResult importData(@RequestHeader(Constants.TENANT_ID)String tenantId,@RequestAttribute(Constants.USER_ID) String userId,@RequestAttribute String ddBB,MultipartFile file) {
         try {
-            if(!file.getOriginalFilename().contains("工序类型")) return new BaseResult(350,"文字名可能不包含\"工序类型\"等字,请选择正确的文件及文件格式,否则可能导致异常");
+            if(!file.getOriginalFilename().contains("工序类型")) return new BaseResult(350,"文件名可能不包含\"工序类型\"等字,请选择正确的文件及文件格式,否则可能导致异常");
             excelUtils.importData(ddBB+TableConstants.SEPARATE+TableConstants.PROCEDURE_TYPE, "PROCEDURE_TYPE_NAME", ddBB+TableConstants.SEPARATE+TableConstants.PROCEDURE_INFO, Arrays.<String>asList("PROCEDURE_NAME", "PROCEDURE_CODE"), "PROCEDURE_TYPE_ID", file,tenantId,userId);
         } catch (IOException e) {
             e.printStackTrace();

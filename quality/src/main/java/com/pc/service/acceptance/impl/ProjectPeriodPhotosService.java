@@ -1,19 +1,15 @@
 package com.pc.service.acceptance.impl;
 
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.service.BaseService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
- 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.pc.core.DataConstants;
-import com.pc.core.Page;
-import com.pc.core.TableConstants;
-import com.pc.dao.acceptance.ProjectPeriodPhotosDao;
-import com.pc.service.BaseService;
 
 @Service
 public class ProjectPeriodPhotosService extends BaseService {
@@ -44,9 +40,9 @@ public class ProjectPeriodPhotosService extends BaseService {
 	}
 
     public List<Map<String, Object>> getProjectPeriodPhotosList(Map<String, Object> params, String ddBB) {
-		Map<String, String> orderMap=new HashMap<>();
-		orderMap.put(TableConstants.ProjectPeriodPhotos.SQNO.name(), TableConstants.ORDER_BY_ASC);
-        	List<Map<String, Object>> list = queryList(params, null,
+		Map<String, Object> orderMap=new HashMap<>();
+		orderMap.put(TableConstants.ProjectPeriodPhotos.UPDATE_TIME.name(), TableConstants.ORDER_BY_DESC);
+        	List<Map<String, Object>> list = queryList(params, orderMap,
 				ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD_PHOTOS);
 		return list;
 	}

@@ -163,6 +163,9 @@ public class OperatPrivilegesController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.OperatePrivileges.OPERATE_PRIVILEGES_NAME.name())){
+			map.put(TableConstants.OperatePrivileges.OPERATE_PRIVILEGES_NAME.name(), "%"+map.get(TableConstants.OperatePrivileges.OPERATE_PRIVILEGES_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, operatPrivilegesService.getOperatPrivilegePage(page, ddBB));
 	}

@@ -1,22 +1,5 @@
 package com.pc.controller.acceptance;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.alibaba.fastjson.JSONObject;
 import com.pc.annotation.EncryptProcess;
 import com.pc.base.BaseResult;
@@ -42,11 +25,32 @@ import com.pc.service.procedure.impl.DominantItemService;
 import com.pc.service.procedure.impl.GeneralItemService;
 import com.pc.service.procedure.impl.ProcedureInfoService;
 import com.pc.service.procedure.impl.ProcedureTypeService;
+import com.pc.service.project.impl.ProjectBuildingService;
+import com.pc.service.project.impl.ProjectHouseholdService;
+import com.pc.service.project.impl.ProjectInfoService;
+import com.pc.service.project.impl.ProjectPeriodService;
+import com.pc.service.project.impl.ProjectRegionProcedureRelateService;
 import com.pc.service.user.UserService;
 import com.pc.util.DateUtil;
 import com.pc.util.ImgUtil;
 import com.pc.util.JPushUtil;
 import com.pc.vo.ParamsVo;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:
@@ -58,6 +62,19 @@ import com.pc.vo.ParamsVo;
 @Controller
 @RequestMapping("/client")
 public class AcceptanceBatchController extends BaseController {
+	
+	@Autowired
+	private ProjectInfoService projectInfoService;
+	
+	@Autowired
+	private ProjectPeriodService projectPeriodService;
+	
+	@Autowired
+	private ProjectBuildingService projectBuildingService;
+	
+	@Autowired
+	private ProjectHouseholdService projectHouseholdService;
+	
 	@Autowired
 	private AcceptanceBatchService acceptanceBatchService;
 
@@ -105,6 +122,9 @@ public class AcceptanceBatchController extends BaseController {
 	
 	@Autowired
 	private ProcedureScheduleRelateService procedureScheduleRelateService;
+	
+	@Autowired
+	private ProjectRegionProcedureRelateService projectRegionProcedureRelateService;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
@@ -213,7 +233,7 @@ public class AcceptanceBatchController extends BaseController {
 	 */
 	@RequestMapping("/acceptanceBatch/getAllAcceptanceBatchByNotice")
 	@ResponseBody
-	public BaseResult getAllAcceptanceBatchByNotice(@RequestAttribute(Constants.USER_ID) String userId,
+	public BaseResult getAllAcceptanceBatchByNotice(@EncryptProcess Page page, @RequestAttribute(Constants.USER_ID) String userId,
 			@RequestHeader(Constants.TENANT_ID) String tenantId, @RequestAttribute String ddBB) {
 
 		Map<String, Object> user = userService.getByID(userId, ddBB);
@@ -230,7 +250,7 @@ public class AcceptanceBatchController extends BaseController {
 			return new BaseResult(ReturnCode.NO_POST_AUTH);
 		}
 		
-		return new BaseResult(ReturnCode.OK,acceptanceBatchService.getAllAcceptanceBatchByNotic(userId, DataConstants.INSPECTOR_ROLE_ZJ, ddBB));
+		return new BaseResult(ReturnCode.OK,acceptanceBatchService.getAllAcceptanceBatchByNotic(page,userId, DataConstants.INSPECTOR_ROLE_ZJ, ddBB));
 	}
 
 	/**
@@ -249,6 +269,32 @@ public class AcceptanceBatchController extends BaseController {
 			@RequestAttribute String ddBB) {
 
 		String batchId = (String) params.getParams().get(TableConstants.AcceptanceBatch.ID.name());
+		
+		if (batchId == null) {
+			String projectPeriodId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+			String inspectorRole = (String) params.getParams().get(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name());
+			String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
+			String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
+			String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
+			if(StringUtils.isBlank(projectPeriodId)||StringUtils.isBlank(inspectorRole)||StringUtils.isBlank(regionType)||
+					StringUtils.isBlank(regionId)||StringUtils.isBlank(procedureId)){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
+			Map<String, Object> map = acceptanceNoteService
+					.getAcceptanceNote(ParamsMap.newMap(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId)
+							.addParams(TableConstants.AcceptanceNote.REGION_ID.name(), regionId)
+							.addParams(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType)
+							.addParams(TableConstants.IS_SEALED, 0), ddBB);
+			batchId = (String) acceptanceBatchService
+					.getAcceptanceBatch(ParamsMap.newMap(TableConstants.AcceptanceBatch.ACCEPTANCE_NOTE_ID.name(), (String)map.get(TableConstants.AcceptanceNote.id.name()))
+							.addParams(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), inspectorRole)
+							.addParams(TableConstants.AcceptanceBatch.BATCH_STATUS.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_MASTER)
+							.addParams(TableConstants.IS_SEALED, 0), ddBB).get(TableConstants.AcceptanceBatch.id.name());
+		}
+		
+		if(batchId==null){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+		}
 
 		Map<String, Object> oldBatch = acceptanceBatchService.getByID(batchId, ddBB);
 
@@ -264,8 +310,9 @@ public class AcceptanceBatchController extends BaseController {
 				noteMap.get(TableConstants.AcceptanceNote.id.name()));
 		Map<String, Object> batchStatus = procedureBatchStatusService.getProcedureBatchStatus(batchStatusParamsMap,
 				ddBB);
-
-		if (oldBatch == null || noteMap == null || batchStatus == null) {
+		
+		Map<String, Object> user = userService.getByID(userId, ddBB);
+		if (oldBatch == null || noteMap == null || batchStatus == null||user==null) {
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 		}
 
@@ -424,6 +471,8 @@ public class AcceptanceBatchController extends BaseController {
 				acceptanceBatch.get(TableConstants.AcceptanceBatch.id.name()));
 		updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.REMARK.name(),
 				(String) params.getParams().get(TableConstants.AcceptanceBatch.REMARK.name()));
+		updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ACCEPTANCE_PERSON_ID.name(),userId);
+		updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ACCEPTER.name(),(String)user.get(TableConstants.User.realName.name()));
 
 		if (DataConstants.BATCH_STATUS_ID_ZJWYS
 				.equals((String) acceptanceBatch.get(TableConstants.AcceptanceBatch.batchStatusId.name()))
@@ -442,8 +491,6 @@ public class AcceptanceBatchController extends BaseController {
 					.valueOf((String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
 			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ELIGIBLE_RATE.name(),
 					(String) params.getParams().get(TableConstants.AcceptanceBatch.ELIGIBLE_RATE.name()));
-			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.REMARK.name(),
-					(String) params.getParams().get(TableConstants.AcceptanceBatch.REMARK.name()));
 
 			// 修改验收状态
 			Map<String, Object> updateBatchStatus = new HashMap<>();
@@ -597,7 +644,35 @@ public class AcceptanceBatchController extends BaseController {
 
 		String batchId = (String) params.getParams().get(TableConstants.AcceptanceBatch.ID.name());
 		if (batchId == null) {
-			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			String projectPeriodId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+			String inspectorRole = (String) params.getParams().get(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name());
+			String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
+			String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
+			String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
+			if(StringUtils.isBlank(projectPeriodId)||StringUtils.isBlank(inspectorRole)||StringUtils.isBlank(regionType)||
+					StringUtils.isBlank(regionId)||StringUtils.isBlank(procedureId)){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
+			Map<String, Object> map = acceptanceNoteService
+					.getAcceptanceNote(ParamsMap.newMap(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId)
+							.addParams(TableConstants.AcceptanceNote.REGION_ID.name(), regionId)
+							.addParams(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType)
+							.addParams(TableConstants.IS_SEALED, 0), ddBB);
+			if(map!=null){
+				Map<String, Object> batchMap = acceptanceBatchService
+						.getAcceptanceBatch(ParamsMap.newMap(TableConstants.AcceptanceBatch.ACCEPTANCE_NOTE_ID.name(), (String)map.get(TableConstants.AcceptanceNote.id.name()))
+								.addParams(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), inspectorRole)
+								.addParams(TableConstants.AcceptanceBatch.BATCH_STATUS_ID.name(), inspectorRole.equals(DataConstants.INSPECTOR_ROLE_ZJ)?DataConstants.BATCH_STATUS_ID_ZJWYS:DataConstants.BATCH_STATUS_ID_JLWYS)
+								.addParams(TableConstants.AcceptanceBatch.BATCH_STATUS.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_MASTER)
+								.addParams(TableConstants.IS_SEALED, 0), ddBB);
+				if(batchMap!=null){
+					batchId=(String) batchMap.get(TableConstants.AcceptanceBatch.id.name());
+				}else{
+					batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId);
+				}
+			}else{
+				batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId);
+			}
 		}
 		// 主信息
 		Map<String, Object> result = acceptanceBatchService.getBatchInfo(batchId, ddBB);
@@ -692,6 +767,30 @@ public class AcceptanceBatchController extends BaseController {
 		String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
 		String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
 		
+		if((!(DataConstants.REGION_PERIOD_TYPE_VAL.equals(regionType)||DataConstants.REGION_BUILDING_TYPE_VAL.equals(regionType)||
+				DataConstants.REGION_FLOOR_TYPE_VAL.equals(regionType)))||StringUtils.isBlank(projectPeriodId)||
+				StringUtils.isBlank(regionId)||StringUtils.isBlank(procedureId)){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+		}
+		
+		boolean hasFloorType=false;
+		boolean hasRoomType=false;
+		if(DataConstants.REGION_FLOOR_TYPE_VAL.equals(regionType)){
+			Map<String, Object> typeMap=new HashMap<>();
+			typeMap.put(TableConstants.ProjectRegionProcedureRelate.PROCEDURE_ID.name(), procedureId);
+			typeMap.put(TableConstants.ProjectRegionProcedureRelate.PROJECT_PERIOD_ID.name(), projectPeriodId);
+			
+			typeMap.put(TableConstants.ProjectRegionProcedureRelate.REGION_TYPE_ID.name(), DataConstants.REGION_FLOOR_TYPE_VAL);
+			hasFloorType=projectRegionProcedureRelateService.getProjectRegionProcedureRelateList(typeMap, ddBB).size()>0;
+			
+			typeMap.put(TableConstants.ProjectRegionProcedureRelate.REGION_TYPE_ID.name(), DataConstants.REGION_ROOM_TYPE_VAL);
+			hasRoomType=projectRegionProcedureRelateService.getProjectRegionProcedureRelateList(typeMap, ddBB).size()>0;
+			
+			if((!hasFloorType)&&(!hasRoomType)){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
+		}
+		
 		Map<String, Object> user = userService.getByID(userId, ddBB);
 		if (user.get(TableConstants.User.postId.name()) == null) {
 			return new BaseResult(ReturnCode.NO_POST_AUTH);
@@ -703,15 +802,18 @@ public class AcceptanceBatchController extends BaseController {
 		}
 		
 		String inspectorRole=null;
+		String batchStatusId=null;
 		if(DataConstants.INSPECTOR_ROLE_NAME_ZJ.equals((String)postInfo.get(TableConstants.PostInfo.postName.name()))){
 			inspectorRole=DataConstants.INSPECTOR_ROLE_ZJ;
+			batchStatusId=DataConstants.BATCH_STATUS_ID_ZJWYS;
 		}else if(DataConstants.INSPECTOR_ROLE_NAME_JL.equals((String)postInfo.get(TableConstants.PostInfo.postName.name()))){
 			inspectorRole=DataConstants.INSPECTOR_ROLE_JL;
+			batchStatusId=DataConstants.BATCH_STATUS_ID_JLWYS;
 		}else{
 			return new BaseResult(ReturnCode.NO_POST_AUTH);
 		}
 		
-		return new BaseResult(ReturnCode.OK, acceptanceBatchService.getAllAcceptanceBatchByPost(projectPeriodId, inspectorRole,
+		return new BaseResult(ReturnCode.OK, acceptanceBatchService.getAllAcceptanceBatchByPost(hasFloorType,hasRoomType,batchStatusId,projectPeriodId, inspectorRole,
 				procedureId, regionType, regionId, ddBB));
 	}
 
@@ -750,12 +852,13 @@ public class AcceptanceBatchController extends BaseController {
 		Map<String, Object> teamInfo = teamInfoService.getByID(constructionTeamId, ddBB);
 		Map<String, Object> supervisorCompany = companyService.getByID(supervisorCompanyId, ddBB);
 		Map<String, Object> contractingPro = companyService.getByID(contractingProId, ddBB);
+		Map<String, Object> user = userService.getByID(userId, ddBB);
 
 		Map<String, Object> acceptanceBatch = acceptanceBatchService.getByID(batchId, ddBB);
-//		if (DataConstants.ACCEPTANCE_BATCH_STATUS_MEMBER.equals((String)acceptanceBatch.get(TableConstants.AcceptanceBatch.batchStatus.name()))
-//				||acceptanceBatch == null || teamInfo == null || supervisorCompany == null || contractingPro == null) {
-//			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
-//		}
+		if (DataConstants.ACCEPTANCE_BATCH_STATUS_MEMBER.equals((String)acceptanceBatch.get(TableConstants.AcceptanceBatch.batchStatus.name()))
+				||acceptanceBatch == null || teamInfo == null || supervisorCompany == null || contractingPro == null||user==null) {
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+		}
 		
 		String acceptanceNoteId = (String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptanceNoteId.name());
 		Map<String, Object> acceptanceNote = acceptanceNoteService.getByID(acceptanceNoteId, ddBB);
@@ -808,6 +911,8 @@ public class AcceptanceBatchController extends BaseController {
 					(String) params.getParams().get(TableConstants.AcceptanceBatch.ELIGIBLE_RATE.name()));
 			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.REMARK.name(),
 					(String) params.getParams().get(TableConstants.AcceptanceBatch.REMARK.name()));
+			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ACCEPTANCE_PERSON_ID.name(),userId);
+			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ACCEPTER.name(),(String)user.get(TableConstants.User.realName.name()));
 
 			// 修改验收状态
 			Map<String, Object> batchStatusParamsMap = new HashMap<>();
@@ -844,6 +949,15 @@ public class AcceptanceBatchController extends BaseController {
 					updateAcceptanceNote.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(),
 							DataConstants.PROCEDURE_STATUS_ID_ZJYYS);
 				}else{
+					if(DataConstants.ACCEPTANCE_BATCH_STATUS_ID_WBY.equals((String)batchStatus.get(TableConstants.ProcedureBatchStatus.statementId.name()))){
+						updateBatchStatus.put(TableConstants.ProcedureBatchStatus.STATEMENT_ID.name(),
+								DataConstants.ACCEPTANCE_BATCH_STATUS_ID_YBY);
+					}
+					if(DataConstants.PROCEDURE_STATUS_ID_SGZ.equals((String)acceptanceNote.get(TableConstants.AcceptanceNote.statementId.name()))){
+						updateAcceptanceNote.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(),
+								DataConstants.PROCEDURE_STATUS_ID_YBY);
+					}
+					
 					updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.BATCH_STATUS_ID.name(),
 							DataConstants.BATCH_STATUS_ID_ZJNFY);
 				}
@@ -871,6 +985,16 @@ public class AcceptanceBatchController extends BaseController {
 					updateAcceptanceNote.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(),
 							DataConstants.PROCEDURE_STATUS_ID_JLYYS);
 				}else{
+					if(DataConstants.ACCEPTANCE_BATCH_STATUS_ID_WBY.equals((String)batchStatus.get(TableConstants.ProcedureBatchStatus.statementId.name()))){
+						updateBatchStatus.put(TableConstants.ProcedureBatchStatus.STATEMENT_ID.name(),
+								DataConstants.ACCEPTANCE_BATCH_STATUS_ID_ZJYYS);
+					}
+					
+					if(DataConstants.PROCEDURE_STATUS_ID_SGZ.equals((String)acceptanceNote.get(TableConstants.AcceptanceNote.statementId.name()))){
+						updateAcceptanceNote.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(),
+								DataConstants.PROCEDURE_STATUS_ID_ZJYYS);
+					}
+					
 					updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.BATCH_STATUS_ID.name(),
 							DataConstants.BATCH_STATUS_ID_JLNFY);
 				}
@@ -985,6 +1109,8 @@ public class AcceptanceBatchController extends BaseController {
 					(String) params.getParams().get(TableConstants.AcceptanceBatch.ELIGIBLE_RATE.name()));
 			batchAcceptance.put(TableConstants.AcceptanceBatch.REMARK.name(),
 					(String) params.getParams().get(TableConstants.AcceptanceBatch.REMARK.name()));
+			batchAcceptance.put(TableConstants.AcceptanceBatch.ACCEPTANCE_PERSON_ID.name(),userId);
+			batchAcceptance.put(TableConstants.AcceptanceBatch.ACCEPTER.name(),(String)user.get(TableConstants.User.realName.name()));
 
 			int batchAcceptanceNo = acceptanceBatchService
 					.getAcceptanceBatchList(
@@ -1147,13 +1273,13 @@ public class AcceptanceBatchController extends BaseController {
 			acceptanceBatchService.updateAcceptanceBatch(updateAcceptanceBatch, ddBB);
 			acceptanceNoteService.updateAcceptanceNote(updateAcceptanceNote, ddBB);
 			
-			updateProcedureScheduleRelate(ddBB, userId, (String)acceptanceNote.get(TableConstants.AcceptanceNote.procedureId.name()),
-					(String)acceptanceNote.get(TableConstants.AcceptanceNote.regionType.name()), 
-					(String)acceptanceNote.get(TableConstants.AcceptanceNote.regionId.name()));
-
 		}else{
 			return new BaseResult(ReturnCode.ACCEPTANCE_IS_SUCCEED);
 		}
+		
+		updateProcedureScheduleRelate(ddBB, userId, (String)acceptanceNote.get(TableConstants.AcceptanceNote.procedureId.name()),
+				(String)acceptanceNote.get(TableConstants.AcceptanceNote.regionType.name()), 
+				(String)acceptanceNote.get(TableConstants.AcceptanceNote.regionId.name()));
 		
 		JSONObject result=new JSONObject();
 		result.put(TableConstants.AcceptanceBatch.id.name(), batchId);
@@ -1170,9 +1296,35 @@ public class AcceptanceBatchController extends BaseController {
 	 */
 	@RequestMapping("/acceptanceBatch/getBatchInfo")
 	@ResponseBody
-	public BaseResult getBatchInfo(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
+	public BaseResult getBatchInfo(@RequestAttribute(Constants.USER_ID) String userId, @RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
 			@RequestAttribute String ddBB) {
 		String batchId = (String) params.getParams().get(TableConstants.AcceptanceBatch.ID.name());
+		
+		if(batchId==null){
+			String projectPeriodId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+			String inspectorRole = (String) params.getParams().get(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name());
+			String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
+			String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
+			String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
+			
+			Map<String, Object> map = acceptanceNoteService
+					.getAcceptanceNote(ParamsMap.newMap(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId)
+							.addParams(TableConstants.AcceptanceNote.REGION_ID.name(), regionId)
+							.addParams(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType)
+							.addParams(TableConstants.IS_SEALED, 0), ddBB);
+			if(map!=null){
+				batchId = (String) acceptanceBatchService
+						.getAcceptanceBatch(ParamsMap.newMap(TableConstants.AcceptanceBatch.ACCEPTANCE_NOTE_ID.name(), (String)map.get(TableConstants.AcceptanceNote.id.name()))
+								.addParams(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), inspectorRole)
+								.addParams(TableConstants.AcceptanceBatch.BATCH_STATUS.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_MASTER)
+								.addParams(TableConstants.IS_SEALED, 0), ddBB).get(TableConstants.AcceptanceBatch.id.name());
+			}else{
+				batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId);
+			}
+		}
+		if(StringUtils.isBlank(batchId)){
+			new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+		}
 
 		Map<String, Object> result = acceptanceBatchService.getBatchInfo(batchId, ddBB);
 
@@ -1436,7 +1588,8 @@ public class AcceptanceBatchController extends BaseController {
 	 * @param regionId
 	 */
 	private void updateProcedureScheduleRelate(String ddBB,String userId,String procedureId,String regionType,String regionId){
-		if(DataConstants.REGION_ROOM_TYPE_VAL.equals(regionType)&&StringUtils.isNotBlank(regionId)){
+		if((DataConstants.REGION_ROOM_TYPE_VAL.equals(regionType)&&StringUtils.isNotBlank(regionId))||
+				(DataConstants.REGION_FLOOR_TYPE_VAL.equals(regionType)&&StringUtils.isNotBlank(regionId))){
 			Map<String, Object> procedure=procedureInfoService.getByID(procedureId, ddBB);
 			Map<String, Object> procedureType=procedureTypeService.getByID((String)procedure.get(TableConstants.ProcedureInfo.procedureTypeId.name()), ddBB);
 			String idTree=(String) procedureType.get(TableConstants.ProcedureType.idTree.name());
@@ -1457,5 +1610,162 @@ public class AcceptanceBatchController extends BaseController {
 				}
 			}
 		}
+	}
+	
+	private String addNoteBatch(String ddBB,String tenantId,String projectPeriodId,String inspectorRole,
+			String userId,String regionType,String regionId,String procedureId){
+		Map<String, Object> projectPeriod = projectPeriodService.getByID(projectPeriodId, ddBB);
+		Map<String, Object> projectInfo = projectInfoService.getByID((String)projectPeriod.get(TableConstants.ProjectPeriod.projectId.name()), ddBB);
+		Map<String, Object> user = userService.getByID(userId, ddBB);
+		
+		
+		String generalContractId=(String) projectInfo.get(TableConstants.ProjectInfo.generalContractId.name());
+		String constructionId=(String) projectInfo.get(TableConstants.ProjectInfo.constructionId.name());
+		String generalContract=null;
+		String construction=null;
+		if(generalContractId!=null){
+			generalContract=(String)companyService.getByID(generalContractId, ddBB).get(TableConstants.Company.corporateName.name());
+		}
+		if(constructionId!=null){
+			construction=(String)companyService.getByID(constructionId, ddBB).get(TableConstants.Company.corporateName.name());
+		}
+		
+		if (StringUtils.isBlank(projectPeriodId) ||  StringUtils.isBlank(regionId) || StringUtils.isBlank(regionType)) {
+			return null;
+		}
+		
+		Map<String, Object> period=null;
+		String regionMinName=null;
+		String regionName=null;
+		if (DataConstants.REGION_PERIOD_TYPE_VAL.equals(regionType)) {
+			period = projectPeriod;
+			regionMinName=(String) period.get(TableConstants.ProjectPeriod.periodName.name());
+			regionName=(String) period.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE+DataConstants.REGION_PERIOD_KEY;
+		} else if (DataConstants.REGION_BUILDING_TYPE_VAL.equals(regionType)) {
+			period = projectBuildingService.getByID(regionId, ddBB);
+			regionMinName=(String) period.get(TableConstants.ProjectBuilding.buildingName.name());
+			regionName=(String) period.get(TableConstants.ProjectBuilding.buildingName.name())+TableConstants.SEPARATE_TREE+DataConstants.REGION_BUILDING_KEY;
+		} else if (DataConstants.REGION_FLOOR_TYPE_VAL.equals(regionType)) {
+			period = projectHouseholdService.getByID(regionId, ddBB);
+			regionMinName=(String) period.get(TableConstants.ProjectHousehold.roomName.name());
+			regionName=((String) period.get(TableConstants.ProjectHousehold.nameTree.name())).replace(projectPeriod.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE, "");
+		} else if (DataConstants.REGION_ROOM_TYPE_VAL.equals(regionType)) {
+			period = projectHouseholdService.getByID(regionId, ddBB);
+			regionMinName=(String) period.get(TableConstants.ProjectHousehold.roomName.name());
+			regionName=((String) period.get(TableConstants.ProjectHousehold.nameTree.name())).replace(projectPeriod.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE, "");
+		} else {
+			logger.info("部位类型不正常");
+			return null;
+		}
+		if(period==null){
+			return null;
+		}
+
+		
+		Map<String, Object> procedure=procedureInfoService.getByID(procedureId, ddBB);
+		if(procedure==null){
+			return null;
+		}
+		String procedureName = (String) procedure.get(TableConstants.ProcedureInfo.procedureName.name());
+
+		Map<String, Object> map = acceptanceNoteService
+				.getAcceptanceNote(ParamsMap.newMap(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId)
+						.addParams(TableConstants.AcceptanceNote.REGION_ID.name(), regionId)
+						.addParams(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType)
+						.addParams(TableConstants.IS_SEALED, 0), ddBB);
+		
+		String acceptanceNoteId=null;
+		
+		if (map!=null) {
+			Map<String, Object> nmap = new HashMap<>();
+			acceptanceNoteId=(String) map.get(TableConstants.AcceptanceNote.id.name());
+			nmap.put(TableConstants.AcceptanceNote.ID.name(), acceptanceNoteId);
+			nmap.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(), DataConstants.PROCEDURE_STATUS_ID_YBY);
+			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
+			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
+					DateUtil.convertDateTimeToString(new Date(), null));
+			acceptanceNoteService.updateAcceptanceNote(nmap, ddBB);
+			
+		} else {
+			map = new HashMap<>();
+			map.put(TableConstants.TENANT_ID, tenantId);
+			map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
+			map.put(TableConstants.UPDATE_USER_ID, userId);
+			map.put(TableConstants.IS_SEALED, 0);
+
+			map.put(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name(), projectPeriodId);
+			map.put(TableConstants.AcceptanceNote.PROJECT_NAME.name(),
+					(String) projectPeriod.get(TableConstants.ProjectPeriod.periodName.name()));
+			
+			map.put(TableConstants.AcceptanceNote.SUPERVISOR_COMPANY_ID.name(),generalContractId);
+			map.put(TableConstants.AcceptanceNote.CONTRACTING_PRO_ID.name(),constructionId);
+			
+			map.put(TableConstants.AcceptanceNote.SUPERVISOR_COMPANY.name(),generalContract);
+			map.put(TableConstants.AcceptanceNote.CONTRACTING_PRO.name(),construction);
+			
+			map.put(TableConstants.AcceptanceNote.REGION_ID.name(), regionId);
+			map.put(TableConstants.AcceptanceNote.REGION_NAME.name(), regionName);
+			map.put(TableConstants.AcceptanceNote.REGION_MIN_NAME.name(), regionMinName);
+			map.put(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType);
+			map.put(TableConstants.AcceptanceNote.REGION_ID_TREE.name(),
+					(String) period.get(TableConstants.ProjectHousehold.idTree.name()));
+			map.put(TableConstants.AcceptanceNote.REGION_NAME_TREE.name(),
+					(String) period.get(TableConstants.ProjectHousehold.nameTree.name()));
+			map.put(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId);
+			map.put(TableConstants.AcceptanceNote.PROCEDURE_NAME.name(), procedureName);
+
+			map.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(), DataConstants.PROCEDURE_STATUS_ID_SGZ);
+			map.put(TableConstants.AcceptanceNote.BATCH_TIMES.name(), 1);
+			map.put(TableConstants.AcceptanceNote.CHECK_TIMES.name(), 0);
+
+			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
+			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
+					DateUtil.convertDateTimeToString(new Date(), null));
+
+			acceptanceNoteService.addAcceptanceNote(map, ddBB);
+			acceptanceNoteId=(String) map.get(TableConstants.AcceptanceNote.ID.name());
+		}
+		
+		//新建一批次
+		Map<String, Object> batchMap = new HashMap<>();
+		batchMap.put(TableConstants.TENANT_ID, tenantId);
+		batchMap.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
+		batchMap.put(TableConstants.UPDATE_USER_ID, userId);
+		batchMap.put(TableConstants.IS_SEALED, 0);
+		batchMap.put(TableConstants.AcceptanceBatch.ACCEPTANCE_NOTE_ID.name(), acceptanceNoteId);
+		batchMap.put(TableConstants.AcceptanceBatch.BATCH_NO.name(), 1);
+		batchMap.put(TableConstants.AcceptanceBatch.BATCH_ACCEPTANCE_NO.name(), 1);
+		batchMap.put(TableConstants.AcceptanceBatch.MIN_PASS_RATIO.name(), (Float)procedure.get(TableConstants.AcceptanceBatch.minPassRatio.name()));
+		batchMap.put(TableConstants.AcceptanceBatch.BATCH_STATUS.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_MASTER);
+		
+		Map<String, Object> zjBatchMap = new HashMap<>(batchMap);
+		zjBatchMap.put(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), DataConstants.INSPECTOR_ROLE_ZJ);
+		zjBatchMap.put(TableConstants.AcceptanceBatch.BATCH_STATUS_ID.name(), DataConstants.BATCH_STATUS_ID_ZJWYS);
+		acceptanceBatchService.addAcceptanceBatch(zjBatchMap, ddBB);
+		
+		Map<String, Object> jlBatchMap = new HashMap<>(batchMap);
+		jlBatchMap.put(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), DataConstants.INSPECTOR_ROLE_JL);
+		jlBatchMap.put(TableConstants.AcceptanceBatch.BATCH_STATUS_ID.name(), DataConstants.BATCH_STATUS_ID_JLWYS);
+		acceptanceBatchService.addAcceptanceBatch(jlBatchMap, ddBB);
+		
+		//加入批次状态
+		Map<String, Object> batchStatusMap = new HashMap<>();
+		batchStatusMap.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
+		batchStatusMap.put(TableConstants.UPDATE_USER_ID, userId);
+		batchStatusMap.put(TableConstants.IS_SEALED, 0);
+		batchStatusMap.put(TableConstants.ProcedureBatchStatus.ACCEPTANCE_NOTE_ID.name(), acceptanceNoteId);
+		batchStatusMap.put(TableConstants.ProcedureBatchStatus.PROCEDURE_ID.name(), procedureId);
+		batchStatusMap.put(TableConstants.ProcedureBatchStatus.BATCH_NO.name(), 1);
+		batchStatusMap.put(TableConstants.ProcedureBatchStatus.STATEMENT_ID.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_ID_WBY);
+		procedureBatchStatusService.addProcedureBatchStatus(batchStatusMap, ddBB);
+		
+		if (DataConstants.INSPECTOR_ROLE_ZJ.equals(inspectorRole)) {
+			return (String) zjBatchMap.get(TableConstants.AcceptanceBatch.ID.name());
+		}else if(DataConstants.INSPECTOR_ROLE_JL.equals(inspectorRole)){
+			return (String) jlBatchMap.get(TableConstants.AcceptanceBatch.ID.name());
+		}else{
+			return null;
+		}
+		
 	}
 }

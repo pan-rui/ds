@@ -1,19 +1,17 @@
 package com.pc.service.project.impl;
 
-import java.util.List;
-import java.util.Map;
-
-import com.pc.dao.project.ProjectBuildingDao;
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.dao.project.FloorTypeBatchNoteDao;
+import com.pc.service.BaseService;
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pc.core.Page;
-import com.pc.core.TableConstants;
-import com.pc.dao.project.FloorTypeBatchNoteDao;
-import com.pc.service.BaseService;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class FloorTypeBatchNoteService extends BaseService {

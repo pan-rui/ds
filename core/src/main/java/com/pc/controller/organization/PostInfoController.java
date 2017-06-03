@@ -108,6 +108,9 @@ public class PostInfoController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.PostInfo.POST_NAME.name())){
+			map.put(TableConstants.PostInfo.POST_NAME.name(), "%"+map.get(TableConstants.PostInfo.POST_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, postInfoService.getPostInfoPage(page, ddBB));
 	}

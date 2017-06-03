@@ -22,13 +22,6 @@ public class OrganizationInfoService extends BaseService {
     public List<Map<String, Object>> getProjectOrganizationInfoList(Map<String, Object> params, String ddBB) {
     	params.put("oTableName", ddBB + TableConstants.SEPARATE + TableConstants.ORGANIZATION_INFO);
     	params.put("ppTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD);
-		params.put("pbTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_BUILDING);
-		params.put("phTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_HOUSEHOLD);
-		
-		params.put("rdprTableName", ddBB + TableConstants.SEPARATE + TableConstants.ROLE_DATA_PRIVILEGES_RELATE);
-		params.put("dpTableName", ddBB + TableConstants.SEPARATE + TableConstants.DATA_PRIVILEGES_INFO);
-		params.put("rTableName", ddBB + TableConstants.SEPARATE + TableConstants.ROLES_INFO);
-		params.put("urrTableName", ddBB + TableConstants.SEPARATE + TableConstants.USER_ROLE_RELATE);
 		return organizationInfoDao.queryProjectOrganizationInfoListInTab(params);
 	}
      

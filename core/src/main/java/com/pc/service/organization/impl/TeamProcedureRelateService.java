@@ -1,19 +1,16 @@
 package com.pc.service.organization.impl;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
- 
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.dao.organization.TeamProcedureRelateDao;
+import com.pc.service.BaseService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pc.core.Page;
-import com.pc.core.TableConstants;
-import com.pc.dao.organization.TeamProcedureRelateDao;
-import com.pc.dao.organization.TeamUserRelateDao;
-import com.pc.service.BaseService;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class TeamProcedureRelateService extends BaseService {

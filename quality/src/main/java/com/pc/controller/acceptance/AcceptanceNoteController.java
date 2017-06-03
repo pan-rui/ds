@@ -1,21 +1,5 @@
 package com.pc.controller.acceptance;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.pc.annotation.EncryptProcess;
 import com.pc.base.BaseResult;
 import com.pc.base.Constants;
@@ -36,7 +20,23 @@ import com.pc.service.project.impl.ProjectHouseholdService;
 import com.pc.service.project.impl.ProjectInfoService;
 import com.pc.service.project.impl.ProjectPeriodService;
 import com.pc.util.DateUtil;
+import com.pc.util.JPushUtil;
 import com.pc.vo.ParamsVo;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description:
@@ -90,8 +90,11 @@ public class AcceptanceNoteController extends BaseController {
 		map.put(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name(), (String) page.getParams()
 				.get(TableConstants.ProjectBuilding.PROJECT_PERIOD_ID.name()));
 		map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_ID.name(), userId);
-
 		page.setParams(map);
+		
+		Map<String, Object> orderMap = new LinkedHashMap<>();
+		orderMap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(), TableConstants.ORDER_BY_DESC);
+		page.setOrderMap(orderMap);
 		return new BaseResult(ReturnCode.OK, acceptanceNoteService.getAcceptanceNotePage(page, ddBB));
 	}
 	
@@ -154,22 +157,31 @@ public class AcceptanceNoteController extends BaseController {
 		Map<String, Object> period=null;
 		String regionMinName=null;
 		if (DataConstants.REGION_PERIOD_TYPE_VAL.equals(regionType)) {
-			period = projectPeriod;
+			period = projectPeriodService.getByID(regionId, ddBB);
+			if(period==null){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectPeriod.PERIOD_NAME.name());
 		} else if (DataConstants.REGION_BUILDING_TYPE_VAL.equals(regionType)) {
 			period = projectBuildingService.getByID(regionId, ddBB);
+			if(period==null){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectBuilding.buildingName.name());
 		} else if (DataConstants.REGION_FLOOR_TYPE_VAL.equals(regionType)) {
 			period = projectHouseholdService.getByID(regionId, ddBB);
+			if(period==null){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectHousehold.roomName.name());
 		} else if (DataConstants.REGION_ROOM_TYPE_VAL.equals(regionType)) {
 			period = projectHouseholdService.getByID(regionId, ddBB);
+			if(period==null){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectHousehold.roomName.name());
 		} else {
 			logger.info("部位类型不正常");
-			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
-		}
-		if(period==null){
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 		}
 
@@ -183,11 +195,16 @@ public class AcceptanceNoteController extends BaseController {
 		Map<String, Object> map = acceptanceNoteService
 				.getAcceptanceNote(ParamsMap.newMap(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId)
 						.addParams(TableConstants.AcceptanceNote.REGION_ID.name(), regionId)
+						.addParams(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType)
 						.addParams(TableConstants.IS_SEALED, 0), ddBB);
 		
 		String acceptanceNoteId=null;
 		
 		if (map!=null) {
+			if(!DataConstants.PROCEDURE_STATUS_ID_SGZ.equals((String) map.get(TableConstants.AcceptanceNote.statementId.name()))){
+				return new BaseResult(ReturnCode.ACCEPTANCE_EXIST);
+			}
+			
 			Map<String, Object> nmap = new HashMap<>();
 			acceptanceNoteId=(String) map.get(TableConstants.AcceptanceNote.id.name());
 			
@@ -197,7 +214,6 @@ public class AcceptanceNoteController extends BaseController {
 			nmap.put(TableConstants.AcceptanceNote.CHECK_TIMES.name(), 0);
 			nmap.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(), constructionInspector);
 			nmap.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(), constructionInspectorId);
-			nmap.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECKED.name(), 0);
 
 			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
@@ -240,7 +256,6 @@ public class AcceptanceNoteController extends BaseController {
 			map.put(TableConstants.AcceptanceNote.CHECK_TIMES.name(), 0);
 			map.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(), constructionInspector);
 			map.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(), constructionInspectorId);
-			map.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECKED.name(), 0);
 
 			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
@@ -289,9 +304,10 @@ public class AcceptanceNoteController extends BaseController {
 			batchStatusMap.put(TableConstants.ProcedureBatchStatus.BATCH_NO.name(), 1);
 			batchStatusMap.put(TableConstants.ProcedureBatchStatus.STATEMENT_ID.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_ID_YBY);
 			procedureBatchStatusService.addProcedureBatchStatus(batchStatusMap, ddBB);
-		}else{
-			return new BaseResult(ReturnCode.ACCEPTANCE_EXIST);
 		}
+		
+		//加入推送
+		JPushUtil.push(constructionInspectorId,"新任务","新任务：部位-"+regionName+"，工序-"+procedureName);
 		
 		return new BaseResult(ReturnCode.OK);
 	}

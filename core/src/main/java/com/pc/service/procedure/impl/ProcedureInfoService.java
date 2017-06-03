@@ -1,24 +1,30 @@
 package com.pc.service.procedure.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.dao.procedure.ProcedureInfoDao;
+import com.pc.service.BaseService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pc.core.Page;
-import com.pc.core.TableConstants;
-import com.pc.dao.procedure.ProcedureInfoDao;
-import com.pc.service.BaseService;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProcedureInfoService extends BaseService {
 	private Logger logger = LogManager.getLogger(this.getClass());
 	@Autowired
 	private ProcedureInfoDao procedureInfoDao;
+	
+	public Page getProcedureInfoDetailByPage(Page<Map<String, Object>> page,Map<String, Object> map, String ddBB) {
+		map.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_INFO);
+		map.put("ptTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_TYPE);
+		map.put("page", page);
+		page.setResults(procedureInfoDao.queryProcedureDetailByPageInTab(map));
+		return page;
+	}
 	
 	public List<Map<String, Object>> getProcedureTree(Map<String, Object> paramsMap, String ddBB) {
 		paramsMap.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_INFO);

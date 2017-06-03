@@ -1,21 +1,6 @@
 package com.pc.controller.acceptance;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.pc.annotation.EncryptProcess;
@@ -33,6 +18,20 @@ import com.pc.service.project.impl.ProjectHouseholdService;
 import com.pc.service.project.impl.ProjectRegionTypeService;
 import com.pc.util.TreeUtil;
 import com.pc.vo.ParamsVo;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -55,6 +54,13 @@ public class ProcedureScheduleRelateController extends BaseController {
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
+	/**
+	 * 获取栋工序进度
+	 * @param tenantId
+	 * @param ddBB
+	 * @param params
+	 * @return
+	 */
 	@RequestMapping("/procedureScheduleRelate/getProcedureSchedule")
 	@ResponseBody
 	public BaseResult getProcedureSchedule(@RequestHeader(Constants.TENANT_ID) String tenantId,
@@ -144,6 +150,44 @@ public class ProcedureScheduleRelateController extends BaseController {
 						DataConstants.REGION_FLOOR_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
 		List<Map<String, Object>> floorList = projectHouseholdService.getFloorList(floorMap, ddBB);
 		
+		Map<String, Object> tjFloorParams=new HashMap<>();
+		tjFloorParams.put(TableConstants.ProjectBuilding.projectPeriodId.name(), projectPeriodId);
+		tjFloorParams.put(TableConstants.ProjectHousehold.regionTypeId.name(),(String)projectRegionTypeService
+				.getProjectRegionType(ParamsMap.newMap(TableConstants.ProjectRegionType.REGION_TYPE_NAME.name(),
+						DataConstants.REGION_FLOOR_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
+		tjFloorParams.put(TableConstants.ProcedureScheduleRelate.procedureTypeId.name(), (String)procedureTypeService.getProcedureType(ParamsMap
+				.newMap(TableConstants.ProcedureType.NAME_TREE.name(),DataConstants.PROCEDURE_TYPE_TJ)
+				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_TJ), ddBB)
+				.get(TableConstants.ProcedureType.id.name()));
+		List<Map<String, Object>> tjFloorList=procedureScheduleRelateService.getProcedureScheduleRoomidList(tjFloorParams, ddBB);
+		
+		Map<String, Object> zxFloorParams=new HashMap<>();
+		zxFloorParams.put(TableConstants.ProjectBuilding.projectPeriodId.name(), projectPeriodId);
+		zxFloorParams.put(TableConstants.ProjectHousehold.regionTypeId.name(),(String)projectRegionTypeService
+				.getProjectRegionType(ParamsMap.newMap(TableConstants.ProjectRegionType.REGION_TYPE_NAME.name(),
+						DataConstants.REGION_FLOOR_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
+		zxFloorParams.put(TableConstants.ProcedureScheduleRelate.procedureTypeId.name(), (String)procedureTypeService.getProcedureType(ParamsMap
+				.newMap(TableConstants.ProcedureType.NAME_TREE.name(),DataConstants.PROCEDURE_TYPE_ZX)
+				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_ZX), ddBB)
+				.get(TableConstants.ProcedureType.id.name()));
+		List<Map<String, Object>> zxFloorList=procedureScheduleRelateService.getProcedureScheduleRoomidList(zxFloorParams, ddBB);
+		
+		String tjSchedule="0";
+		String zxSchedule="0";
+		for(Map<String, Object> floor:floorList){
+			tjSchedule="0";
+			zxSchedule="0";
+			if(tjFloorList.contains(floor)){
+				tjSchedule="1";
+			}
+			if(zxFloorList.contains(floor)){
+				zxSchedule="1";
+			}
+			floor.put("tjSchedule", tjSchedule);
+			floor.put("zxSchedule", zxSchedule);
+		}
+		
+		
 		Map<String, Object> roomMap=new HashMap<>();
 		roomMap.put(TableConstants.ProjectBuilding.projectPeriodId.name(), projectPeriodId);
 		roomMap.put(TableConstants.ProjectHousehold.regionTypeId.name(),projectRegionTypeService
@@ -174,20 +218,20 @@ public class ProcedureScheduleRelateController extends BaseController {
 		List<Map<String, Object>> zxRoomList=procedureScheduleRelateService.getProcedureScheduleRoomidList(zxParams, ddBB);
 		
 		for(Map<String, Object> room:roomList){
+			tjSchedule="0";
+			zxSchedule="0";
 			if(tjRoomList.contains(room)){
-				room.put("tjSchedule", "1");
-			}else{
-				room.put("tjSchedule", "0");
+				tjSchedule="1";
 			}
 			if(zxRoomList.contains(room)){
-				room.put("zxSchedule", "1");
-			}else{
-				room.put("zxSchedule", "0");
+				zxSchedule="1";
 			}
+			room.put("tjSchedule", tjSchedule);
+			room.put("zxSchedule", zxSchedule);
 		}
 		
 		return new BaseResult(ReturnCode.OK,TreeUtil.getRegionTrees(false, null, null, buildingList, floorList, roomList));
 		
 	}
-
+	
 }

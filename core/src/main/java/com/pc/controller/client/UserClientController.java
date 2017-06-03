@@ -1,14 +1,10 @@
 package com.pc.controller.client;
 
-import com.pc.annotation.EncryptProcess;
 import com.pc.base.BaseResult;
 import com.pc.base.Constants;
 import com.pc.base.ReturnCode;
 import com.pc.controller.BaseController;
-import com.pc.core.DataConstants;
-import com.pc.core.ParamsMap;
 import com.pc.core.TableConstants;
-import com.pc.service.auth.DataPrivilegeTypeService;
 import com.pc.service.user.UserService;
 import com.pc.util.DateUtil;
 import com.pc.util.ImgUtil;

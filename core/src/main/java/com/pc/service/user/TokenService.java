@@ -67,5 +67,10 @@ public class TokenService {
 	@CacheEvict(value = {"qCache", "system", "tmp", "auth", "columns"}, allEntries = true, cacheManager = "cacheManager")
 	public void clearAllCache() {
 	}
+
+	@CacheEvict(value ="offline",allEntries = true,cacheManager = "cacheManager")
+	public void clearOfflineCache() {
+		System.out.println("清除Offline缓存....");
+	}
 	
 }

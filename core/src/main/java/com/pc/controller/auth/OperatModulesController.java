@@ -134,6 +134,9 @@ public class OperatModulesController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0);
+		if(map.containsKey(TableConstants.OperateModules.MODULE_NAME.name())){
+			map.put(TableConstants.OperateModules.MODULE_NAME.name(), "%"+map.get(TableConstants.OperateModules.MODULE_NAME.name())+"%");
+		}
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, operatModulesService.getOperatModulesPage(page, ddBB));
 	}

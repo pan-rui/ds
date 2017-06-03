@@ -15,9 +15,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 1404 $
+ * @version: \$Rev: 2652 $
  * @UpdateAuthor: \$Author: zhangj $
- * @UpdateDateTime: \$Date: 2017-04-22 09:40:51 +0800 (周六, 22 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-05-27 18:37:56 +0800 (周六, 27 5月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -42,8 +42,8 @@ public class AcceptanceBatchDao {
 	}
 	
 	@DataSource
-	public List<Map<String, Object>> queryAllAcceptanceBatchByNoticeInTab(Map<String, Object> paramsMap) {
-		return sqlSessionTemplate.selectList(className + ".queryAllAcceptanceBatchByNoticeInTab", paramsMap);
+	public List<Map<String, Object>> queryAllAcceptanceBatchByNoticePageInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryAllAcceptanceBatchByNoticePageInTab", paramsMap);
 	}
 	
 	@DataSource

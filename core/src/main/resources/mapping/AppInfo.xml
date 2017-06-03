@@ -8,7 +8,7 @@
 		SELECT a.ID as id,a.NAME as name,a.APP_ICON as appIcon,a.APP_PACKAGE_NAME as appPackageName,
 		a.APP_ANDROID_PATH as appAndroidPath,a.APP_IOS_PATH as appIosPath,a.REMARK as remark,b.UPDATE_TYPE as 
 		updateType,b.VERSION_CODE as versionCode,b.VERSION_NAME as versionName,b.FILE_SIZE as fileSize,
-		b.UPDATE_CONTENT as b.updateContent,b.PUBLISH_TIME as publishTime 
+		b.UPDATE_CONTENT as updateContent,b.PUBLISH_TIME as publishTime,b.ID as versionId 
 		FROM ${aTableName} a, ${uvTableName} b WHERE a.LATEST_VERSION_ID=b.ID 
 		<if  test="NAME != null">
 			AND a.NAME like #{NAME} 
@@ -30,7 +30,7 @@
 		SELECT a.ID as id,a.NAME as name,a.APP_ICON as appIcon,a.APP_PACKAGE_NAME as appPackageName,
 		a.APP_ANDROID_PATH as appAndroidPath,a.APP_IOS_PATH as appIosPath,a.REMARK as remark,b.UPDATE_TYPE as 
 		updateType,b.VERSION_CODE as versionCode,b.VERSION_NAME as versionName,b.FILE_SIZE as fileSize,
-		b.UPDATE_CONTENT as b.updateContent,b.PUBLISH_TIME as publishTime 
+		b.UPDATE_CONTENT as updateContent,b.PUBLISH_TIME as publishTime,b.ID as versionId 
 		FROM ${aTableName} a, ${uvTableName} b WHERE a.LATEST_VERSION_ID=b.ID 
 		<if  test="NAME != null">
 			AND a.NAME like #{NAME} 

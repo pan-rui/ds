@@ -10,7 +10,6 @@ import com.pc.core.Page;
 import com.pc.core.TableConstants;
 import com.pc.service.acceptance.impl.HiddenPhotosRecordService;
 import com.pc.service.acceptance.impl.HiddenPhotosService;
-import com.pc.util.DateUtil;
 import com.pc.vo.ParamsVo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;

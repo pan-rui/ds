@@ -1,18 +1,17 @@
 package com.pc.service.auth;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.pc.core.Page;
+import com.pc.core.TableConstants;
+import com.pc.dao.privilege.RoleDataPrivilegesRelateDao;
+import com.pc.service.BaseService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pc.core.Page;
-import com.pc.core.TableConstants;
-import com.pc.dao.privilege.RoleDataPrivilegesRelateDao;
-import com.pc.service.BaseService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class RoleDataPrivilegesRelateService extends BaseService {

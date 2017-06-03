@@ -7,7 +7,11 @@ import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -96,8 +100,8 @@ public class PageInterceptor implements Interceptor {
     public void encryptProcess(final BoundSql boundSql) {
         String sql = boundSql.getSql();
         Matcher matcher = tablePattern.matcher(sql);
-        int index=sql.indexOf("FROM",9);
-        if(index<0) index = sql.indexOf("from",9);
+        int index=sql.indexOf("from",9);
+        if(index<0) index = sql.indexOf("FROM",9);
         if (matcher.find(index)) {
             String tableName = matcher.group(1);
             Matcher matcher1 = tPattern.matcher(sql);
@@ -119,7 +123,7 @@ public class PageInterceptor implements Interceptor {
         Matcher matcher1 = tPattern.matcher(sql);
        a: while (matcher1.find()){
             String prefix = matcher1.group(1);
-            Matcher matcher = tablePattern2.matcher(sql);
+            Matcher matcher = tablePattern2.matcher(sql.substring(13));
           b: while (matcher.find()) {
                 String tableName = matcher.group(1);
                 String tableAlias = matcher.group(3);

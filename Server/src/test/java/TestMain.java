@@ -23,6 +23,7 @@ public class TestMain {
     public static BaseDao baseDao;
 
     public static void main2(String[] args) {
+        System.out.println(Long.MAX_VALUE);
         System.out.println(Base64.encode(DigestUtils.md5("12345678".getBytes())));
         HashedCredentialsMatcher matcher3=new HashedCredentialsMatcher("md5");
         SimpleCredentialsMatcher matcher4=new SimpleCredentialsMatcher();
@@ -92,6 +93,7 @@ public class TestMain {
     }
 
     public static void main(String[] args) {
+        System.out.println(Long.MAX_VALUE);
         ParamsMap paramsMap = ParamsMap.newMap("sdddddddddfd", "39ufr");
         paramsMap.addParams("tList", Arrays.asList("fdf", "0j", "3fdf"));
         System.out.println(paramsMap);

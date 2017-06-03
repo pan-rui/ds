@@ -51,6 +51,7 @@
         <if test='updateTime !=null'>
             and ph.UPDATE_TIME &gt; #{updateTime}
         </if>
+        order by pb.BUILDING_SNO,ph.FLOOR,ph.ROOM
     </select>
 
     <resultMap id="offlineProject" type="java.util.LinkedHashMap">
@@ -188,12 +189,12 @@ WHERE ph.TENANT_ID=#{tenantId}
         pi_remark,pi.IS_HIDE pi_isHide,pi.UPDATE_TIME pi_updateTime,
         pt.ID pt_id,pt.PROCEDURE_TYPE_NAME pt_procedureTypeName,pt.PARENT_ID pt_parentId,pt.IS_LEAF pt_isLeaf,pt.ID_TREE
         pt_idTree,pt.NAME_TREE pt_nameTree,pt.LEVEL pt_level,pt.UPDATE_TIME pt_updateTime,
-        di.ID di_id,di.PROCEDURE_ID di_procedureId,di.GRADING_STANDARD di_gradingStandard,di.ERROR_RANGE
+        di.ID di_id,di.PROCEDURE_ID di_procedureId,di.IS_GENERAL di_isGeneral,di.GRADING_STANDARD di_gradingStandard,di.ERROR_RANGE
         di_errorRange,di.STANDARD_VAL di_standardVal,di.UNIT di_unit,di.CALC_TYPE di_calcType,di.PASS_TEXT
-        di_passText,di.NO_PASS_TEXT di_noPassText,di.REMARK di_remark,di.UPDATE_TIME di_updateTime,
+        di_passText,di.NO_PASS_TEXT di_noPassText,di.IS_SEALED di_isSealed,di.REMARK di_remark,di.UPDATE_TIME di_updateTime,
         gi.ID gi_id,gi.PROCEDURE_ID gi_procedureId,gi.GRADING_STANDARD gi_gradingStandard,gi.ERROR_RANGE
         gi_errorRange,gi.ALLOW_MAX_VALUE gi_allowMaxValue,gi.ALLOW_MIN_VALUE gi_allowMinValue,gi.STANDARD_VAL gi_standardVal,gi.UNIT gi_unit,gi.CALC_TYPE gi_calcType,gi.PASS_TEXT
-        gi_passText,gi.NO_PASS_TEXT gi_noPassText,gi.REMARK gi_remark,gi.UPDATE_TIME gi_updateTime,
+        gi_passText,gi.NO_PASS_TEXT gi_noPassText,gi.IS_SEALED gi_isSealed,gi.REMARK gi_remark,gi.UPDATE_TIME gi_updateTime,
         tpr.ID tpr_id,tpr.PROCEDURE_ID tpr_procedureId,tpr.TEAM_ID tpr_teamId,tpr.REMARK tpr_remark,tpr.UPDATE_TIME
         tpr_updateTime,
         ti.ID ti_id,ti.TEAM_NAME ti_teamName,ti.PARTNER_ID ti_partnerId,ti.UPDATE_TIME ti_updateTime
@@ -240,12 +241,13 @@ WHERE ph.TENANT_ID=#{tenantId}
         LEFT JOIN ${ddBB}.DOMINANT_ITEM di ON pi.ID = di.PROCEDURE_ID
         LEFT JOIN ${ddBB}.GENERAL_ITEM gi ON pi.ID = gi.PROCEDURE_ID
         LEFT JOIN ${ddBB}.TEAM_PROCEDURE_RELATE tpr ON pi.ID = tpr.PROCEDURE_ID
-        LEFT JOIN ${ddBB}.TEAM_INFO ti ON tpr.TEAM_ID = ti.ID
+        LEFT JOIN ${ddBB}.PROJECT_PARTNER_RELATE ppr ON tpr.TEAM_ID=ppr.TEAM_ID and prpr.PROJECT_PERIOD_ID=ppr.PROJECT_PERIOD_ID
+        LEFT JOIN ${ddBB}.TEAM_INFO ti ON ppr.TEAM_ID = ti.ID
         LEFT JOIN ${ddBB}.PARTNER_INFO pi2 ON ti.PARTNER_ID = pi2.ID
         LEFT JOIN ${ddBB}.COMPANY c ON pi2.CORPORATE_ID=c.ID
         LEFT JOIN ${ddBB}.TEAM_USER_RELATE tur ON ti.ID = tur.TEAM_ID
         LEFT JOIN ${ddBB}.USER u ON tur.USER_ID = u.ID
-        JOIN ${ddBB}.ACCEPTANCE_NOTE an ON pi.ID = an.PROCEDURE_ID
+        LEFT JOIN ${ddBB}.ACCEPTANCE_NOTE an ON pi.ID = an.PROCEDURE_ID and prpr.REGION_TYPE_ID=an.REGION_TYPE and prpr.PROJECT_PERIOD_ID=an.PROJECT_PERIOD_ID
         LEFT JOIN ${ddBB}.ACCEPTANCE_BATCH ab ON an.ID = ab.ACCEPTANCE_NOTE_ID
         LEFT JOIN ${ddBB}.STATUS_INFO s ON ab.BATCH_STATUS_ID=s.ID
         LEFT JOIN ${ddBB}.PROCEDURE_BATCH_STATUS pbs ON an.ID = pbs.ACCEPTANCE_NOTE_ID
@@ -279,7 +281,38 @@ WHERE ph.TENANT_ID=#{tenantId}
             <association property="procedureType" javaType="map" columnPrefix="pt_" autoMapping="true">
                 <id property="id" column="id"/>
             </association>
-            <association property="acceptanceNote" javaType="java.util.LinkedHashMap" foreignColumn="PROCEDURE_ID">
+            <collection property="dominantItem" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="di_">
+                <id property="id" column="id"/>
+                <result property="procedureId" column="procedureId"/>
+                <result property="isGeneral" column="isGeneral"/>
+                <result property="gradingStandard" column="gradingStandard"/>
+                <result property="errorRange" column="errorRange"/>
+                <result property="standardVal" column="standardVal"/>
+                <result property="unit" column="unit"/>
+                <result property="calcType" column="calcType"/>
+                <result property="passText" column="passText"/>
+                <result property="noPassText" column="noPassText"/>
+                <result property="isSealed" column="isSealed"/>
+                <result property="remark" column="remark"/>
+                <result property="updateTime" column="updateTime"/>
+            </collection>
+            <collection property="generalItem" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="gi_">
+                <id property="id" column="id"/>
+                <result property="procedureId" column="procedureId"/>
+                <result property="gradingStandard" column="gradingStandard"/>
+                <result property="errorRange" column="errorRange"/>
+                <result property="allowMaxValue" column="allowMaxValue"/>
+                <result property="allowMinValue" column="allowMinValue"/>
+                <result property="standardVal" column="standardVal"/>
+                <result property="unit" column="unit"/>
+                <result property="calcType" column="calcType"/>
+                <result property="passText" column="passText"/>
+                <result property="noPassText" column="noPassText"/>
+                <result property="isSealed" column="isSealed"/>
+                <result property="remark" column="remark"/>
+                <result property="updateTime" column="updateTime"/>
+            </collection>
+            <collection property="acceptanceNotes" ofType="java.util.LinkedHashMap" javaType="ArrayList">
                 <id property="id" column="an_id"/>
                 <result property="parentCompanyId" column="an_parentCompanyId"/>
                 <result property="supervisorCompanyId" column="an_supervisorCompanyId"/>
@@ -347,35 +380,8 @@ WHERE ph.TENANT_ID=#{tenantId}
                         <id property="id" column="id"/>
                     </association>
                 </collection>
-            </association>
-            <collection property="dominantItem" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="di_">
-                <id property="id" column="id"/>
-                <result property="procedureId" column="procedureId"/>
-                <result property="gradingStandard" column="gradingStandard"/>
-                <result property="errorRange" column="errorRange"/>
-                <result property="standardVal" column="standardVal"/>
-                <result property="unit" column="unit"/>
-                <result property="calcType" column="calcType"/>
-                <result property="passText" column="passText"/>
-                <result property="noPassText" column="noPassText"/>
-                <result property="remark" column="remark"/>
-                <result property="updateTime" column="updateTime"/>
             </collection>
-            <collection property="generalItem" ofType="java.util.LinkedHashMap" javaType="ArrayList" columnPrefix="gi_">
-                <id property="id" column="id"/>
-                <result property="procedureId" column="procedureId"/>
-                <result property="gradingStandard" column="gradingStandard"/>
-                <result property="errorRange" column="errorRange"/>
-                <result property="allowMaxValue" column="allowMaxValue"/>
-                <result property="allowMinValue" column="allowMinValue"/>
-                <result property="standardVal" column="standardVal"/>
-                <result property="unit" column="unit"/>
-                <result property="calcType" column="calcType"/>
-                <result property="passText" column="passText"/>
-                <result property="noPassText" column="noPassText"/>
-                <result property="remark" column="remark"/>
-                <result property="updateTime" column="updateTime"/>
-            </collection>
+
             <collection property="teamProcedures" ofType="java.util.LinkedHashMap" javaType="ArrayList">
                 <id property="id" column="tpr_id"/>
                 <result property="procedureId" column="tpr_procedureId"/>

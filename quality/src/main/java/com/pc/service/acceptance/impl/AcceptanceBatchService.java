@@ -22,7 +22,7 @@ public class AcceptanceBatchService extends BaseService {
     @Autowired
     private AcceptanceBatchDao acceptanceBatchDao;
     
-    public List<Map<String, Object>> getAllAcceptanceBatchByNotic(String userId, String inspectorRole, String ddBB) {
+    public Page getAllAcceptanceBatchByNotic(Page page,String userId, String inspectorRole, String ddBB) {
     	Map<String, Object> params=new HashMap<>();
 		params.put("abTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_BATCH);
 		params.put("anTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_NOTE);
@@ -33,28 +33,52 @@ public class AcceptanceBatchService extends BaseService {
 		params.put("isNoticeJL", 0);
 		params.put("statementId", DataConstants.ACCEPTANCE_BATCH_STATUS_ID_ZJYYS);
 		params.put("batchStatusId", DataConstants.BATCH_STATUS_ID_ZJYYS);
-    	
-    	return acceptanceBatchDao.queryAllAcceptanceBatchByNoticeInTab(params);
+		params.put("page", page);
+		page.setResults(acceptanceBatchDao.queryAllAcceptanceBatchByNoticePageInTab(params));
+    	return page;
     }
     
-    public List<Map<String, Object>> getAllAcceptanceBatchByPost(String projectPeriodId, String inspectorRole, String procedureId, String regionType, String regionId, String ddBB) {
+    public List<Map<String, Object>> getAllAcceptanceBatchByPost(boolean hasFloorType,boolean hasRoomType,String batchStatusId, String projectPeriodId, String inspectorRole, String procedureId, String regionType, String regionId, String ddBB) {
     	Map<String, Object> params=new HashMap<>();
+    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_INFO);
 		params.put("abTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_BATCH);
 		params.put("anTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_NOTE);
 		params.put("pbsTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_BATCH_STATUS);
+		
+		params.put("inspectorRole", inspectorRole);
+		params.put("batchStatusId", batchStatusId);
+		params.put("batchStatusId", batchStatusId);
+		params.put("statementId", DataConstants.ACCEPTANCE_BATCH_STATUS_ID_WBY);
+		
 		params.put(TableConstants.AcceptanceBatch.batchStatus.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_MASTER);
 		params.put("projectPeriodId", projectPeriodId);
-		params.put("inspectorRole", inspectorRole);
 		
 		if(procedureId!=null){
 			params.put("procedureId", procedureId);
 		}
     	
-    	if(DataConstants.REGION_PERIOD_TYPE_VAL.equals(regionType)||DataConstants.REGION_BUILDING_TYPE_VAL.equals(regionType)){
-    		params.put("regionId", regionId);
+    	if(DataConstants.REGION_PERIOD_TYPE_VAL.equals(regionType)){
+    		params.put("tid", regionId);
+    		params.put("tableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD);
+			params.put("regionMinName", TableConstants.ProjectPeriod.PERIOD_NAME.name());
+			params.put("regionType", regionType);
+		}else if(DataConstants.REGION_BUILDING_TYPE_VAL.equals(regionType)){
+			params.put("tid", regionId);
+    		params.put("tableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_BUILDING);
+			params.put("regionMinName", TableConstants.ProjectBuilding.BUILDING_NAME.name());
+			params.put("regionType", regionType);
 		}else{
 			Map<String, Object> period = super.getByID(ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_HOUSEHOLD,regionId);
-			params.put("idTree", period.get(TableConstants.ProjectHousehold.idTree.name())+"%");
+			params.put("buildingId", period.get(TableConstants.ProjectHousehold.buildingId.name()));
+			params.put("floor", period.get(TableConstants.ProjectHousehold.floor.name()));
+			params.put("tableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_HOUSEHOLD);
+			params.put("regionMinName", TableConstants.ProjectHousehold.ROOM_NAME.name());
+			if(hasFloorType&&(!hasRoomType)){
+				params.put("regionType", DataConstants.REGION_FLOOR_TYPE_VAL);
+			}
+			if((!hasFloorType)&&hasRoomType){
+				params.put("regionType", DataConstants.REGION_ROOM_TYPE_VAL);
+			}
 		}
 		
 		return acceptanceBatchDao.queryAllAcceptanceBatchByPostInTab(params);

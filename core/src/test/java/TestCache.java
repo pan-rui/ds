@@ -1,8 +1,9 @@
 import com.pc.controller.auth.FuncRolePrivilegesController;
+import com.pc.core.Page;
 import com.pc.core.ParamsMap;
-import com.pc.core.TableConstants;
 import com.pc.dao.BaseDao;
 import com.pc.dao.cache.OfflineDao;
+import com.pc.dao.sys.StatisticsDao;
 import com.pc.service.project.impl.ProjectPeriodService;
 import com.pc.service.tenant.impl.TenantService;
 import com.pc.util.ExcelUtils;
@@ -14,13 +15,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ThinkPad on 2017/3/24.
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring-shiro.xml", "classpath:baseServlet.xml"})
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(locations = {"classpath:spring-shiro.xml", "classpath:baseServlet.xml"})
 //@ContextConfiguration(locations = {"classpath*:cache-redis.xml","classpath*:data.xml","classpath*:common.xml","classpath*:spring-shiro.xml","classpath*:baseServlet.xml","classpath:spring.xml","classpath:spring-front.xml"})
 public class TestCache {
 
@@ -40,6 +42,8 @@ public class TestCache {
     private FuncRolePrivilegesController funcRolePrivilegesController;
     @Autowired
     private OfflineDao offlineDao;
+    @Autowired
+    private StatisticsDao statisticsDao;
 
 //    @Test
     public void putCache() throws InterruptedException {
@@ -52,13 +56,17 @@ public class TestCache {
 //        tCache.testCache("9h4tt");
     }
 
-    @Test
+//    @Test
     public void testOfflineProject() throws IOException {
         System.out.println(System.currentTimeMillis());
 //        List<Map<String, Object>> resultList = offlineDao.queryOffLineProject("dems","1", new Date(100000l));
 //        List<Map<String, Object>> resultList = offlineDao.queryOffLineProject("dems", "1","f3467010f06943d385481263fde84f77",null);
 //        List<Map<String, Object>> resultList = offlineDao.queryChart("dems", "1","f3467010f06943d385481263fde84f77",null);
-        List<Map<String, Object>> resultList = offlineDao.queryOfflineProcedure("dems", "1","f3467010f06943d385481263fde84f77", Arrays.asList("4","14"));
+        List<Map<String, Object>> resultList = offlineDao.queryOfflineProcedure("dems", "1","f3467010f06943d385481263fde84f77", null);
+//        List<Map<String, Object>> resultList = offlineDao.queryOfflineProcedure("dems", "1","f3467010f06943d385481263fde84f77", Arrays.asList("4","14"));
+        Page page = new Page();
+        page.setParams(ParamsMap.newMap("TYPE", 1));
+//        List<Map<String, Object>> resultList = statisticsDao.queryAccessByPageTab("dems",page);
         System.out.println(System.currentTimeMillis());
 //        List<Map<String, Object>> resultList = offlineDao.queryOfflineProcedure("dems", "f3467010f06943d385481263fde84f77",null);
         resultList.get(0).keySet().forEach(k-> System.out.println(k));

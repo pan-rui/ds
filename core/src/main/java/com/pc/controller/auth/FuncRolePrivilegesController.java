@@ -2,17 +2,14 @@ package com.pc.controller.auth;
 
 import com.pc.annotation.EncryptProcess;
 import com.pc.base.BaseResult;
-import com.pc.base.Constants;
 import com.pc.base.ReturnCode;
 import com.pc.controller.BaseController;
-import com.pc.core.TableConstants;
 import com.pc.security.UrlFilterService;
 import com.pc.service.auth.FuncRolePrivilegesService;
 import com.pc.vo.ParamsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 

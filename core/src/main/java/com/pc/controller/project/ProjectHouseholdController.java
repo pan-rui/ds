@@ -12,6 +12,7 @@ import com.pc.core.ParamsMap;
 import com.pc.core.TableConstants;
 import com.pc.service.project.impl.ProjectBuildingService;
 import com.pc.service.project.impl.ProjectHouseholdService;
+import com.pc.service.project.impl.ProjectPeriodService;
 import com.pc.service.project.impl.ProjectRegionTypeService;
 import com.pc.util.DateUtil;
 import com.pc.vo.ParamsVo;
@@ -24,7 +25,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Description: 
@@ -41,6 +47,9 @@ public class ProjectHouseholdController extends BaseController {
 
 	@Autowired
 	private ProjectBuildingService projectBuildingService;
+	
+	@Autowired
+	private ProjectPeriodService projectPeriodService;
 
 	@Autowired
 	private ProjectRegionTypeService projectRegionTypeService;
@@ -195,6 +204,7 @@ public class ProjectHouseholdController extends BaseController {
 						&& mapBuilding.get(TableConstants.ProjectBuilding.projectPeriodId.name()) != null)
 				{
 					projectPeriodId = (String)mapBuilding.get(TableConstants.ProjectBuilding.projectPeriodId.name());
+					projectPeriodName=(String) projectPeriodService.getByID(projectPeriodId, ddBB).get(TableConstants.ProjectPeriod.periodName.name());
 				}
 			}
 		}
@@ -252,7 +262,7 @@ public class ProjectHouseholdController extends BaseController {
 					floorIdTree, projectPeriodId,  floorId);
 		}
 
-		projectHouseholdService.addProjectHousehold(map, ddBB);
+		projectHouseholdService.addProjectHousehold(household, ddBB);
 
 		return new BaseResult(ReturnCode.OK);
 	}
@@ -333,6 +343,7 @@ public class ProjectHouseholdController extends BaseController {
 		floor.put(TableConstants.ProjectHousehold.ROOM_NAME.name(), floorName);
 		floor.put(TableConstants.ProjectHousehold.ROOM_FULL_NAME.name(), String.format("%s%s%s", projectPeriodName, buildingName, floorName));
 		floor.put(TableConstants.ProjectHousehold.BUILDING_ID.name(), buildingId);
+		floor.put(TableConstants.ProjectHousehold.FLOOR_ID.name(), floorId);
 		if(idxFloor != null) {
 			floor.put(TableConstants.ProjectHousehold.FLOOR.name(), idxFloor);
 		}

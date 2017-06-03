@@ -1,6 +1,10 @@
 package com.pc.dao;
 
-import com.pc.core.*;
+import com.pc.core.DataSource;
+import com.pc.core.DataSourceHolder;
+import com.pc.core.MapResultHandler;
+import com.pc.core.Page;
+import com.pc.core.ParamsMap;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;

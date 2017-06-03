@@ -91,16 +91,16 @@ public class DataConstants {
     public final static String REGION_BUILDING_RULE_A_Z  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     // 部位项目信息
-    public final static  String REGION_PERIOD_TYPE_VAL = "0";
+    public final static  String REGION_PERIOD_TYPE_VAL = "1";
 
     // 部位栋信息
-    public final static  String REGION_BUILDING_TYPE_VAL = "1";
+    public final static  String REGION_BUILDING_TYPE_VAL = "2";
 
     // 部位层信息
-    public final static  String REGION_FLOOR_TYPE_VAL = "2";
+    public final static  String REGION_FLOOR_TYPE_VAL = "3";
 
     // 部位户信息
-    public final static  String REGION_ROOM_TYPE_VAL = "3";
+    public final static  String REGION_ROOM_TYPE_VAL = "4";
     
     //状态类型
     public final static  String PROCEDURE_STATUS = "1";

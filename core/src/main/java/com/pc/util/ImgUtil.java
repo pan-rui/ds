@@ -4,8 +4,8 @@ import com.pc.core.Constants;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.codec.Base64;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +27,10 @@ public class ImgUtil {
 	
 	public static final String USER_IMG_PATH = "user/img/";
 	
+	public static final String UNIT_CHART_IMG_PATH = "unitChart/img/";
+	
 	public static final String ACCEPTANCE_IMG_PATH = "acceptance/img/";
+	
 	public static final String ACCEPTANCE_PERIOD_IMG_PATH = "acceptance/img/period/";
 	
 	public static final String TEMP_APK_PATH = "temp/apk/";
@@ -524,5 +527,19 @@ public class ImgUtil {
 
 	public static boolean validateFileType(String fileName, String type) {
 		return fileName.substring(fileName.lastIndexOf(".") + 1).equalsIgnoreCase(type);
+	}
+	
+	public static String encodeBase64Img(String path){
+		try{
+			File file = new File(path);;
+			FileInputStream inputFile = new FileInputStream(file);
+			byte[] buffer = new byte[(int) file.length()];
+			inputFile.read(buffer);
+			inputFile.close();
+			return Base64.encodeToString(buffer);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
