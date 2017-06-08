@@ -38,9 +38,9 @@ import java.util.Set;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2014-12-27 14:21)
- * @version: \$Rev: 2395 $
+ * @version: \$Rev: 2895 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-18 10:36:38 +0800 (周四, 18 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
  */
 @Component
 public class BaseImpl implements IBase, ApplicationContextAware, InitializingBean, CacheResolver {

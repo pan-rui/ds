@@ -3,5 +3,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborContractorCompanyInfoDao">
-	
+	<select id="queryLaborCompanyToPushListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id, c.`PROJECT_CODE` AS Project_ID,
+		a.`COMPANY_NAME` AS Company_Name, a.`COMPANY_SHORT_NAME` AS
+		Short_Name, a.`ISSUED_CAPITAL_STOCK` AS Capital,
+		a.`COMPANY_LEGAL_PERSON` AS Legal_Person,
+		a.`COMPANY_CREDIT_CODE` AS SUID, a.`OPEN_BANK_NAME` AS Bank_Open, a.`BANK_ACCOUNT` AS
+		Bank_Num, a.`COMPANY_ADDR` AS Address, a.`COMPANY_LINKER` AS Contacts,
+		a.`COMPANY_PHONE` AS Mobile_Phone, a.`COMPANY_EMAIL` AS Email,
+		b.`CODE` AS `Type` FROM ${cTableName} a,
+		${ctTableName} b,${pTableName} c WHERE
+		a.`COMPANY_TYPE_ID`=b.`ID` AND a.`PROJECT_ID`=c.`ID` AND
+		a.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND c.`ID`=#{PROJECT_ID} 
+	</select>
 </mapper>

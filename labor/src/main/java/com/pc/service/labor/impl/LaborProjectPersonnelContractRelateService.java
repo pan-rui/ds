@@ -1,5 +1,6 @@
 package com.pc.service.labor.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
  
@@ -10,13 +11,26 @@ import org.springframework.stereotype.Service;
 
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
+import com.pc.dao.labor.LaborAttendanceDetailRecordDao;
 import com.pc.dao.labor.LaborProjectPersonnelContractRelateDao;
 import com.pc.service.BaseService;
 
 @Service
 public class LaborProjectPersonnelContractRelateService extends BaseService {
     private Logger logger = LogManager.getLogger(this.getClass());
-
+    
+    @Autowired
+	private LaborProjectPersonnelContractRelateDao laborProjectPersonnelContractRelateDao;
+    
+    public List<Map<String, Object>> getLaborContractToPushList(String projectId, String ddBB) {
+    	Map<String, Object> params=new HashMap<>();
+    	params.put(TableConstants.LaborContractorCompanyInfo.PROJECT_ID.name(), projectId);
+    	params.put("lppcrTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE);
+    	params.put("lpTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO);
+    	params.put("lppTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO);
+    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_INFO);
+		return laborProjectPersonnelContractRelateDao.queryLaborContractToPushListInTab(params);
+	}
      
     public void addLaborProjectPersonnelContractRelate(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE);

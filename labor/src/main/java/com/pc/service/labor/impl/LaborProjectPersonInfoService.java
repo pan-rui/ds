@@ -1,5 +1,6 @@
 package com.pc.service.labor.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
  
@@ -10,13 +11,31 @@ import org.springframework.stereotype.Service;
 
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
+import com.pc.dao.labor.LaborAttendanceDetailRecordDao;
 import com.pc.dao.labor.LaborProjectPersonInfoDao;
 import com.pc.service.BaseService;
 
 @Service
 public class LaborProjectPersonInfoService extends BaseService {
     private Logger logger = LogManager.getLogger(this.getClass());
-
+    
+    @Autowired
+	private LaborProjectPersonInfoDao laborProjectPersonInfoDao;
+    
+    public List<Map<String, Object>> getLaborPersonToPushList(String projectId, String ddBB) {
+    	Map<String, Object> params=new HashMap<>();
+    	params.put(TableConstants.LaborContractorCompanyInfo.PROJECT_ID.name(), projectId);
+    	params.put("lppTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO);
+    	params.put("lpTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO);
+    	params.put("lcciTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
+    	params.put("leciTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_EMP_CATEGORY_INFO);
+    	params.put("ljniTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_JOB_NAME_INFO);
+    	params.put("ljtiTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_JOB_TYPENAME_INFO);
+    	params.put("lwtiTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO);
+    	params.put("lpiTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_INFO);
+    	
+		return laborProjectPersonInfoDao.queryLaborPersonToPushListInTab(params);
+	}
      
     public void addLaborProjectPersonInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO);

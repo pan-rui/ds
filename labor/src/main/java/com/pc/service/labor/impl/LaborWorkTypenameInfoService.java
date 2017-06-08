@@ -41,17 +41,21 @@ public class LaborWorkTypenameInfoService extends BaseService {
 		return null;
 	}
 
-        public List<Map<String, Object>> getLaborWorkTypenameInfoList(Map<String, Object> params, String ddBB) {
+    public List<Map<String, Object>> getLaborWorkTypenameInfoList(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,
 				ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO);
 		return list;
 	}
-        public Map<String, Object> getByID(String id, String ddBB) {
+    
+    public Map<String, Object> getByID(String id, String ddBB) {
 		return super.getByID(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO,id);
 	}
 
-
 	public boolean deleteLaborWorkTypenameInfo(Map<String, Object> params, String ddBB) {
 		return deleteByState(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO) > 0;
+	}
+	
+	public void addList(List<Map<String, Object>> list, String ddBB) {
+		super.addList(list, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO);
 	}
 }

@@ -1,8 +1,10 @@
 package com.pc.controller.labor;
 
  
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,6 +46,7 @@ public class LaborTrainingDetailInfoController extends BaseController {
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
+	
 	@RequestMapping("/laborTrainingDetailInfo/add")
 	@ResponseBody
 	public BaseResult add(@RequestAttribute(Constants.USER_ID) String userId,
@@ -54,7 +57,7 @@ public class LaborTrainingDetailInfoController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0); 
 		laborTrainingDetailInfoService.addLaborTrainingDetailInfo(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
@@ -111,7 +114,7 @@ public class LaborTrainingDetailInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborTrainingDetailInfoService.getLaborTrainingDetailInfoPage(page, ddBB));

@@ -19,6 +19,8 @@ public class TableConstants {
 	public static final String IS_ENABLED = "IS_ENABLED";
 	public static final String UPDATE_USER_ID = "UPDATE_USER_ID";
 	public static final String UPDATE_TIME = "UPDATE_TIME";
+	
+	public static final String IS_SYNCHRO = "IS_SYNCHRO";
 	//
 	public static final String ACCEPTANCE_ATTACH="ACCEPTANCE_ATTACH";
 	//
@@ -1361,6 +1363,8 @@ public class TableConstants {
 		id,	//编号
 		FEEDBACK_TYPE,	//反馈来源（质检1）
 		feedbackType,	//反馈来源（质检1）
+		APP_VERSION,
+		appVersion,
 		FEEDBACK_CONTENT,	//反馈内容
 		feedbackContent,	//反馈内容
 		FEEDBACK_USER_ID,	//反馈人
@@ -1774,8 +1778,8 @@ public class TableConstants {
 		deviceId,	//
 		PERSON_TYPE,	//
 		personType,	//
-		PERSON_ID,	//
-		personId,	//
+		PERSON_CARDID,	//
+		personCardid,	//
 		PASSED_TIME,	//
 		passedTime,	//
 		DIRECTION,	//
@@ -1887,6 +1891,8 @@ public class TableConstants {
 		bankAccount,	//
 		REMARK,	//
 		remark,	//
+		IS_SYNCHRO,	//
+		isSynchro,	//
 		UPTATE_TIME,	//
 		uptateTime,	//
 		UPDATE_USER_ID,	//

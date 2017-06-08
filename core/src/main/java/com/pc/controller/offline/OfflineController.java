@@ -38,9 +38,9 @@ import java.util.zip.CRC32;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-21 19:00)
- * @version: \$Rev: 2691 $
+ * @version: \$Rev: 2910 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-31 21:03:22 +0800 (周三, 31 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-08 17:16:43 +0800 (周四, 08 6月 2017) $
  */
 @Controller
 @RequestMapping("/offline")
@@ -147,17 +147,18 @@ public class OfflineController extends BaseController {
             byte[] byt = new byte[length - len];
             System.arraycopy(bytes,len-5,byt,0,byt.length);
         }*/
-       ByteBuffer byteBuffer=ByteBuffer.allocate(length);
+        int realLength=length-len+13;
+       ByteBuffer byteBuffer=ByteBuffer.allocate(realLength);
        byteBuffer.put((byte) (0&0xff));
-        byteBuffer.putInt(length);
+        byteBuffer.putInt(realLength);
         CRC32 crc32 = new CRC32();
         crc32.update(bytes,len-13,length-len);
         byteBuffer.putLong(crc32.getValue());       //CRC校验
         byteBuffer.put(bytes,len-13,length-len);
         response.setContentType("application/octet-stream;charset=utf-8");
-        response.setContentLength(length-len+13);
+        response.setContentLength(realLength);
         OutputStream out=response.getOutputStream();
-        out.write(byteBuffer.array(),0,length-len+13);
+        out.write(byteBuffer.array());
         out.close();
     }
 

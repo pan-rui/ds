@@ -9,6 +9,13 @@ package com.pc.core;
  */
 public class DataConstants {
 	
+	//劳务同步标识位
+	public final static String NOT_SYNCHRO="0";
+	public final static String SYNCHRO_SUCCESS="1";
+	public final static String SYNCHRO_FAIL="2";
+	
+	
+	
 	//工序第一级分类名  装修/土建
 	public final static String PROCEDURE_TYPE_TJ = "主体结构";
 	public final static String PROCEDURE_TYPE_ZX = "建筑装饰装修";
@@ -60,6 +67,7 @@ public class DataConstants {
     public final static  String REGION_ROOM_TYPE = "户";
     
     //部位名称
+    public final static  String REGION_FLOOR_KEY = "本层";
     public final static  String REGION_PERIOD_KEY = "本期";
     public final static  String REGION_BUILDING_KEY = "本栋";
     

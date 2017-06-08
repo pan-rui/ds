@@ -46,16 +46,20 @@ public class FeedbackInfoController extends BaseController {
 	
 	@RequestMapping("/feedbackInfo/add")
 	@ResponseBody
-	public BaseResult add(@RequestAttribute(Constants.USER_ID) String userId,
+	public BaseResult add(@RequestAttribute(Constants.USER_ID) String userId,@RequestHeader(Constants.APP_VERSION) String appVersion,
 			@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
 			@RequestAttribute String ddBB) {
 		
-                Map<String, Object> map = new LinkedHashMap<>(params.getParams());
+        Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0); 
+		
+		map.put(TableConstants.FeedbackInfo.FEEDBACK_TIME.name(), DateUtil.convertDateTimeToString(new Date(), null));
+		map.put(TableConstants.FeedbackInfo.FEEDBACK_USER_ID.name(), userId);
+		map.put(TableConstants.FeedbackInfo.APP_VERSION.name(), appVersion);
+		
 		feedbackInfoService.addFeedbackInfo(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
 	}
@@ -111,7 +115,6 @@ public class FeedbackInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, feedbackInfoService.getFeedbackInfoPage(page, ddBB));

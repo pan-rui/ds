@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2014-12-27 14:21)
- * @version: \$Rev: 2351 $
+ * @version: \$Rev: 2895 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-16 18:07:26 +0800 (周二, 16 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD,ElementType.TYPE})

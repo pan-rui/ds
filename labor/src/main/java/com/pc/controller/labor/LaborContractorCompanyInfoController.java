@@ -1,10 +1,14 @@
 package com.pc.controller.labor;
 
  
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.pc.util.ExcelUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pc.controller.BaseController;
@@ -28,6 +34,10 @@ import com.pc.vo.ParamsVo;
 import com.pc.core.TableConstants;
  
 import com.pc.service.labor.impl.LaborContractorCompanyInfoService;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Description: 
@@ -41,6 +51,8 @@ import com.pc.service.labor.impl.LaborContractorCompanyInfoService;
 public class LaborContractorCompanyInfoController extends BaseController {
 	@Autowired
 	private LaborContractorCompanyInfoService laborContractorCompanyInfoService;
+	@Autowired
+	private ExcelUtils excelUtils;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
@@ -54,7 +66,7 @@ public class LaborContractorCompanyInfoController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0); 
 		laborContractorCompanyInfoService.addLaborContractorCompanyInfo(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
@@ -111,9 +123,22 @@ public class LaborContractorCompanyInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborContractorCompanyInfoService.getLaborContractorCompanyInfoPage(page, ddBB));
+	}
+
+	@RequestMapping(value = "/laborContractorCompanyInfo/import",method = RequestMethod.POST)
+	@ResponseBody
+	public BaseResult importData(HttpServletRequest request,@RequestAttribute String ddBB, @RequestAttribute(Constants.USER_ID) String userId, @RequestHeader(Constants.TENANT_ID) String tenantId,@RequestParam String projectId, MultipartFile file) {
+		List fields = Arrays.asList("COMPANY_NAME", "", "COMPANY_CREDIT_CODE", "COMPANY_LEGAL_PERSON", "COMPANY_LINKER", "COMPANY_EMAIL", "COMPANY_PHONE", "COMPANY_ADDR", "COMPANY_CODE","","","OPEN_BANK_NAME","BANK_ACCOUNT","","","","COMPANY_TYPE_ID");
+		try {
+			excelUtils.importCompany(file,ddBB+TableConstants.SEPARATE+TableConstants.LABOR_CONTRACTOR_COMPANY_INFO,fields,tenantId,userId,projectId);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new BaseResult(1, e.getMessage());
+		}
+		return new BaseResult(0, "OK");
 	}
 }

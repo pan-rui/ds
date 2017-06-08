@@ -26,7 +26,7 @@ import com.pc.core.ParamsMap;
  * @UpdateDateTime: \$Date$
  */
 @Repository
-@CacheConfig(cacheNames = "dems", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
+@CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
 public class LaborAttendanceRecordDao {
         private Logger logger = LogManager.getLogger(this.getClass());
 

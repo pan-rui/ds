@@ -1,5 +1,6 @@
 package com.pc.service.labor.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
  
@@ -40,8 +41,20 @@ public class LaborDeviceInfoService extends BaseService {
 		}
 		return null;
 	}
+	
+	public Map<String, Object> getLaborDeviceInfoByProject(String projectId, String ddBB) {
+		Map<String, Object> params=new HashMap<>();
+		params.put(TableConstants.LaborDeviceInfo.PROJECT_ID.name(), projectId);
+		params.put(TableConstants.LaborDeviceInfo.IS_SEALED.name(), 0);
+		List<Map<String, Object>> list = queryList(params, null,
+				ddBB + TableConstants.SEPARATE + TableConstants.LABOR_DEVICE_INFO);
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
 
-        public List<Map<String, Object>> getLaborDeviceInfoList(Map<String, Object> params, String ddBB) {
+    public List<Map<String, Object>> getLaborDeviceInfoList(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,
 				ddBB + TableConstants.SEPARATE + TableConstants.LABOR_DEVICE_INFO);
 		return list;

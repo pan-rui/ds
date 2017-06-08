@@ -54,4 +54,8 @@ public class LaborEmpCategoryInfoService extends BaseService {
 	public boolean deleteLaborEmpCategoryInfo(Map<String, Object> params, String ddBB) {
 		return deleteByState(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_EMP_CATEGORY_INFO) > 0;
 	}
+	
+	public void addList(List<Map<String, Object>> list, String ddBB) {
+		super.addList(list, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_EMP_CATEGORY_INFO);
+	}
 }

@@ -1,10 +1,14 @@
 package com.pc.controller.labor;
 
  
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.pc.util.ExcelUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pc.controller.BaseController;
@@ -28,6 +34,10 @@ import com.pc.vo.ParamsVo;
 import com.pc.core.TableConstants;
  
 import com.pc.service.labor.impl.LaborPersonInfoService;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Description: 
@@ -41,6 +51,8 @@ import com.pc.service.labor.impl.LaborPersonInfoService;
 public class LaborPersonInfoController extends BaseController {
 	@Autowired
 	private LaborPersonInfoService laborPersonInfoService;
+	@Autowired
+	private ExcelUtils excelUtils;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
@@ -54,7 +66,7 @@ public class LaborPersonInfoController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0); 
 		laborPersonInfoService.addLaborPersonInfo(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
@@ -111,9 +123,23 @@ public class LaborPersonInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborPersonInfoService.getLaborPersonInfoPage(page, ddBB));
 	}
+
+	@RequestMapping(value = "/laborPersonInfo/import",method = RequestMethod.POST)
+	@ResponseBody
+	public BaseResult importData(HttpServletRequest request,@RequestAttribute String ddBB, @RequestHeader(Constants.TENANT_ID) String tenantId, @RequestAttribute(Constants.USER_ID) String userId, @RequestParam String projectId, MultipartFile file) {
+		List fields = Arrays.asList("EMP_NAME", "ID_CODE", "", "", "EMP_PHONE", "EMP_NATIVE_PROVINCE", "HOME_ADDR", "EMP_NATION", "EMP_BIRTHDATE","USER_EDUCATION","EMP_NATIVEPLACE","","","","","","","","","","","","","","","","","","","HAS_CERTIFICATE","CERTIFICATE_NAME","");
+		try {
+			excelUtils.importPerson(file,ddBB+TableConstants.SEPARATE+TableConstants.LABOR_PERSON_INFO,fields,tenantId,userId,projectId);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new BaseResult(1, e.getMessage());
+		}
+		return new BaseResult(0, "OK");
+	}
+	//(MultipartFile) ((DefaultMultipartHttpServletRequest) request).getFileMap().values().toArray()[0]
 }

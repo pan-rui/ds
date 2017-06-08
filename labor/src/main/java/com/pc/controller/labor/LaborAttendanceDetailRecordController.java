@@ -1,9 +1,12 @@
 package com.pc.controller.labor;
 
  
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +23,7 @@ import com.pc.annotation.EncryptProcess;
 import com.pc.base.BaseResult;
 import com.pc.base.Constants;
 import com.pc.base.ReturnCode;
+import com.pc.core.DataConstants;
 import com.pc.core.Page;
 import com.pc.core.ParamsMap;
 import com.pc.util.DateUtil;
@@ -28,6 +32,8 @@ import com.pc.vo.ParamsVo;
 import com.pc.core.TableConstants;
  
 import com.pc.service.labor.impl.LaborAttendanceDetailRecordService;
+import com.pc.service.labor.impl.LaborDeviceInfoService;
+import com.pc.service.labor.impl.LaborProjectInfoService;
 
 /**
  * @Description: 
@@ -41,8 +47,57 @@ import com.pc.service.labor.impl.LaborAttendanceDetailRecordService;
 public class LaborAttendanceDetailRecordController extends BaseController {
 	@Autowired
 	private LaborAttendanceDetailRecordService laborAttendanceDetailRecordService;
+	
+	@Autowired
+	private LaborProjectInfoService laborProjectInfoService;
+	
+	@Autowired
+	private LaborDeviceInfoService laborDeviceInfoService;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	
+	@RequestMapping("/laborAttendanceDetailRecord/addList")
+	@ResponseBody
+	public BaseResult addList(@RequestAttribute(Constants.USER_ID) String userId,
+			@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
+			@RequestAttribute String ddBB) {
+		List<Map<String, Object>> list=(List<Map<String, Object>>) params.getParams().get("LIST");
+		String projectId=(String) params.getParams().get(TableConstants.LaborAttendanceDetailRecord.PROJECT_ID.name());
+		
+		Map<String, Object> project=laborProjectInfoService.getByID(projectId, ddBB);
+		
+		if(project==null||list==null||list.size()==0){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+		}
+		
+		Map<String, Object> device=laborDeviceInfoService.getLaborDeviceInfoByProject(projectId, ddBB);
+		
+		List<Map<String, Object>> attendanceList=new ArrayList<Map<String,Object>>();
+		for(Map<String, Object> map:list){
+			Map<String, Object> attendance = new LinkedHashMap<>();
+			attendance.put(TableConstants.TENANT_ID, tenantId);
+			attendance.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
+			attendance.put(TableConstants.UPDATE_USER_ID, userId);
+			attendance.put(TableConstants.IS_SEALED, 0);
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.IS_SYNCHRO.name(), DataConstants.NOT_SYNCHRO);
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.PROJECT_ID.name(), projectId);
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.DEVICE_ID.name(), device.get(TableConstants.LaborDeviceInfo.id.name()));
+			
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.PERSON_CARDID.name(), map.get(TableConstants.LaborAttendanceDetailRecord.PERSON_CARDID.name()));
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.PERSON_TYPE.name(), map.get(TableConstants.LaborAttendanceDetailRecord.PERSON_TYPE.name()));
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.PASSED_TIME.name(), map.get(TableConstants.LaborAttendanceDetailRecord.PASSED_TIME.name()));
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.DIRECTION.name(), map.get(TableConstants.LaborAttendanceDetailRecord.DIRECTION.name()));
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.WAY.name(), map.get(TableConstants.LaborAttendanceDetailRecord.WAY.name()));
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.SITE_PHOTO.name(), map.get(TableConstants.LaborAttendanceDetailRecord.SITE_PHOTO.name()));
+			
+			attendance.put(TableConstants.LaborAttendanceDetailRecord.ID.name(), UUID.randomUUID().toString().replace("-", ""));
+			attendanceList.add(attendance);
+		}
+        
+		laborAttendanceDetailRecordService.addLaborAttendanceDetailRecordList(attendanceList, ddBB);
+		return new BaseResult(ReturnCode.OK);
+	}
 	
 	@RequestMapping("/laborAttendanceDetailRecord/add")
 	@ResponseBody
@@ -54,7 +109,6 @@ public class LaborAttendanceDetailRecordController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0); 
 		laborAttendanceDetailRecordService.addLaborAttendanceDetailRecord(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
@@ -111,7 +165,6 @@ public class LaborAttendanceDetailRecordController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborAttendanceDetailRecordService.getLaborAttendanceDetailRecordPage(page, ddBB));

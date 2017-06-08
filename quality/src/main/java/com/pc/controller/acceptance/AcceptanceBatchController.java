@@ -519,9 +519,9 @@ public class AcceptanceBatchController extends BaseController {
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECKED.name(),
 						(String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.accepter.name()));
+						(String) user.get(TableConstants.User.realName.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptancePersonId.name()));
+						(String) user.get(TableConstants.User.id.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECK_RESULT.name(),
 						Float.valueOf((String) params.getParams()
 								.get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
@@ -547,9 +547,9 @@ public class AcceptanceBatchController extends BaseController {
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECKED.name(),
 						(String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_NAME.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.accepter.name()));
+						(String) user.get(TableConstants.User.realName.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_ID.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptancePersonId.name()));
+						(String) user.get(TableConstants.User.id.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECK_RESULT.name(),
 						Float.valueOf((String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECK_TIME.name(),
@@ -643,37 +643,6 @@ public class AcceptanceBatchController extends BaseController {
 			@RequestAttribute String ddBB) {
 
 		String batchId = (String) params.getParams().get(TableConstants.AcceptanceBatch.ID.name());
-		if (batchId == null) {
-			String projectPeriodId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
-			String inspectorRole = (String) params.getParams().get(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name());
-			String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
-			String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
-			String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
-			if(StringUtils.isBlank(projectPeriodId)||StringUtils.isBlank(inspectorRole)||StringUtils.isBlank(regionType)||
-					StringUtils.isBlank(regionId)||StringUtils.isBlank(procedureId)){
-				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
-			}
-			Map<String, Object> map = acceptanceNoteService
-					.getAcceptanceNote(ParamsMap.newMap(TableConstants.AcceptanceNote.PROCEDURE_ID.name(), procedureId)
-							.addParams(TableConstants.AcceptanceNote.REGION_ID.name(), regionId)
-							.addParams(TableConstants.AcceptanceNote.REGION_TYPE.name(), regionType)
-							.addParams(TableConstants.IS_SEALED, 0), ddBB);
-			if(map!=null){
-				Map<String, Object> batchMap = acceptanceBatchService
-						.getAcceptanceBatch(ParamsMap.newMap(TableConstants.AcceptanceBatch.ACCEPTANCE_NOTE_ID.name(), (String)map.get(TableConstants.AcceptanceNote.id.name()))
-								.addParams(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), inspectorRole)
-								.addParams(TableConstants.AcceptanceBatch.BATCH_STATUS_ID.name(), inspectorRole.equals(DataConstants.INSPECTOR_ROLE_ZJ)?DataConstants.BATCH_STATUS_ID_ZJWYS:DataConstants.BATCH_STATUS_ID_JLWYS)
-								.addParams(TableConstants.AcceptanceBatch.BATCH_STATUS.name(), DataConstants.ACCEPTANCE_BATCH_STATUS_MASTER)
-								.addParams(TableConstants.IS_SEALED, 0), ddBB);
-				if(batchMap!=null){
-					batchId=(String) batchMap.get(TableConstants.AcceptanceBatch.id.name());
-				}else{
-					batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId);
-				}
-			}else{
-				batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId);
-			}
-		}
 		// 主信息
 		Map<String, Object> result = acceptanceBatchService.getBatchInfo(batchId, ddBB);
 
@@ -831,6 +800,20 @@ public class AcceptanceBatchController extends BaseController {
 			@RequestAttribute String ddBB) {
 
 		String batchId = (String) params.getParams().get(TableConstants.AcceptanceBatch.ID.name());
+		
+		if (StringUtils.isBlank(batchId)) {
+			String projectPeriodId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+			String inspectorRole = (String) params.getParams().get(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name());
+			String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
+			String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
+			String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
+			if(StringUtils.isBlank(projectPeriodId)||StringUtils.isBlank(inspectorRole)||StringUtils.isBlank(regionType)||
+					StringUtils.isBlank(regionId)||StringUtils.isBlank(procedureId)){
+				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+			}
+			
+			batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId);
+		}
 
 		String supervisorCompanyId = (String) params.getParams()
 				.get(TableConstants.AcceptanceNote.SUPERVISOR_COMPANY_ID.name());
@@ -964,9 +947,9 @@ public class AcceptanceBatchController extends BaseController {
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECKED.name(),
 						(String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.accepter.name()));
+						(String) user.get(TableConstants.User.realName.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptancePersonId.name()));
+						(String) user.get(TableConstants.User.id.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECK_RESULT.name(),
 						Float.valueOf((String) params.getParams()
 								.get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
@@ -1002,9 +985,9 @@ public class AcceptanceBatchController extends BaseController {
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECKED.name(),
 						(String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_NAME.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.accepter.name()));
+						(String) user.get(TableConstants.User.realName.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_ID.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptancePersonId.name()));
+						(String) user.get(TableConstants.User.id.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECK_RESULT.name(),
 						Float.valueOf((String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECK_TIME.name(),
@@ -1172,9 +1155,9 @@ public class AcceptanceBatchController extends BaseController {
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECKED.name(),
 						(String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.accepter.name()));
+						(String) user.get(TableConstants.User.realName.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptancePersonId.name()));
+						(String) user.get(TableConstants.User.id.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_CHECK_RESULT.name(),
 						Float.valueOf((String) params.getParams()
 								.get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
@@ -1199,9 +1182,9 @@ public class AcceptanceBatchController extends BaseController {
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECKED.name(),
 						(String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_NAME.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.accepter.name()));
+						(String) user.get(TableConstants.User.realName.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_ID.name(),
-						(String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptancePersonId.name()));
+						(String) user.get(TableConstants.User.id.name()));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECK_RESULT.name(),
 						Float.valueOf((String) params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_SCORE.name())));
 				updateAcceptanceNote.put(TableConstants.AcceptanceNote.SUPERVISOR_CHECK_TIME.name(),
@@ -1638,29 +1621,37 @@ public class AcceptanceBatchController extends BaseController {
 		String regionMinName=null;
 		String regionName=null;
 		if (DataConstants.REGION_PERIOD_TYPE_VAL.equals(regionType)) {
-			period = projectPeriod;
+			period = projectPeriodService.getByID(regionId, ddBB);
+			if(period==null){
+				return null;
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectPeriod.periodName.name());
 			regionName=(String) period.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE+DataConstants.REGION_PERIOD_KEY;
 		} else if (DataConstants.REGION_BUILDING_TYPE_VAL.equals(regionType)) {
 			period = projectBuildingService.getByID(regionId, ddBB);
+			if(period==null){
+				return null;
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectBuilding.buildingName.name());
-			regionName=(String) period.get(TableConstants.ProjectBuilding.buildingName.name())+TableConstants.SEPARATE_TREE+DataConstants.REGION_BUILDING_KEY;
+			regionName=(String) period.get(TableConstants.ProjectBuilding.nameTree.name())+TableConstants.SEPARATE_TREE+DataConstants.REGION_BUILDING_KEY;
 		} else if (DataConstants.REGION_FLOOR_TYPE_VAL.equals(regionType)) {
 			period = projectHouseholdService.getByID(regionId, ddBB);
+			if(period==null){
+				return null;
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectHousehold.roomName.name());
-			regionName=((String) period.get(TableConstants.ProjectHousehold.nameTree.name())).replace(projectPeriod.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE, "");
+			regionName=(String) period.get(TableConstants.ProjectHousehold.nameTree.name()) + DataConstants.REGION_FLOOR_KEY;
 		} else if (DataConstants.REGION_ROOM_TYPE_VAL.equals(regionType)) {
 			period = projectHouseholdService.getByID(regionId, ddBB);
+			if(period==null){
+				return null;
+			}
 			regionMinName=(String) period.get(TableConstants.ProjectHousehold.roomName.name());
-			regionName=((String) period.get(TableConstants.ProjectHousehold.nameTree.name())).replace(projectPeriod.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE, "");
+			regionName=((String) period.get(TableConstants.ProjectHousehold.nameTree.name()));
 		} else {
 			logger.info("部位类型不正常");
 			return null;
 		}
-		if(period==null){
-			return null;
-		}
-
 		
 		Map<String, Object> procedure=procedureInfoService.getByID(procedureId, ddBB);
 		if(procedure==null){

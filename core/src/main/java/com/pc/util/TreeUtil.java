@@ -118,11 +118,6 @@ public class TreeUtil {
 
 				if (mapRooms.containsKey(buildingFloor)) {
 					listRoomsByFloor = (List<Map<String, Object>>) mapRooms.get(buildingFloor);
-					if(isContains){
-						listRoomsByFloor.add(0, floorEntity);
-					}
-
-					mapFloor.put(DataConstants.REGION_ROOM_LIST_TYPE_KEY, listRoomsByFloor);
 
 					Collections.sort(listRoomsByFloor, new Comparator() {
 						public int compare(Object arg0, Object arg1) {
@@ -146,6 +141,13 @@ public class TreeUtil {
 							return result;
 						}
 					});
+					
+					if(isContains){
+						floorEntity.put(TableConstants.ProjectHousehold.roomName.name(), DataConstants.REGION_FLOOR_KEY);
+						listRoomsByFloor.add(0, floorEntity);
+					}
+
+					mapFloor.put(DataConstants.REGION_ROOM_LIST_TYPE_KEY, listRoomsByFloor);
 				}
 
 				listFloorsByBuilding.add(mapFloor);

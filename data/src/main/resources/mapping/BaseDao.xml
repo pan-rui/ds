@@ -92,7 +92,19 @@
                 </foreach>
             </foreach>
     </insert>
-
+    <insert id="insertIgnoreBatchByProsInTab" parameterType="map">
+        insert ignore into ${tableName}
+        <foreach collection="dataList" item="data" index="ind" separator=",">
+            <if test="ind == 0">
+                <foreach collection="data.keys" item="k" separator="," open="(" close=") values">
+                    ${k}
+                </foreach>
+            </if>
+            <foreach collection="data.values" item="value" open="(" close=")" separator=",">
+                #{value}
+            </foreach>
+        </foreach>
+    </insert>
     <insert id="insertIgnoreByProsInTab" parameterType="map">
         insert IGNORE  into ${tableName}
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -105,6 +117,43 @@
                 #{value}
             </foreach>
         </trim>
+    </insert>
+    <insert id="insertUpdateByProsInTab" parameterType="map">
+        insert into ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <foreach collection="params.keys" item="key" index="ind" separator=",">
+                ${key}
+            </foreach>
+        </trim>
+        <trim prefix=" values(" suffix=")" suffixOverrides=",">
+            <foreach collection="params.values" item="value" index="ind" separator=",">
+                #{value}
+            </foreach>
+        </trim>
+        <trim prefix="on duplicate key update" suffix=",">
+            <foreach collection="params.keys" item="k" separator=",">
+                <if test='k !="ID"'>${k}=VALUES(${k})</if>
+            </foreach>
+        </trim>
+    </insert>
+    <insert id="insertUpdateBatchByProsInTab" parameterType="map">
+        insert into ${tableName}
+        <foreach collection="dataList" item="data" index="ind" separator=",">
+            <if test="ind == 0">
+                <foreach collection="data.keys" item="k" separator="," open="(" close=") values">
+                    ${k}
+                </foreach>
+            </if>
+            <foreach collection="data.values" item="value" open="(" close=")" separator=",">
+                #{value}
+            </foreach>
+            <if test="ind== dataList.size-1">
+                on duplicate key update
+                <foreach collection="data.keys" item="k" separator=",">
+                    <if test='k !="ID"'>${k}=VALUES(${k})</if>
+                </foreach>
+            </if>
+        </foreach>
     </insert>
 
     	<select id="queryPageInTab" parameterType="map" resultType="map">

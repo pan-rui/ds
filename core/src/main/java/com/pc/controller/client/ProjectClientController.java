@@ -36,9 +36,9 @@ import java.util.Map;
 /**
  * @Description: 项目对应工序管理
  * @Author: wady (2017-04-10 11:51)
- * @version: \$Rev: 2094 $
- * @UpdateAuthor: \$Author: zhangj $
- * @UpdateDateTime: \$Date: 2017-05-09 20:22:04 +0800 (周二, 09 5月 2017) $
+ * @version: \$Rev: 2895 $
+ * @UpdateAuthor: \$Author: panrui $
+ * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
  */
 @Controller
 @RequestMapping("/client")

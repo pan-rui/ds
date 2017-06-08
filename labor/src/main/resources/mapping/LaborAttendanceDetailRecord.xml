@@ -3,5 +3,18 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborAttendanceDetailRecordDao">
+	<select id="queryLaborAttendanceToPushListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`PERSON_TYPE` AS person_type, a.`PERSON_CARDID` AS person_id,
+		b.`EMP_NAME` AS person_name, a.`PASSED_TIME` AS passed_time,
+		a.`DIRECTION` AS direction,
+		a.`WAY` AS way, a.`SITE_PHOTO` AS site_photo FROM
+		${ladrTableName} a, ${lpTableName} b WHERE
+		a.`PERSON_CARDID`=b.`ID_CODE` AND b.`IS_SEALED`=0 AND a.`IS_SEALED`=0
+		AND a.`IS_SYNCHRO`=0 AND a.`PROJECT_ID`=#{PROJECT_ID}
+	</select>
 	
+	<update id="updateLaborAttendanceListToPushInTab" parameterType="map">
+    	UPDATE ${ladrTableName} SET IS_SYNCHRO=1 WHERE IS_SYNCHRO=0 AND PROJECT_ID=#{PROJECT_ID}
+    </update>
 </mapper>

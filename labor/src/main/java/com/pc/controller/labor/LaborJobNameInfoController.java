@@ -54,7 +54,6 @@ public class LaborJobNameInfoController extends BaseController {
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		map.put(TableConstants.IS_VALID, 0);
 		map.put(TableConstants.IS_SEALED, 0); 
 		laborJobNameInfoService.addLaborJobNameInfo(map, ddBB);
 		return new BaseResult(ReturnCode.OK);
@@ -111,7 +110,7 @@ public class LaborJobNameInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		map.put(TableConstants.IS_VALID, 0);
+		
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborJobNameInfoService.getLaborJobNameInfoPage(page, ddBB));

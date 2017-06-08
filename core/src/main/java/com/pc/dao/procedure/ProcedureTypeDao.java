@@ -15,9 +15,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 1503 $
- * @UpdateAuthor: \$Author: zhangj $
- * @UpdateDateTime: \$Date: 2017-04-25 20:20:50 +0800 (周二, 25 4月 2017) $
+ * @version: \$Rev: 2895 $
+ * @UpdateAuthor: \$Author: panrui $
+ * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")

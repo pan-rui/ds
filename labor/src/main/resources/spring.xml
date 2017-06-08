@@ -13,13 +13,13 @@ http://www.springframework.org/schema/task/spring-task-3.1.xsd http://www.spring
     <!--<import resource="classpath*:common.xml"/>-->
     <import resource="classpath*:spring-shiro.xml"/>
 
-   <!--定时器 
+   <!--定时器 -->
     <task:executor id="executor" pool-size="5" />
     <task:scheduler id="scheduler" pool-size="10" />
     <task:annotation-driven executor="executor" scheduler="scheduler" />
     <task:scheduled-tasks>
-        <task:scheduled ref="offlineDataTask" method="loadOfflineData" cron="0 0 2 * * *"/>
+        <task:scheduled ref="pushLaborDataTask" method="pushData" cron="0 0 2 * * *"/>
     </task:scheduled-tasks>
-	 -->
+	 
     <!--<cache:annotation-driven proxy-target-class="true" cache-manager="cacheManager"/>-->
 </beans>

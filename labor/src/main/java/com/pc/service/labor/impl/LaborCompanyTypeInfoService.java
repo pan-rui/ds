@@ -50,8 +50,11 @@ public class LaborCompanyTypeInfoService extends BaseService {
 		return super.getByID(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_COMPANY_TYPE_INFO,id);
 	}
 
-
 	public boolean deleteLaborCompanyTypeInfo(Map<String, Object> params, String ddBB) {
 		return deleteByState(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_COMPANY_TYPE_INFO) > 0;
+	}
+	
+	public void addList(List<Map<String, Object>> list, String ddBB) {
+		super.addList(list, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_COMPANY_TYPE_INFO);
 	}
 }

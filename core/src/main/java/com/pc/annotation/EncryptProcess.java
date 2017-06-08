@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 /**
  * @Description: 参数加密,解密..处理
  * @Author: 潘锐 (2017-03-27 19:19)
- * @version: \$Rev: 1158 $
+ * @version: \$Rev: 2895 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
  */
 @Target({ElementType.PARAMETER,ElementType.ANNOTATION_TYPE,ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -17,9 +17,9 @@ import java.util.Properties;
 /**
  * @Description: ${Description}
  * @Create: 潘锐 (2016-11-29 11:02)
- * @version: \$Rev: 1158 $
+ * @version: \$Rev: 2895 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
  */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 public class UpdateIntercept implements Interceptor {

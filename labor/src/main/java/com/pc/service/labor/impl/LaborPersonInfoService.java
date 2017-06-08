@@ -2,7 +2,8 @@ package com.pc.service.labor.impl;
 
 import java.util.List;
 import java.util.Map;
- 
+
+import com.pc.base.BaseResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import com.pc.service.BaseService;
 @Service
 public class LaborPersonInfoService extends BaseService {
     private Logger logger = LogManager.getLogger(this.getClass());
-
+    private LaborPersonInfoDao laborPersonInfoDao;
      
     public void addLaborPersonInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO);
@@ -53,5 +54,10 @@ public class LaborPersonInfoService extends BaseService {
 
 	public boolean deleteLaborPersonInfo(Map<String, Object> params, String ddBB) {
 		return deleteByState(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO) > 0;
+	}
+
+	public BaseResult importData() {
+
+    	return null;
 	}
 }

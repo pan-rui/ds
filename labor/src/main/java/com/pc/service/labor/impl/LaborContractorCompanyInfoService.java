@@ -1,5 +1,6 @@
 package com.pc.service.labor.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
  
@@ -16,7 +17,18 @@ import com.pc.service.BaseService;
 @Service
 public class LaborContractorCompanyInfoService extends BaseService {
     private Logger logger = LogManager.getLogger(this.getClass());
-
+    
+    @Autowired
+	private LaborContractorCompanyInfoDao laborContractorCompanyInfoDao;
+    
+    public List<Map<String, Object>> getLaborCompanyToPushList(String projectId, String ddBB) {
+    	Map<String, Object> params=new HashMap<>();
+    	params.put(TableConstants.LaborContractorCompanyInfo.PROJECT_ID.name(), projectId);
+    	params.put("ctTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_COMPANY_TYPE_INFO);
+    	params.put("cTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
+    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_INFO);
+		return laborContractorCompanyInfoDao.queryLaborCompanyToPushListInTab(params);
+	}
      
     public void addLaborContractorCompanyInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
@@ -41,7 +53,7 @@ public class LaborContractorCompanyInfoService extends BaseService {
 		return null;
 	}
 
-        public List<Map<String, Object>> getLaborContractorCompanyInfoList(Map<String, Object> params, String ddBB) {
+    public List<Map<String, Object>> getLaborContractorCompanyInfoList(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,
 				ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
 		return list;

@@ -14,9 +14,9 @@ import java.sql.SQLException;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-03-31 10:02)
- * @version: \$Rev: 1371 $
- * @UpdateAuthor: \$Author: wady $
- * @UpdateDateTime: \$Date: 2017-04-21 14:09:24 +0800 (周五, 21 4月 2017) $
+ * @version: \$Rev: 2898 $
+ * @UpdateAuthor: \$Author: panrui $
+ * @UpdateDateTime: \$Date: 2017-06-07 19:37:03 +0800 (周三, 07 6月 2017) $
  */
 public class GenerateAction {
     private String dbName;

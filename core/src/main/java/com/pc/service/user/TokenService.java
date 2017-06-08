@@ -50,6 +50,12 @@ public class TokenService {
 	}
 
 	@Cacheable(value = "token", key = Constants.REDIS_TOKEN_USER_KEY, cacheManager = "cacheManager")
+
+
+
+
+
+
     public Map<String, String> cacheUserByToken(String token, String userId, String phone, String tenantId, String ddBB) {
         return ParamsMap.newMap(Constants.USER_ID, userId).addParams(Constants.USER_PHONE, phone).addParams(Constants.TENANTID, tenantId).addParams(Constants.DDBB, ddBB);
     }

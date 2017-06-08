@@ -26,7 +26,7 @@ import com.pc.core.ParamsMap;
  * @UpdateDateTime: \$Date$
  */
 @Repository
-@CacheConfig(cacheNames = "dems", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
+@CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
 public class LaborContractorCompanyInfoDao {
         private Logger logger = LogManager.getLogger(this.getClass());
 
@@ -47,13 +47,9 @@ public class LaborContractorCompanyInfoDao {
 		return sqlSessionTemplate;
 	}
 
-	/*@DataSource
-	@Cacheable(value = "auth", key = "Constants.CACHE_AUTHENTICATION_PREFIX+#dbName+'_'+#uName")
-	public String authenticationQuery(String uName, String dbName) {
-		Map<String, Object> paramsMap = ParamsMap.newMap("uName", uName).addParams("dbName", dbName);
-		return sqlSessionTemplate.selectOne(className + ".authenticationQuery", paramsMap);
-	}*/
-
-	
+	@DataSource
+	public List<Map<String, Object>> queryLaborCompanyToPushListInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborCompanyToPushListInTab", paramsMap);
+	}
 
 }
