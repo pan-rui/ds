@@ -20,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ImgUtil {
+	
+	public static final String PROJECT_FILE_PATH = "/home/data/attachment/project/";
 
 	public static final String BASE_PATH = "/home/data/attachment/";
 

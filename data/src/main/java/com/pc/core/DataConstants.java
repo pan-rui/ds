@@ -68,8 +68,9 @@ public class DataConstants {
     
     //部位名称
     public final static  String REGION_FLOOR_KEY = "本层";
-    public final static  String REGION_PERIOD_KEY = "本期";
     public final static  String REGION_BUILDING_KEY = "本栋";
+    public final static  String REGION_PERIOD_KEY = "本期";
+    public final static  String REGION_PROJECT_KEY = "本项目";
     
     // 项目信息
     public final static  String REGION_PERIOD_TYPE_KEY = "period";

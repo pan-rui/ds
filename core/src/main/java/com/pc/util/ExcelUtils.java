@@ -7,6 +7,7 @@ import javafx.scene.control.Tab;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,11 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -33,15 +37,17 @@ import java.util.UUID;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-26 16:44)
- * @version: \$Rev: 2913 $
+ * @version: \$Rev: 3020 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-06-08 19:09:46 +0800 (周四, 08 6月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-12 18:40:12 +0800 (周一, 12 6月 2017) $
  */
 @Service
 public class ExcelUtils {
     private static Logger logger = LogManager.getLogger(ExcelUtils.class);
     private final static String xls = "xls";
     private final static String xlsx = "xlsx";
+    private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
     @Autowired
     private BaseDao baseDao;
 
@@ -143,9 +149,13 @@ public class ExcelUtils {
         //判断数据的类型
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_NUMERIC: //数字
-                cellValue = String.valueOf(cell.getNumericCellValue());
-                if (cellValue.endsWith(".0"))
-                    cellValue = cellValue.substring(0, cellValue.length() - 2);
+                if(HSSFDateUtil.isCellDateFormatted(cell)){
+                    cellValue = df.format(cell.getDateCellValue());
+                }else {
+                    cellValue = String.valueOf(cell.getNumericCellValue());
+                    if (cellValue.endsWith(".0"))
+                        cellValue = cellValue.substring(0, cellValue.length() - 2);
+                }
                 break;
             case Cell.CELL_TYPE_STRING: //字符串
                 cellValue = cell.getStringCellValue();
@@ -320,22 +330,23 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                 int firstCellNum = row.getFirstCellNum();
                 int lastCellNum = row.getLastCellNum();
                 //循环当前行
-                for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
+                for (int cellNum = firstCellNum; cellNum < fields.size(); cellNum++) {
                     Cell cell = row.getCell(cellNum);
                     String cellVal = getCellValue(cell);
                     if (StringUtils.isNotEmpty(cellVal)) {
                         switch (cellNum) {
                             default:
-                                String key = fields.get(cellNum);
-                                if (!StringUtils.isEmpty(key))
-                                    fieldMap.put(key, cellVal);
+                                    String key = fields.get(cellNum);
+                                    if (!StringUtils.isEmpty(key))
+                                        fieldMap.put(key, cellVal);
                                 break;
                         }
                     }
-                    if (cellNum == lastCellNum - 1) {
+                    if (cellNum == fields.size() - 1) {
                         List<Map<String,Object>> rList=baseDao.queryByProsInTab(ddBB+TableConstants.SEPARATE+TableConstants.LABOR_COMPANY_TYPE_INFO,ParamsMap.newMap("NAME",cellVal));
                         if(!rList.isEmpty()) fieldMap.put(fields.get(cellNum), rList.get(0).get("id"));
-                        fieldMap.addParams("ID", UUID.randomUUID().toString().replace("-", "")).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("PROJECT_ID", projectId).addParams("IS_SEALED", 0);
+                        fieldMap.addParams("ID", UUID.randomUUID().toString().replace("-", "")).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("PROJECT_ID", projectId).addParams("IS_SYNCHRO","0")
+                                .addParams("IS_SEALED", 0);
                         listData.add(fieldMap);
                     }
                 }
@@ -357,13 +368,14 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
             //获得当前sheet的开始行
             int firstRowNum = sheet.getFirstRowNum();
             int lastRowNum = sheet.getLastRowNum();
-            List<Map<String, Object>> listData = new LinkedList<>();
-            List<Map<String, Object>> listData2 = new LinkedList<>();
+//            List<Map<String, Object>> listData = new LinkedList<>();
+//            List<Map<String, Object>> listData2 = new LinkedList<>();
             String ddBB=tableName.split("\\.")[0];
             //循环除了第一行的所有行
             for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
-                ParamsMap<String, Object> fieldMap = new ParamsMap<>();
-                ParamsMap<String, Object> fieldMap2 = new ParamsMap<>();
+                ParamsMap<String, Object> fieldMap = new ParamsMap<>();     //人员信息
+                ParamsMap<String, Object> fieldMap2 = new ParamsMap<>();    //项目人员关联
+                ParamsMap<String, Object> fieldMap3 = new ParamsMap<>();    //合同
                 //获得当前行
                 Row row = sheet.getRow(rowNum);
                 if (row == null)
@@ -375,6 +387,11 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                 for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
                     Cell cell = row.getCell(cellNum);
                     String cellVal = getCellValue(cell);
+                    if ("是".equals(cellVal.trim())) {
+                        cellVal = "1";
+                    } else if ("否".equals(cellVal.trim())) {
+                        cellVal = "0";
+                    }
                     if (StringUtils.isNotEmpty(cellVal)) {
                         switch (cellNum) {
                             case 11:
@@ -386,8 +403,12 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                                 if(!list13.isEmpty()){
                                     fieldMap2.put("WORK_TYPENAME_ID", list13.get(0).get("id"));
                                 }else{
-                                    baseDao.insertByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO, ParamsMap.newMap("ID", UUID.randomUUID().toString().replace("-", "")).addParams("NAME", cellVal).addParams("PROJECT_ID", projectId));
+                                    baseDao.insertByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_WORK_TYPENAME_INFO, ParamsMap.newMap("ID", UUID.randomUUID().toString().replace("-", ""))
+                                            .addParams("NAME", cellVal).addParams("UPDATE_USER_ID", userId));
                                 }
+                                break;
+                            case 23:
+                                fieldMap3.put("CONTRACT_NO", cellVal);
                                 break;
                             case 24:
                                 fieldMap2.put("SAFE_EDUCATION_SCORE", cellVal);
@@ -405,6 +426,7 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                                 break;
                             case 28:
                                 fieldMap2.put("CONTRACT_SIGN_TIME", cellVal);
+                                fieldMap3.put("CONTRACT_DATE", cellVal);
                                 break;
                             case 31:
                                 fieldMap2.put("HAS_INSURANCE", cellVal);
@@ -415,13 +437,25 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                             case 33:
                                 fieldMap2.put("HAS_SAFE_EDUCATION_CARD_TIME", cellVal);
                                 break;
-                            case 38:        //人员类型
-                                List<Map<String, Object>> list38 = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_JOB_TYPENAME_INFO, ParamsMap.newMap("NAME", cellVal));
-                                if(!list38.isEmpty()) fieldMap2.put("JOB_TYPENAME_ID", list38.get(0).get("id"));
+                            case 38:        //人员类别
+                                List<Map<String, Object>> list43 = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_JOB_TYPENAME_INFO, ParamsMap.newMap("NAME", cellVal));
+                                if(!list43.isEmpty()) fieldMap2.put("JOB_TYPENAME_ID", list43.get(0).get("id"));
                                 break;
+
                             case 39:
                                 List<Map<String, Object>> list39 = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_JOB_NAME_INFO, ParamsMap.newMap("NAME", cellVal));
                                 if(!list39.isEmpty()) fieldMap2.put("JOB_NAME_ID", list39.get(0).get("id"));
+                                break;
+                            case 42:
+                                fieldMap2.put("PASS_PERIOD", cellVal);
+                                break;
+                            case 43:        //人员类型
+                                List<Map<String, Object>> list38 = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_EMP_CATEGORY_INFO, ParamsMap.newMap("NAME", cellVal));
+                                if (!list38.isEmpty())
+                                    fieldMap2.put("EMP_CATEGORY_ID", list38.get(0).get("id"));        //人员类别
+                                break;
+                            case 44:
+                                fieldMap3.put("CONTRACT_EXPIRE_DATE", cellVal);
                                 break;
                             default:
                                 if(cellNum<fields.size()) {
@@ -432,20 +466,35 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                                 break;
                         }
                     }
-                    if (cellNum == lastCellNum - 1) {
+                    if (cellNum == 44) {
                         List<Map<String,Object>> rList=baseDao.queryByProsInTab(ddBB+TableConstants.SEPARATE+TableConstants.LABOR_COMPANY_TYPE_INFO,ParamsMap.newMap("NAME",cellVal));
                         if(!rList.isEmpty()) fieldMap.put(fields.get(cellNum), rList.get(0).get("id"));
                         String id1=UUID.randomUUID().toString().replace("-", "");
-                        fieldMap.addParams("ID", id1).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("IS_SEALED", "0");
+                        fieldMap.addParams("ID", id1).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("IS_SEALED", "0").addParams("UPDATE_USER_ID", userId);
 //                        listData.add(fieldMap);
                         int size=baseDao.insertUpdateByProsInTab(tableName, fieldMap);
                         if(size>0) {
-                            List<Map<String, Object>> list38 = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_EMP_CATEGORY_INFO, ParamsMap.newMap("NAME", "建筑工人"));
-                            if (!list38.isEmpty())
-                                fieldMap2.put("EMP_CATEGORY_ID", list38.get(0).get("id"));        //人员类别
-                            fieldMap2.addParams("ID", UUID.randomUUID().toString().replace("-", "")).addParams("PERSON_ID", id1).addParams("IS_SEALED", "0").addParams("PROJECT_ID", projectId).addParams("TENANT_ID", tenantId);
+                            String id2=UUID.randomUUID().toString().replace("-", "");
+                            fieldMap2.addParams("ID",id2 ).addParams("IS_SEALED", "0").addParams("PROJECT_ID", projectId).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("IS_SYNCHRO", "0");
+                            List<Map<String, Object>> qqList = baseDao.queryByProsInTab(tableName,ParamsMap.newMap("ID_CODE",fieldMap.get("ID_CODE")));
+                            if(CollectionUtils.isEmpty(qqList)) {
+                                fieldMap2.addParams("PERSON_ID", id1);
+                            }else{
+//                                List<Map<String,Object>> qList=baseDao.queryByProsInTab(tableName,ParamsMap.newMap("ID_CODE",fieldMap.get("ID_CODE")));
+                                fieldMap2.addParams("PERSON_ID", qqList.get(0).get("id"));
+                            }
 //                        listData2.add(fieldMap2);
-                            baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO, fieldMap2);
+                            int size2=baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO, fieldMap2);
+                            if(size2>0){
+                                List<Map<String, Object>> qList = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO, ParamsMap.newMap("PROJECT_ID", fieldMap2.get("PROJECT_ID")).addParams("PERSON_ID", fieldMap2.get("PERSON_ID")));
+                                if(CollectionUtils.isEmpty(qList)) {
+                                    fieldMap3.addParams("PROJECT_PERSON_ID", id2);
+                                }else{
+                                    fieldMap3.addParams("PROJECT_PERSON_ID", qList.get(0).get("id"));
+                                }
+                            fieldMap3.addParams("ID", UUID.randomUUID().toString().replace("-", "")).addParams("IS_SEALED", "0").addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("IS_SYNCHRO", "0");
+                            baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE, fieldMap3);
+                            }
                         }
                     }
                 }
@@ -453,6 +502,80 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
 /*            int size = baseDao.insertBatchByProsInTab(tableName, listData);
             if(size>0)
                 baseDao.insertBatchByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO, listData2);*/
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
+    public void importTraining(MultipartFile file, String tableName, List<String> fields, String tenantId, String userId,String projectId) throws IOException {
+        //检查文件
+        checkFile(file);
+        //获得Workbook工作薄对象
+        Workbook workbook = getWorkBook(file);
+        if (workbook != null) {
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null) return;
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum();
+            int lastRowNum = sheet.getLastRowNum();
+            String ddBB=tableName.split("\\.")[0];
+            //循环除了第一行的所有行
+            for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
+                ParamsMap<String, Object> fieldMap = new ParamsMap<>();     //培训信息
+                ParamsMap<String, Object> fieldMap2 = new ParamsMap<>();
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null)
+                    continue;
+                //获得当前行的开始列
+                int firstCellNum = row.getFirstCellNum();
+                int lastCellNum = row.getLastCellNum();
+                //循环当前行
+                for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
+                    Cell cell = row.getCell(cellNum);
+                    String cellVal = getCellValue(cell);
+                    if ("是".equals(cellVal.trim())) {
+                        cellVal = "1";
+                    } else if ("否".equals(cellVal.trim())) {
+                        cellVal = "0";
+                    }
+                    if (StringUtils.isNotEmpty(cellVal)) {
+                        switch (cellNum) {
+                            case 1:
+                                List<Map<String, Object>> list1 = baseDao.queryByS("SELECT  ppi.ID FROM " + ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO + " ppi JOIN " + ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO + " pi ON ppi.PERSON_ID = pi.ID WHERE pi.ID_CODE='" + cellVal + "'");
+                                if(!list1.isEmpty()) fieldMap2.put("PROJECT_PERSON_ID", list1.get(0).get("ID"));
+                                break;
+                            case 6:
+                                fieldMap2.put("EDU_TIME", cellVal);
+                                break;
+                            default:
+                                if(cellNum<fields.size()) {
+                                    String key = fields.get(cellNum);
+                                    if (!StringUtils.isEmpty(key))
+                                        fieldMap.put(key, cellVal);
+                                }
+                                break;
+                        }
+                    }
+                    if (cellNum == fields.size()-1) {
+                        String id1=UUID.randomUUID().toString().replace("-", "");
+                        fieldMap.addParams("ID", id1).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("IS_SEALED", "0").addParams("UPDATE_TIME", new Date()).addParams("PROJECT_ID", projectId);
+//                        listData.add(fieldMap);
+                        int size=baseDao.insertUpdateByProsInTab(tableName, fieldMap);
+                        if(size>0) {
+                            String id2=UUID.randomUUID().toString().replace("-", "");
+                            fieldMap2.addParams("ID",id2 ).addParams("IS_SEALED", "0").addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId).addParams("IS_SYNCHRO", "0");
+                            List<Map<String,Object>> qqList=baseDao.queryByProsInTab(tableName,ParamsMap.newMap("PROJECT_ID",projectId).addParams("EDU_COURSENAME",fieldMap.get("EDU_COURSENAME")));
+                            if(CollectionUtils.isEmpty(qqList)) {
+                                fieldMap2.addParams("TRAINING_ID", id1);
+                            }else{
+//                                List<Map<String,Object>> qList=baseDao.queryByProsInTab(tableName,ParamsMap.newMap("ID_CODE",fieldMap.get("ID_CODE")));
+                                fieldMap2.addParams("TRAINING_ID", qqList.get(0).get("id"));
+                            }
+                            baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_DETAIL_INFO, fieldMap2);
+                        }
+                    }
+                }
+            }
         }
     }
 }

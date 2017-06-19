@@ -474,6 +474,12 @@ public class TableConstants {
 		minPassRatio,	//最小通过比例
 		ELIGIBLE,	//是否符合
 		eligible,	//是否符合
+		EXPRESSION_VALUE,
+		expressionValue,
+		MAX_VAL,
+		maxVal,
+		MIN_VAL,
+		minVal,
 		CHECK_POINT_SIZE,	//检查点数
 		checkPointSize,	//检查点数
 		CHECK_POINT_MAX_DIFF,	//检查点最大偏差
@@ -1790,8 +1796,8 @@ public class TableConstants {
 		sitePhoto,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1817,8 +1823,8 @@ public class TableConstants {
 		date,	//
 		WORK_DURATION,	//
 		workDuration,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1838,8 +1844,8 @@ public class TableConstants {
 		code,	//
 		NAME,	//
 		name,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1893,8 +1899,8 @@ public class TableConstants {
 		remark,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1934,8 +1940,8 @@ public class TableConstants {
 		authorizeKey,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1955,8 +1961,8 @@ public class TableConstants {
 		code,	//
 		NAME,	//
 		name,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1976,8 +1982,8 @@ public class TableConstants {
 		code,	//
 		NAME,	//
 		name,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -1997,8 +2003,8 @@ public class TableConstants {
 		code,	//
 		NAME,	//
 		name,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2075,8 +2081,8 @@ public class TableConstants {
 		payGross,	//
 		PAY_NET,	//
 		payNet,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2106,8 +2112,8 @@ public class TableConstants {
 		payCardnum,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2137,8 +2143,8 @@ public class TableConstants {
 		bankVoucher,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2200,55 +2206,8 @@ public class TableConstants {
 		idphotoScan2,	//
 		IS_BLACKLIST,	//
 		isBlacklist,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
-		UPDATE_USER_ID,	//
-		updateUserId,	//
-		IS_SEALED,	//
-		isSealed,	//
-		SEALED_USER_ID,	//
-		sealedUserId,	//
-		SEALED_TIME,	//
-		sealedTime,	//
-		TENANT_ID,	//
-		tenantId,	//
-	}
-
-	public enum LaborProjectInfo{
-		ID,	//
-		id,	//
-		ITEM_NAME,	//
-		itemName,	//
-		ITEM_CODE,	//
-		itemCode,	//
-		ITEM_ADDR,	//
-		itemAddr,	//
-		CONSTRUCTION_UNIT,	//
-		constructionUnit,	//
-		PLAN_TO_INVEST,	//
-		planToInvest,	//
-		REPORTED_TIME,	//
-		reportedTime,	//
-		PROJECT_NAME,	//
-		projectName,	//
-		PROJECT_CODE,	//
-		projectCode,	//
-		PROJECT_ADDR,	//
-		projectAddr,	//
-		MANAGER_DEPT,	//
-		managerDept,	//
-		PROJECT_TYPE_LEVEL,	//
-		projectTypeLevel,	//
-		PROJECT_TYPE,	//
-		projectType,	//
-		RED_AREA,	//
-		redArea,	//
-		DESIGN_COMPANY,	//
-		designCompany,	//
-		SUPERVISION_COMPANY,	//
-		supervisionCompany,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2274,8 +2233,8 @@ public class TableConstants {
 		contractFile,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2341,8 +2300,8 @@ public class TableConstants {
 		empStatus,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2370,8 +2329,8 @@ public class TableConstants {
 		eduAttach,	//
 		IS_SYNCHRO,	//
 		isSynchro,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2401,8 +2360,8 @@ public class TableConstants {
 		eduClasshour,	//
 		EDU_CONTENT,	//
 		eduContent,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -2431,8 +2390,8 @@ public class TableConstants {
 		projectId,	//
 		NAME,	//
 		name,	//
-		UPTATE_TIME,	//
-		uptateTime,	//
+		UPDATE_TIME,	//
+		updateTime,	//
 		UPDATE_USER_ID,	//
 		updateUserId,	//
 		IS_SEALED,	//
@@ -3012,6 +2971,10 @@ public class TableConstants {
 		idTree,	//
 		NAME_TREE,	//
 		nameTree,	//
+		PROJECT_CODE,	//
+		projectCode,	//
+		PROJECT_ADDR,	//
+		projectAddr,	//
 		REMARK,	//分期描述
 		remark,	//分期描述
 		UPDATE_USER_ID,	//更新人

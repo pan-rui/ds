@@ -130,7 +130,7 @@
                 #{value}
             </foreach>
         </trim>
-        <trim prefix="on duplicate key update" suffix=",">
+        <trim prefix="on duplicate key update" suffixOverrides=",">
             <foreach collection="params.keys" item="k" separator=",">
                 <if test='k !="ID"'>${k}=VALUES(${k})</if>
             </foreach>

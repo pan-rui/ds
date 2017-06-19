@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,9 @@ public class ProjectPeriodService extends BaseService {
 	}
 
     public List<Map<String, Object>> getProjectPeriodList(Map<String, Object> params, String ddBB) {
-		List<Map<String, Object>> list = queryList(params, null,
+    	Map<String, Object> orderMap=new HashMap<>();
+    	orderMap.put(TableConstants.ProjectPeriod.PERIOD_NAME.name(), TableConstants.ORDER_BY_ASC);
+		List<Map<String, Object>> list = queryList(params, orderMap,
 				ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD);
 		return list;
 	}
