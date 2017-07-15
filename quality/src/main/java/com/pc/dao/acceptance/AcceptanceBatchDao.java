@@ -15,9 +15,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 2652 $
+ * @version: \$Rev: 3282 $
  * @UpdateAuthor: \$Author: zhangj $
- * @UpdateDateTime: \$Date: 2017-05-27 18:37:56 +0800 (周六, 27 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-27 14:22:47 +0800 (周二, 27 6月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -39,6 +39,26 @@ public class AcceptanceBatchDao {
 
 	public SqlSessionTemplate getSqlSessionTemplate() {
 		return sqlSessionTemplate;
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryAcceptanceBatchByQTPostInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryAcceptanceBatchByQTPostInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryRegionAcceptanceRecordInfoInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryRegionAcceptanceRecordInfoInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryTotalCheckedFailTimesByRegionInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryTotalCheckedFailTimesByRegionInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryTotalCheckedTimesByRegionInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryTotalCheckedTimesByRegionInTab", paramsMap);
 	}
 	
 	@DataSource

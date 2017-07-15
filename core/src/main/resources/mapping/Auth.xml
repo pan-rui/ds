@@ -288,8 +288,7 @@
 		d ON d.ID = a.DATA_TYPE_ID
 		WHERE a.DATA_TYPE_ID = #{dataSignId};
 	</select>
-	<select id="queryDataSceneRuleGroupDetailByScene" parameterType="string"
-		resultType="map" statementType="PREPARED">
+	<select id="queryDataSceneRuleGroupDetailByScene" parameterType="string" resultType="map" statementType="PREPARED">
 		SELECT a.*, b.NAME, b.SCENE_GROUP_OP,
 		b.PARENT_ID, b.ID_TREE, b.NAME_TREE
 		FROM ${dsrTableName} a LEFT JOIN
@@ -310,12 +309,39 @@
 			</foreach>
 		</trim>
 	</select>
-	<!--TODO:有效标记 待定-->
 	<select id="queryFuncPermissByRoleTab" parameterType="map" resultType="map" statementType="PREPARED">
 		select a.*  from ${funcPermissTab} a,${funcRoleTab} b where b.FUNC_PRIVILEGE_ID=a.ID and a.IS_SEALED='0' and a.IS_VALID='0' and b.FUNC_ROLE_ID=#{role}
 	</select>
+
 	<select id="queryRoleByFunPermissTab" parameterType="map" resultType="map" statementType="PREPARED">
 		select a.*  from ${funcRoleTab} a,${funcRolePermissTab} b where a.ID=b.FUNC_ROLE_ID and a.IS_SEALED='0' and a.IS_VALID='0' and b.FUNC_PRIVILEGE_ID=#{perId}
+	</select>
+
+<select id="queryTenantRoleAsNamePageMul" parameterType="map" resultType="map" statementType="PREPARED">
+	SELECT trr.UPDATE_TIME updateTime,t.*,tr.*,trr.ID id FROM ${ddBB}.TENANT_ROLE_RELATE trr JOIN ${ddBB}.TENANT t ON trr.TENANT_ID=t.ID JOIN ${ddBB}.TENANT_ROLE tr ON trr.FUNC_ROLE_ID=tr.ID where trr.IS_VALID='0'
+	<if test="null != page.params">
+		<trim prefix=" and " prefixOverrides="or | and">
+			<foreach collection="page.params" item="item" index="key" separator=" and ">
+				<if test="null != item">
+					${key} LIKE '%${item}%'
+				</if>
+			</foreach>
+		</trim>
+	</if>
+</select>
+
+	<select id="queryTenantRoles" statementType="PREPARED" parameterType="map" resultType="map">
+		SELECT tr.ROLE_CODE roleCode,tr.ID id FROM ${ddBB}.TENANT_ROLE_RELATE trr JOIN ${ddBB}.TENANT_ROLE tr ON trr.FUNC_ROLE_ID=tr.ID WHERE trr.IS_VALID='0' and trr.TENANT_ID=${tenantId}
+	</select>
+
+	<select id="queryTenantPermissByRoles" parameterType="map" resultType="map" statementType="PREPARED">
+		select tp.PRIVILEGES_CODE privilegesCode from ${ddBB}.ROLE_PRIVILEGES_RELATE rpr JOIN ${ddBB}.TENANT_PRIVILEGES tp ON rpr.FUNC_PRIVILEGE_ID = tp.ID where tp.TENANT_ID=${tenantId} and rpr.IS_VALID='0' and
+		rpr.FUNC_ROLE_ID in
+		<trim prefix="(" suffix=")" prefixOverrides="(">
+			<foreach collection="roles" item="item" index="key" separator=" , ">
+				<if test="null != item">#{item}</if>
+			</foreach>
+		</trim>
 	</select>
 
 </mapper>

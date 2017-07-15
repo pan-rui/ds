@@ -1,10 +1,14 @@
 package com.pc.controller.labor;
 
  
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.pc.util.ExcelUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.pc.controller.BaseController;
@@ -28,6 +34,9 @@ import com.pc.vo.ParamsVo;
 import com.pc.core.TableConstants;
  
 import com.pc.service.labor.impl.LaborPayWagesRecordService;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Description: 
@@ -41,6 +50,8 @@ import com.pc.service.labor.impl.LaborPayWagesRecordService;
 public class LaborPayWagesRecordController extends BaseController {
 	@Autowired
 	private LaborPayWagesRecordService laborPayWagesRecordService;
+	@Autowired
+	private ExcelUtils excelUtils;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
@@ -115,5 +126,17 @@ public class LaborPayWagesRecordController extends BaseController {
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborPayWagesRecordService.getLaborPayWagesRecordPage(page, ddBB));
+	}
+
+	@RequestMapping(value = "/laborPayWagesRecord/import",method = RequestMethod.POST)
+	@ResponseBody
+	public BaseResult importData(HttpServletRequest request, @RequestAttribute String ddBB, @RequestHeader(Constants.TENANT_ID) String tenantId, @RequestAttribute(Constants.USER_ID) String userId, @RequestParam String projectId, MultipartFile file) {
+		try {
+			excelUtils.importSalary(file,ddBB,tenantId,userId,projectId);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new BaseResult(1, e.getMessage());
+		}
+		return new BaseResult(0, "OK");
 	}
 }

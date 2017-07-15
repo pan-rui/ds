@@ -3,17 +3,44 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborTrainingDetailInfoDao">
+	<select id="queryLaborTrainingDetailPageInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id,b.`EDU_COURSENAME`
+		AS eduCoursename,b.`EDU_ORGANIZATION` AS
+		eduOrganization,b.`EDU_TEACHER` AS eduTeracher,d.`EMP_NAME` AS
+		empName,d.`ID_CODE` AS idCode,a.`EDU_TIME` AS eduTime,a.`IS_SYNCHRO`
+		AS isSynchro FROM LABOR_TRAINING_DETAIL_INFO a,LABOR_TRAINING_INFO
+		b,LABOR_PROJECT_PERSON_INFO c,LABOR_PERSON_INFO d WHERE
+		a.`TRAINING_ID`=b.`ID` AND a.`PROJECT_PERSON_ID`=c.`ID` AND
+		c.`PERSON_ID`=d.`ID` AND a.`IS_SEALED`=0 AND a.`TENANT_ID`=#{TENANT_ID}
+		<if test="PROJECT_ID != null">
+			AND c.`PROJECT_ID`=#{PROJECT_ID}
+		</if>
+		<if test="IS_SYNCHRO != null">
+			AND a.`IS_SYNCHRO`=#{IS_SYNCHRO}
+		</if>
+	</select>
+
 	<select id="queryLaborTrainingToPushListInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
-		SELECT a.ID AS id, e.`ID_CODE` AS person_id,
-		b.`EDU_ORGANIZATION` AS edu_organization, b.`EDU_TEACHER` AS
-		edu_teacher, b.`EDU_ADDR` AS edu_addr, a.`EDU_TIME` AS edu_time,
-		b.`EDU_CLASSHOUR` AS edu_classhour, b.`EDU_CONTENT` AS edu_content,
-		a.`EDU_PHOTO` AS edu_photo FROM ${ltdTableName}
-		a,${ltTableName} b,${lppTableName} c,${lpTableName} d WHERE
-		a.`TRAINING_ID`=b.`ID` AND a.`PROJECT_PERSON_ID`=c.`ID` AND b.`PROJECT_ID`=c.`PROJECT_ID`
-		AND c.`PERSON_ID`=d.`ID` AND a.`IS_SEALED`=0
-		AND b.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND
+		SELECT a.ID AS id, d.`ID_CODE` AS
+		person_id,b.`EDU_COURSENAME` AS edu_coursename,
+		b.`EDU_ORGANIZATION` AS
+		edu_organization, b.`EDU_TEACHER` AS
+		edu_teacher, b.`EDU_ADDR` AS
+		edu_addr, a.`EDU_TIME` AS edu_time,
+		b.`EDU_CLASSHOUR` AS edu_classhour,
+		b.`EDU_CONTENT` AS edu_content,
+		a.`EDU_PHOTO` AS edu_photo FROM
+		${ltdTableName}
+		a,${ltTableName} b,${lppTableName} c,${lpTableName} d
+		WHERE
+		a.`TRAINING_ID`=b.`ID` AND a.`PROJECT_PERSON_ID`=c.`ID` AND
+		b.`PROJECT_ID`=c.`PROJECT_ID`
+		AND c.`PERSON_ID`=d.`ID` AND
+		a.`IS_SEALED`=0
+		AND b.`IS_SEALED`=0 AND d.`IS_SEALED`=0 AND
+		a.`IS_SYNCHRO`=0 AND
 		b.`PROJECT_ID`=#{PROJECT_ID}
 	</select>
 

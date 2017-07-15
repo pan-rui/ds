@@ -46,7 +46,28 @@ public class LaborProjectPersonInfoDao {
 	public SqlSessionTemplate getSqlSessionTemplate() {
 		return sqlSessionTemplate;
 	}
-
+	
+	
+	@DataSource
+	public List<Map<String, Object>> queryLaborProjectPersonInfoFailListInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborProjectPersonInfoFailListInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryLaborProjectListInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborProjectListInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryLaborProjectPersonInfoDetailPageInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborProjectPersonInfoDetailPageInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryLaborPersonListByFileTypeInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborPersonListByFileTypeInTab", paramsMap);
+	}
+	
 	@DataSource
 	public List<Map<String, Object>> queryLaborPersonToPushListInTab(Map<String, Object> paramsMap) {
 		return sqlSessionTemplate.selectList(className + ".queryLaborPersonToPushListInTab", paramsMap);

@@ -38,9 +38,9 @@ import java.util.Set;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2014-12-27 14:21)
- * @version: \$Rev: 2895 $
+ * @version: \$Rev: 3540 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-13 09:53:48 +0800 (周四, 13 7月 2017) $
  */
 @Component
 public class BaseImpl implements IBase, ApplicationContextAware, InitializingBean, CacheResolver {
@@ -159,7 +159,7 @@ public class BaseImpl implements IBase, ApplicationContextAware, InitializingBea
                 sb.append(TableConstants.SEPARATE_SPLIT).append(map.get("COLUMN_NAME")).append(TableConstants.SPACE).append(ColumnProcess.encryptVal((String) map.get("COLUMN_NAME")));
             } else {
                 if (i != 0)
-                    cacheManager.getCache("columns").putIfAbsent(prevTable, sb.toString().substring(1));
+                    cacheManager.getCache("columns").put(prevTable, sb.toString().substring(1));
                 prevTable = tableName;
                 sb = new StringBuffer();
                 sb.append(TableConstants.SEPARATE_SPLIT).append(map.get("COLUMN_NAME")).append(TableConstants.SPACE).append(ColumnProcess.encryptVal((String) map.get("COLUMN_NAME")));
@@ -209,7 +209,6 @@ public class BaseImpl implements IBase, ApplicationContextAware, InitializingBea
 
     @Override
     public Collection<? extends Cache> resolveCaches(CacheOperationInvocationContext<?> cacheOperationInvocationContext) {
-        logger.debug("in......cacheResolve\t"+cacheOperationInvocationContext.getArgs());
         for (String cacheName : initDataMap.keySet()) {
             if (initDataMap.get(cacheName).contains(cacheOperationInvocationContext.getArgs()[0])) {
                 CacheOperation operation = (CacheOperation) cacheOperationInvocationContext.getOperation();
@@ -233,5 +232,12 @@ public class BaseImpl implements IBase, ApplicationContextAware, InitializingBea
 
     public RedisCacheManager getCacheManager() {
         return cacheManager;
+    }
+    public RedisCacheManager getCacheManagerSlave() {
+        return cacheManagerSlave;
+    }
+
+    public BaseDao getBaseDao() {
+        return this.baseDao;
     }
 }

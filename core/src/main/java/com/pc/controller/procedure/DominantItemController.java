@@ -126,7 +126,8 @@ public class DominantItemController extends BaseController {
 		try {
 			ParamsMap paramsMap=ParamsMap.newMap("主控",ddBB+TableConstants.SEPARATE+TableConstants.DOMINANT_ITEM)
 					.addParams("一般",ddBB+TableConstants.SEPARATE+TableConstants.GENERAL_ITEM);
-			List<String> fields=Arrays.<String>asList( "ITEM_CODE","GRADING_STANDARD","ERROR_RANGE","PASS_TEXT","NO_PASS_TEXT","REMARK");
+			List<String> fields=Arrays.<String>asList( "ITEM_CODE","GRADING_STANDARD","ERROR_RANGE","CALCULATE_TYPE","ALLOW_MAX_EXPRESSION","ALLOW_MIN_EXPRESSION",
+					"ALLOW_MAX_VALUE","ALLOW_MIN_VALUE","ALLOW_MAX_VAL","PASS_TEXT","NO_PASS_TEXT","REMARK");
 			if(!file.getOriginalFilename().contains("验收项")) return new BaseResult(350,"文字名可能不包含\"验收项\"等字,请选择正确的文件及文件格式,否则可能导致异常");
 			excelUtils.importItem(paramsMap,ddBB+TableConstants.SEPARATE+ TableConstants.PROCEDURE_INFO, "PROCEDURE_ID", fields, file,tenantId,userId);
 		} catch (IOException e) {
@@ -135,4 +136,22 @@ public class DominantItemController extends BaseController {
 		}
 		return new BaseResult(0, "OK");
 	}
+
+/*	@RequestMapping(value = "/dominant/common/load", method = RequestMethod.POST)
+	@ResponseBody
+	public BaseResult commonImportItem(@RequestHeader(Constants.TENANT_ID) String tenantId,@RequestAttribute(Constants.USER_ID) String userId,@RequestAttribute String ddBB, MultipartFile file) {			//尚未导入CALC_TYPE
+//		ddBB = "dems";
+		try {
+			ParamsMap paramsMap=ParamsMap.newMap("主控",ddBB+TableConstants.SEPARATE+TableConstants.DOMINANT_ITEM)
+					.addParams("一般",ddBB+TableConstants.SEPARATE+TableConstants.GENERAL_ITEM_COMMON);
+			List<String> fields=Arrays.<String>asList( "ITEM_CODE","GRADING_STANDARD","ERROR_RANGE","CALCULATE_TYPE","ALLOW_MAX_EXPRESSION","ALLOW_MIN_EXPRESSION",
+					"ALLOW_MAX_VALUE","ALLOW_MIN_VALUE","ALLOW_MAX_VAL","PASS_TEXT","NO_PASS_TEXT","REMARK");
+			if(!file.getOriginalFilename().contains("验收项")) return new BaseResult(350,"文字名可能不包含\"验收项\"等字,请选择正确的文件及文件格式,否则可能导致异常");
+			excelUtils.importItem(paramsMap,ddBB+TableConstants.SEPARATE+ TableConstants.PROCEDURE_INFO_COMMON, "PROCEDURE_ID", fields, file,"1",userId);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new BaseResult(1, e.getMessage());
+		}
+		return new BaseResult(0, "OK");
+	}*/
 }

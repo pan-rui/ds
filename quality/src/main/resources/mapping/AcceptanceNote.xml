@@ -3,5 +3,310 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.acceptance.AcceptanceNoteDao">
-	
+	<select id="queryAcceptanceNoteByMonthInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${anTableName}
+		a WHERE a.`IS_SEALED`=0 AND a.`TEAM_INSPECTOR_ID`=#{TEAM_INSPECTOR_ID} AND 
+		a.`TEAM_INSPECTOR_CHECK_TIME`>#{beginTime}
+		<if test="PROJECT_PERIOD_ID != null and PROJECT_PERIOD_ID != ''">
+			AND a.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID} 
+		</if>
+	</select>
+
+	<select id="queryUserAcceptanceCountByMonthInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${abTableName}
+		a,${anTableName} b WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND
+		a.`TOTAL_CHECK_RESULT` IS NOT NULL AND a.`TOTAL_CHECK_SCORE` IS NOT NULL AND
+		a.`BATCH_STATUS`=#{BATCH_STATUS} AND a.`ACCEPTANCE_PERSON_ID`=#{ACCEPTANCE_PERSON_ID} AND 
+		a.`UPDATE_TIME`>#{beginTime}
+		<if test="PROJECT_PERIOD_ID != null and PROJECT_PERIOD_ID != ''">
+			AND b.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID} 
+		</if>
+	</select>
+
+	<select id="queryUserAcceptanceStatisticsByPostInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT
+		a.`ACCEPTANCE_PERSON_ID` AS userId,a.`ACCEPTER` AS
+		userName,CAST(IFNULL(AVG(b.`TOTAL_CHECK_SCORE`/a.`TOTAL_CHECK_SCORE`),0)
+		AS DECIMAL(18, 3)) AS conformRate FROM ${abTableName} a LEFT JOIN
+		${abTableName} b ON a.`ACCEPTANCE_NOTE_ID`=b.`ACCEPTANCE_NOTE_ID`
+		AND
+		a.`BATCH_NO`=b.`BATCH_NO`
+		AND b.`BATCH_STATUS`=1 AND
+		b.`INSPECTOR_ROLE`=#{checkRole} LEFT JOIN ${anTableName}
+		c ON
+		a.`ACCEPTANCE_NOTE_ID`=c.`ID`
+		WHERE a.`INSPECTOR_ROLE`=#{inspectorRole}
+		AND a.`BATCH_STATUS`=1 AND
+		a.`TOTAL_CHECK_RESULT` IS NOT NULL AND
+		b.`TOTAL_CHECK_RESULT` IS NOT
+		NULL AND
+		c.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`UPDATE_TIME`
+		</if>
+		<if test="null != list">
+			<trim prefix="AND">
+				<foreach collection="list" item="item" index="key" open="("
+					close=")" separator=" OR ">
+					<if test="null != item">a.`ACCEPTANCE_PERSON_ID`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		GROUP BY a.`ACCEPTANCE_PERSON_ID`
+		ORDER BY conformRate DESC
+	</select>
+
+	<select id="queryProjectAcceptanceStatisticsRankingInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT t.`ID` AS id,t.`PERIOD_NAME` AS periodName,IFNULL(CAST(
+		t2.count2/t1.count1 AS DECIMAL(18, 3)),0) AS
+		qualifiedRate,IFNULL(CAST( t3.count3/t1.count1 AS DECIMAL(18, 3)),0)
+		AS reviewRate FROM ${ppTableName} t LEFT JOIN
+
+		(SELECT
+		b1.`PROJECT_PERIOD_ID`,COUNT(1) AS count1 FROM ${abTableName}
+		a1,${anTableName} b1 WHERE a1.`ACCEPTANCE_NOTE_ID`=b1.`ID` AND
+		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND a1.`BATCH_STATUS`=1
+		AND
+		a1.`TOTAL_CHECK_RESULT` IS NOT NULL
+		<if test="inspectorRoleList != null">
+			<trim prefix="AND">
+				<foreach collection="inspectorRoleList" item="item" index="key"
+					open="(" close=")" separator=" OR ">
+					<if test="null != item">a1.`INSPECTOR_ROLE`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a1.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>=a1.`UPDATE_TIME`
+		</if>
+		GROUP BY b1.`PROJECT_PERIOD_ID`)
+		t1 ON t.`ID`=t1.PROJECT_PERIOD_ID LEFT
+		JOIN
+
+		(SELECT b2.`PROJECT_PERIOD_ID`,COUNT(1) AS count2 FROM
+		${abTableName}
+		a2,${anTableName} b2 WHERE
+		a2.`ACCEPTANCE_NOTE_ID`=b2.`ID` AND
+		a2.`IS_SEALED`=0 AND
+		b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=1
+		AND
+		a2.`TOTAL_CHECK_RESULT`=1
+		<if test="inspectorRoleList != null">
+			<trim prefix="AND">
+				<foreach collection="inspectorRoleList" item="item" index="key"
+					open="(" close=")" separator=" OR ">
+					<if test="null != item">a2.`INSPECTOR_ROLE`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a2.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a2.`UPDATE_TIME`
+		</if>
+		GROUP BY b2.`PROJECT_PERIOD_ID`) t2 ON
+		t.`ID`=t2.PROJECT_PERIOD_ID LEFT
+		JOIN
+
+		(SELECT b3.`PROJECT_PERIOD_ID`,COUNT(1) AS count3 FROM
+		${abTableName}
+		a3,${anTableName} b3 WHERE
+		a3.`ACCEPTANCE_NOTE_ID`=b3.`ID` AND
+		a3.`IS_SEALED`=0 AND
+		b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=1
+		AND
+		a3.`TOTAL_CHECK_RESULT` IS
+		NOT NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
+		<if test="inspectorRoleList != null">
+			<trim prefix="AND">
+				<foreach collection="inspectorRoleList" item="item" index="key"
+					open="(" close=")" separator=" OR ">
+					<if test="null != item">a3.`INSPECTOR_ROLE`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a3.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a3.`UPDATE_TIME`
+		</if>
+		GROUP BY b3.`PROJECT_PERIOD_ID`) t3 ON t.`ID`=t3.PROJECT_PERIOD_ID
+		WHERE t.`TENANT_ID`=#{tenantId}
+		<if test="null != list">
+			<trim prefix="AND">
+				<foreach collection="list" item="item" index="key" open="("
+					close=")" separator=" OR ">
+					<if test="null != item">t.`ID`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		ORDER BY qualifiedRate DESC
+	</select>
+
+	<select id="queryTeamAcceptanceStatisticsRankingInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT t.`ID` AS id,t.`TEAM_NAME` AS teamName,IFNULL(CAST(
+		t2.count2/t1.count1 AS DECIMAL(18, 3)),0) AS
+		qualifiedRate,IFNULL(CAST( t3.count3/t1.count1 AS DECIMAL(18, 3)),0)
+		AS reviewRate FROM ${pprTableName} r LEFT JOIN ${tTableName} t ON
+		r.`TEAM_ID`= t.`ID` LEFT JOIN
+
+		(SELECT
+		b1.`CONSTRUCTION_TEAM_ID`,COUNT(1) AS count1 FROM ${abTableName}
+		a1,${anTableName} b1 WHERE a1.`ACCEPTANCE_NOTE_ID`=b1.`ID` AND
+		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND a1.`BATCH_STATUS`=1
+		AND
+		a1.`TOTAL_CHECK_RESULT` IS NOT NULL
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND a1.`INSPECTOR_ROLE`=#{inspectorRole}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a1.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>=a1.`UPDATE_TIME`
+		</if>
+		GROUP BY b1.`CONSTRUCTION_TEAM_ID`)
+		t1 ON
+		t.`ID`=t1.CONSTRUCTION_TEAM_ID LEFT JOIN
+
+		(SELECT
+		b2.`CONSTRUCTION_TEAM_ID`,COUNT(1) AS count2 FROM ${abTableName}
+		a2,${anTableName} b2 WHERE a2.`ACCEPTANCE_NOTE_ID`=b2.`ID` AND
+		a2.`IS_SEALED`=0 AND b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=1
+		AND
+		a2.`TOTAL_CHECK_RESULT`=1
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND a2.`INSPECTOR_ROLE`=#{inspectorRole}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a2.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a2.`UPDATE_TIME`
+		</if>
+		GROUP BY b2.`CONSTRUCTION_TEAM_ID`) t2 ON
+		t.`ID`=t2.CONSTRUCTION_TEAM_ID LEFT JOIN
+
+		(SELECT
+		b3.`CONSTRUCTION_TEAM_ID`,COUNT(1) AS count3 FROM ${abTableName}
+		a3,${anTableName} b3 WHERE a3.`ACCEPTANCE_NOTE_ID`=b3.`ID` AND
+		a3.`IS_SEALED`=0 AND b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=1
+		AND
+		a3.`TOTAL_CHECK_RESULT` IS NOT NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND a3.`INSPECTOR_ROLE`=#{inspectorRole}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a3.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a3.`UPDATE_TIME`
+		</if>
+		GROUP BY b3.`CONSTRUCTION_TEAM_ID`) t3 ON
+		t.`ID`=t3.CONSTRUCTION_TEAM_ID
+		WHERE r.`IS_SEALED`=0 AND
+		t.`IS_SEALED`=0 AND r.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		<if test="null != list">
+			<trim prefix="AND">
+				<foreach collection="list" item="item" index="key" open="("
+					close=")" separator=" OR ">
+					<if test="null != item">t.`ID`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		ORDER BY qualifiedRate DESC
+	</select>
+
+	<select id="queryCompanyAcceptanceStatisticsRankingInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT t.`ID` AS id,t.`CORPORATE_NAME` AS corporateName,IFNULL(CAST(
+		t2.count2/t1.count1 AS DECIMAL(18, 3)),0) AS
+		qualifiedRate,IFNULL(CAST( t3.count3/t1.count1 AS DECIMAL(18, 3)),0)
+		AS reviewRate FROM (SELECT DISTINCT aa.ID,aa.`CORPORATE_NAME` FROM
+		${cTableName}
+		aa,${anTableName} ab WHERE
+		aa.`ID`=ab.`SUPERVISOR_COMPANY_ID` AND
+		aa.`IS_SEALED`=0 AND
+		ab.`IS_SEALED`=0 AND ab.`TENANT_ID`=#{TENANT_ID}) t LEFT JOIN
+
+		(SELECT
+		b1.`SUPERVISOR_COMPANY_ID`,COUNT(1) AS count1 FROM ${abTableName}
+		a1,${anTableName} b1 WHERE a1.`ACCEPTANCE_NOTE_ID`=b1.`ID` AND
+		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND a1.`BATCH_STATUS`=1
+		AND
+		a1.`TOTAL_CHECK_RESULT` IS NOT NULL
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND a1.`INSPECTOR_ROLE`=#{inspectorRole}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a1.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>=a1.`UPDATE_TIME`
+		</if>
+		GROUP BY b1.`SUPERVISOR_COMPANY_ID`)
+		t1 ON
+		t.`ID`=t1.SUPERVISOR_COMPANY_ID LEFT JOIN
+
+		(SELECT
+		b2.`SUPERVISOR_COMPANY_ID`,COUNT(1) AS count2 FROM ${abTableName}
+		a2,${anTableName} b2 WHERE a2.`ACCEPTANCE_NOTE_ID`=b2.`ID` AND
+		a2.`IS_SEALED`=0 AND b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=1
+		AND
+		a2.`TOTAL_CHECK_RESULT`=1
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND a2.`INSPECTOR_ROLE`=#{inspectorRole}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a2.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a2.`UPDATE_TIME`
+		</if>
+		GROUP BY b2.`SUPERVISOR_COMPANY_ID`) t2 ON
+		t.`ID`=t2.SUPERVISOR_COMPANY_ID LEFT JOIN
+
+		(SELECT
+		b3.`SUPERVISOR_COMPANY_ID`,COUNT(1) AS count3 FROM ${abTableName}
+		a3,${anTableName} b3 WHERE a3.`ACCEPTANCE_NOTE_ID`=b3.`ID` AND
+		a3.`IS_SEALED`=0 AND b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=1
+		AND
+		a3.`TOTAL_CHECK_RESULT` IS NOT NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND a3.`INSPECTOR_ROLE`=#{inspectorRole}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a3.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a3.`UPDATE_TIME`
+		</if>
+		GROUP BY b3.`SUPERVISOR_COMPANY_ID`) t3 ON
+		t.`ID`=t3.SUPERVISOR_COMPANY_ID
+		WHERE 1=1
+		<if test="null != list">
+			<trim prefix="AND">
+				<foreach collection="list" item="item" index="key" open="("
+					close=")" separator=" OR ">
+					<if test="null != item">t.`ID`=#{item.ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		ORDER BY qualifiedRate DESC
+	</select>
+
 </mapper>

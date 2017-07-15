@@ -1,22 +1,18 @@
 package com.pc.dao.labor;
 
-import java.sql.Connection;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import org.apache.ibatis.annotations.Param;
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Repository;
-
 import com.pc.core.DataSource;
 import com.pc.core.Page;
 import com.pc.core.ParamsMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: ${Description}
@@ -28,32 +24,32 @@ import com.pc.core.ParamsMap;
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
 public class LaborPayWagesInfoDao {
-        private Logger logger = LogManager.getLogger(this.getClass());
+    private Logger logger = LogManager.getLogger(this.getClass());
 
-	private SqlSessionTemplate sqlSessionTemplate;
-	private String className;
+    private SqlSessionTemplate sqlSessionTemplate;
+    private String className;
 
-	@Autowired
-	public LaborPayWagesInfoDao(SqlSessionTemplate sqlSessionTemplate) {
-		this.sqlSessionTemplate = sqlSessionTemplate;
-		this.className = this.getClass().getName();
-	}
+    @Autowired
+    public LaborPayWagesInfoDao(SqlSessionTemplate sqlSessionTemplate) {
+        this.sqlSessionTemplate = sqlSessionTemplate;
+        this.className = this.getClass().getName();
+    }
 
-	public Connection getConnection() {
-		return sqlSessionTemplate.getConnection();
-	}
+    public Connection getConnection() {
+        return sqlSessionTemplate.getConnection();
+    }
 
-	public SqlSessionTemplate getSqlSessionTemplate() {
-		return sqlSessionTemplate;
-	}
+    public SqlSessionTemplate getSqlSessionTemplate() {
+        return sqlSessionTemplate;
+    }
 
-	/*@DataSource
-	@Cacheable(value = "auth", key = "Constants.CACHE_AUTHENTICATION_PREFIX+#dbName+'_'+#uName")
-	public String authenticationQuery(String uName, String dbName) {
-		Map<String, Object> paramsMap = ParamsMap.newMap("uName", uName).addParams("dbName", dbName);
-		return sqlSessionTemplate.selectOne(className + ".authenticationQuery", paramsMap);
-	}*/
+    @DataSource
+    public Page queryPayWagesPageInTab(String ddBB, final Page page) {
+        Map<String, Object> paramsMap = ParamsMap.newMap("ddBB", ddBB).addParams("page", page);
+        List<Map<String, Object>> resultList = sqlSessionTemplate.selectList(className + ".queryPayWagesPageInTab", paramsMap);
+        page.setResults(resultList);
+        return page;
+    }
 
-	
 
 }

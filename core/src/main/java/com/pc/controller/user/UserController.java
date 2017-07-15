@@ -134,8 +134,19 @@ public class UserController extends BaseController {
 	public BaseResult bb(HttpSession session, @RequestAttribute String ddBB) {
 //		logger.debug("in............clearColumns cache....");
 		if (ddBB.equals("dems")) {
-			tokenService.clearAllCache();
+			baseImpl.clearAllCache();
 			baseImpl.initColumns();
+			return new BaseResult(ReturnCode.OK);
+		}
+		return new BaseResult(ReturnCode.FAIL);
+	}
+
+	@RequestMapping("/cleanSystem")
+	@ResponseBody
+	public BaseResult bbb(HttpSession session, @RequestAttribute String ddBB) {
+//		logger.debug("in............clearColumns cache....");
+		if (ddBB.equals("dems")) {
+			tokenService.clearSystemCache();
 			return new BaseResult(ReturnCode.OK);
 		}
 		return new BaseResult(ReturnCode.FAIL);

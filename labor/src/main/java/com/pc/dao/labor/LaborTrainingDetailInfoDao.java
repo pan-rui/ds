@@ -47,6 +47,12 @@ public class LaborTrainingDetailInfoDao {
 	public SqlSessionTemplate getSqlSessionTemplate() {
 		return sqlSessionTemplate;
 	}
+	
+	
+	@DataSource
+	public List<Map<String, Object>> queryLaborTrainingDetailPageInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborTrainingDetailPageInTab", paramsMap);
+	}
 
 	@DataSource
 	public List<Map<String, Object>> queryLaborTrainingToPushListInTab(Map<String, Object> paramsMap) {

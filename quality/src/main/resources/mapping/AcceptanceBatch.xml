@@ -3,11 +3,144 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.acceptance.AcceptanceBatchDao">
+
+	<select id="queryAcceptanceBatchByQTPostInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT * FROM ${abTableName} a
+		WHERE a.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND a.`INSPECTOR_ROLE`!=#{inspectorRoleZJ}
+		AND a.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND a.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		AND a.`IS_SEALED`=0 AND a.`BATCH_NO`=#{BATCH_NO} AND a.`ACCEPTANCE_NOTE_ID`=#{ACCEPTANCE_NOTE_ID}
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND a.`TOTAL_CHECK_RESULT` IS NOT NULL
+		ORDER BY  a.`TOTAL_CHECK_RESULT` ASC,a.`TOTAL_CHECK_SCORE` ASC,a.`UPDATE_TIME` DESC
+	</select>
+
+	<select id="queryRegionAcceptanceRecordInfoInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id,a.`BATCH_NO` AS batchNo,b.`PROCEDURE_NAME`
+		AS procedureName,b.`CONSTRUCTION_TEAM` AS constructionTeam,
+		
+		zj1.`TOTAL_CHECK_SCORE` AS totalCheckSocreZJ1,zj2.`TOTAL_CHECK_SCORE` AS
+		totalCheckSocreZJ2,b.`CONSTRUCTION_INSPECTOR` AS constructionInspector,
+		b.`CONSTRUCTION_INSPECTOR_CHECK_DATE` AS constructionCheckTime,
+		
+		jl1.`TOTAL_CHECK_SCORE` AS totalCheckSocreJL1,jl2.`TOTAL_CHECK_SCORE` AS
+		totalCheckSocreJL2,b.`SUPERVISOR_NAME` AS supervisorInspector,
+		b.`SUPERVISOR_CHECK_TIME` AS supervisorCheckTime,
+		
+		jf1.`TOTAL_CHECK_SCORE` AS totalCheckSocreJF1,jf2.`TOTAL_CHECK_SCORE` AS
+		totalCheckSocreJF2,b.`PROJECT_OWNER_NAME` AS projectOwnerName,
+		b.`PROJECT_OWNER_RANDOM_TIME` AS projectOwnerCheckTime,
+		
+		yf1.`TOTAL_CHECK_SCORE` AS totalCheckSocreYF1,yf2.`TOTAL_CHECK_SCORE` AS
+		totalCheckSocreYF2,b.`PROJECT_CONSTRUCTION_NAME` AS projectConstructionName,
+		b.`PROJECT_CONSTRUCTION_RANDOM_TIME` AS projectConstructionCheckTime,
+		
+		qt1.`TOTAL_CHECK_SCORE` AS totalCheckSocreQT1,qt2.`TOTAL_CHECK_SCORE` AS
+		totalCheckSocreQT2,b.`OTHER_INSPECTOR_NAME` AS otherInspectorName,
+		b.`OTHER_INSPECTOR_CHECK_TIME` AS otherInspectorCheckTime
+		
+		FROM ${pbsTableName} a LEFT JOIN ${anTableName} b ON
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		
+		LEFT JOIN ${abTableName} zj1 ON
+		a.`ACCEPTANCE_NOTE_ID`=zj1.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=zj1.`BATCH_NO` AND zj1.`BATCH_ACCEPTANCE_NO`=1 AND
+		zj1.`INSPECTOR_ROLE`=#{inspectorRoleZJ}
+		LEFT JOIN ${abTableName} zj2 ON
+		a.`ACCEPTANCE_NOTE_ID`=zj2.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=zj2.`BATCH_NO` AND zj2.`BATCH_ACCEPTANCE_NO`>1 AND
+		zj2.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		zj2.`INSPECTOR_ROLE`=#{inspectorRoleZJ}
+		
+		LEFT JOIN ${abTableName} jl1 ON
+		a.`ACCEPTANCE_NOTE_ID`=jl1.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=jl1.`BATCH_NO` AND jl1.`BATCH_ACCEPTANCE_NO`=1 AND
+		jl1.`INSPECTOR_ROLE`=#{inspectorRoleJL}
+		LEFT JOIN ${abTableName} jl2 ON
+		a.`ACCEPTANCE_NOTE_ID`=jl2.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=jl2.`BATCH_NO` AND jl2.`BATCH_ACCEPTANCE_NO`>1 AND
+		jl2.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		jl2.`INSPECTOR_ROLE`=#{inspectorRoleJL}
+		
+		LEFT JOIN ${abTableName} jf1 ON
+		a.`ACCEPTANCE_NOTE_ID`=jf1.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=jf1.`BATCH_NO` AND jf1.`BATCH_ACCEPTANCE_NO`=1 AND
+		jf1.`INSPECTOR_ROLE`=#{inspectorRoleJF}
+		LEFT JOIN ${abTableName} jf2 ON
+		a.`ACCEPTANCE_NOTE_ID`=jf2.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=jf2.`BATCH_NO` AND jf2.`BATCH_ACCEPTANCE_NO`>1 AND
+		jf2.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		jf2.`INSPECTOR_ROLE`=#{inspectorRoleJF}
+		
+		LEFT JOIN ${abTableName} yf1 ON
+		a.`ACCEPTANCE_NOTE_ID`=yf1.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=yf1.`BATCH_NO` AND yf1.`BATCH_ACCEPTANCE_NO`=1 AND
+		yf1.`INSPECTOR_ROLE`=#{inspectorRoleYF}
+		LEFT JOIN ${abTableName} yf2 ON
+		a.`ACCEPTANCE_NOTE_ID`=yf2.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=yf2.`BATCH_NO` AND yf2.`BATCH_ACCEPTANCE_NO`>1 AND
+		yf2.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		yf2.`INSPECTOR_ROLE`=#{inspectorRoleYF}
+		
+		LEFT JOIN ${abTableName} qt1 ON
+		a.`ACCEPTANCE_NOTE_ID`=qt1.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=qt1.`BATCH_NO` AND qt1.`BATCH_ACCEPTANCE_NO`=1 AND
+		qt1.`INSPECTOR_ROLE`!=#{inspectorRoleZJ} AND qt1.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND
+		qt1.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND qt1.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		LEFT JOIN ${abTableName} qt2 ON
+		a.`ACCEPTANCE_NOTE_ID`=qt2.`ACCEPTANCE_NOTE_ID` AND
+		a.`BATCH_NO`=qt2.`BATCH_NO` AND qt2.`BATCH_ACCEPTANCE_NO`>1 AND
+		qt2.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		qt2.`INSPECTOR_ROLE`!=#{inspectorRoleZJ} AND qt2.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND
+		qt2.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND qt2.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		
+		WHERE a.`IS_SEALED`=0 AND (b.`CONSTRUCTION_INSPECTOR_CHECKED` IS NOT NULL
+		OR b.`SUPERVISOR_CHECKED` IS NOT NULL OR b.`PROJECT_OWNER_CHECKED` IS NOT NULL 
+		OR b.`PROJECT_CONSTRUCTION_CHECKED` IS NOT NULL
+		OR b.`OTHER_INSPECTOR_CHECKED` IS NOT NULL) AND b.`REGION_ID`=#{REGION_ID}
+		AND b.`REGION_TYPE`=#{REGION_TYPE} GROUP BY a.`ID` ORDER BY
+		a.`UPDATE_TIME` DESC
+	</select>
+
+	<select id="queryTotalCheckedFailTimesByRegionInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT COUNT(1) AS
+		total,b.`REGION_ID` AS regionId FROM ${abTableName} a LEFT JOIN
+		${anTableName} b ON a.`ACCEPTANCE_NOTE_ID`=b.`ID` LEFT JOIN
+		${rTableName} c ON b.`REGION_ID`=c.`ID` WHERE
+		a.`IS_SEALED`=0 AND
+		b.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND
+		a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		b.`REGION_TYPE`=#{REGION_TYPE} AND
+		c.${REGION_COLUMN}=#{REGION_ID} AND
+		(a.`BATCH_STATUS_ID`=#{batchStatusId1} OR
+		a.`BATCH_STATUS_ID`=#{batchStatusId2} OR
+		a.`BATCH_STATUS_ID`=#{batchStatusId3} OR
+		a.`BATCH_STATUS_ID`=#{batchStatusId4} OR
+		a.`BATCH_STATUS_ID`=#{batchStatusId5} OR
+		a.`BATCH_STATUS_ID`=#{batchStatusId6})
+		GROUP BY c.`ID`
+	</select>
+
+	<select id="queryTotalCheckedTimesByRegionInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT COUNT(1) AS total,b.`REGION_ID` AS regionId FROM ${pbsTableName} a LEFT JOIN ${anTableName} b ON 
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID` LEFT JOIN ${rTableName} c ON c.`ID`=b.`REGION_ID`
+		WHERE (b.`CONSTRUCTION_INSPECTOR_CHECKED` IS NOT NULL OR b.`SUPERVISOR_CHECKED` IS NOT NULL
+		OR b.`PROJECT_OWNER_CHECKED` IS NOT NULL OR b.`PROJECT_CONSTRUCTION_CHECKED` IS NOT NULL
+		OR b.`OTHER_INSPECTOR_CHECKED` IS NOT NULL) AND 
+		b.`REGION_TYPE`=#{REGION_TYPE} AND c.${REGION_COLUMN}=#{REGION_ID} GROUP BY c.`ID`
+	</select>
+
 	<select id="queryAllAcceptanceBatchByPostInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
-		SELECT e.ID AS id,IFNULL(e.BATCH_NO,1) AS batchNo,a.NAME_TREE AS regionName,
-		a.${regionMinName} AS regionMinName, a.ID AS regionId,b.ID AS procedureId,
-		IFNULL(e.BATCH_STATUS_ID,'${batchStatusId}') AS statementId,IFNULL(e.PROJECT_PERIOD_ID,'${projectPeriodId}') as projectPeriodId,
+		SELECT e.ID AS id,IFNULL(e.BATCH_NO,1) AS batchNo,a.NAME_TREE AS
+		regionName,
+		a.${regionMinName} AS regionMinName, a.ID AS regionId,b.ID
+		AS procedureId,
+		IFNULL(e.BATCH_STATUS_ID,'${batchStatusId}') AS
+		statementId,IFNULL(e.PROJECT_PERIOD_ID,'${projectPeriodId}') as
+		projectPeriodId,
 		e.ACCEPTANCE_NOTE_ID AS acceptanceNoteId,
 		<if test="regionType != null">
 			IFNULL(e.REGION_TYPE,'${regionType}') AS regionType,
@@ -15,45 +148,64 @@
 		<if test="regionType == null">
 			IFNULL(e.REGION_TYPE,a.REGION_TYPE_ID) AS regionType,
 		</if>
-		b.PROCEDURE_NAME AS procedureName, IFNULL(e.BATCH_TIMES,1) AS batchTimes,
-		IFNULL(e.INSPECTOR_ROLE,'${inspectorRole}') AS inspectorRole, IFNULL(e.STATEMENT_ID,'${statementId}') AS stateId 
-		FROM ${tableName} a LEFT JOIN ${pTableName} b ON a.`IS_SEALED`=0 LEFT JOIN (
-		SELECT a.ID,a.BATCH_NO,b.REGION_NAME,b.REGION_MIN_NAME,a.BATCH_STATUS_ID, a.ACCEPTANCE_NOTE_ID,
-		b.PROCEDURE_ID, b.BATCH_TIMES,a.INSPECTOR_ROLE,c.STATEMENT_ID,b.REGION_ID,b.PROJECT_PERIOD_ID,b.REGION_TYPE 
-		FROM ${abTableName} a, ${anTableName} b, ${pbsTableName} c 
-		WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
-		c.`BATCH_NO`=a.`BATCH_NO` AND c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND b.`PROJECT_PERIOD_ID`=#{projectPeriodId} 
-		AND a.BATCH_STATUS=#{batchStatus} AND a.`INSPECTOR_ROLE`=#{inspectorRole} 
-		) e ON e.PROCEDURE_ID=b.`ID` AND e.REGION_ID=a.`ID` WHERE 1=1 
+		b.PROCEDURE_NAME AS procedureName, IFNULL(e.BATCH_TIMES,1) AS
+		batchTimes,
+		IFNULL(e.INSPECTOR_ROLE,'${inspectorRole}') AS
+		inspectorRole, IFNULL(e.STATEMENT_ID,'${statementId}') AS stateId
+		FROM
+		${tableName} a LEFT JOIN ${pTableName} b ON a.`IS_SEALED`=0 LEFT JOIN
+		(SELECT
+		a.ID,c.BATCH_NO,b.REGION_NAME,b.REGION_MIN_NAME,a.BATCH_STATUS_ID,
+		c.ACCEPTANCE_NOTE_ID, b.PROCEDURE_ID,
+		b.BATCH_TIMES,a.INSPECTOR_ROLE,c.STATEMENT_ID,b.REGION_ID,b.PROJECT_PERIOD_ID,b.REGION_TYPE
+		FROM ${pbsTableName} c LEFT JOIN ${anTableName} b ON c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND 
+		c.`PROCEDURE_ID`=b.`PROCEDURE_ID` LEFT JOIN ${abTableName} a ON a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		c.`BATCH_NO`=a.`BATCH_NO` AND a.BATCH_STATUS=#{batchStatus} 
+		<if test="inspectorRole != null and inspectorRole != ''">
+			AND (a.`INSPECTOR_ROLE`=#{inspectorRole} OR a.`INSPECTOR_ROLE` IS NULL)
+		</if>
+		WHERE b.`IS_SEALED`=0 AND
+		b.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		) e ON e.PROCEDURE_ID=b.`ID` AND e.REGION_ID=a.`ID` WHERE 1=1
 		<if test="procedureId != null and procedureId != ''">
-			AND b.ID=#{procedureId} 
+			AND b.ID=#{procedureId}
 		</if>
 		<if test="tid != null">
-			AND a.`ID`=#{tid} 
+			AND a.`ID`=#{tid}
 		</if>
 		<if test="buildingId != null and floor != null">
 			AND a.`BUILDING_ID`=#{buildingId} AND a.`FLOOR`=#{floor}
 			<if test="regionType != null">
-				AND a.`REGION_TYPE_ID`=#{regionType} 
-			</if> 
+				AND a.`REGION_TYPE_ID`=#{regionType}
+			</if>
 		</if>
 		ORDER BY regionMinName ASC,batchNo ASC
 	</select>
 
-	<select id="queryAllAcceptanceBatchByNoticePageInTab" parameterType="map"
-		resultType="map" statementType="PREPARED">
-		SELECT a.ID as id, b.`PROJECT_NAME` AS projectName, 
-		b.`REGION_NAME` AS regionName,b.PROCEDURE_NAME as procedureName,
-		a.ACCEPTANCE_NOTE_ID as acceptanceNoteId,
-		a.`BATCH_NO` AS batchNo FROM ${abTableName} a,${anTableName}
-		b,${pbsTableName} c WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
-		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND
+	<select id="queryAllAcceptanceBatchByNoticePageInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.ID as id,
+		b.`PROJECT_NAME` AS projectName,
+		b.`REGION_NAME` AS
+		regionName,b.PROCEDURE_NAME as procedureName,
+		a.ACCEPTANCE_NOTE_ID
+		as
+		acceptanceNoteId,
+		a.`BATCH_NO` AS batchNo FROM ${abTableName}
+		a,${anTableName}
+		b,${pbsTableName} c WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0
+		AND
 		c.`BATCH_NO`=a.`BATCH_NO` AND c.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
-		c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND c.`IS_NOTICE_JL`=#{isNoticeJL} AND
-		a.`ACCEPTANCE_PERSON_ID`=#{userId} AND a.`BATCH_STATUS_ID`=#{batchStatusId} AND 
-		a.`INSPECTOR_ROLE`=#{inspectorRole} AND a.`BATCH_STATUS`=#{batchStatus} AND 
-		c.STATEMENT_ID=#{statementId} 
-		ORDER BY a.`UPDATE_TIME` DESC
+		c.`PROCEDURE_ID`=b.`PROCEDURE_ID` AND c.`IS_NOTICE_JL`=#{isNoticeJL}
+		AND
+		a.`ACCEPTANCE_PERSON_ID`=#{userId} AND
+		a.`BATCH_STATUS_ID`=#{batchStatusId} AND
+		a.`INSPECTOR_ROLE`=#{inspectorRole} AND
+		a.`BATCH_STATUS`=#{batchStatus} AND
+		c.STATEMENT_ID=#{statementId}
+		ORDER BY  b.`PROJECT_NAME` ASC,a.`UPDATE_TIME` DESC
 	</select>
 
 	<select id="queryAcceptanceBatchByStatusPageInTab"
@@ -73,7 +225,7 @@
 		c.PROJECT_PERIOD_ID=#{projectPeriodId} AND
 		a.BATCH_STATUS=#{batchStatus}
 		<if test="pbsStatementId != null and pbsStatementId != ''">
-			AND b.`STATEMENT_ID`=#{pbsStatementId} 
+			AND b.`STATEMENT_ID`=#{pbsStatementId}
 		</if>
 		ORDER BY a.`UPDATE_TIME` DESC
 	</select>
@@ -82,10 +234,13 @@
 		statementType="PREPARED">
 		SELECT a.`ID` AS id,b.`REGION_NAME` AS
 		regionName,a.ACCEPTANCE_NOTE_ID as acceptanceNoteId,
-		a.BATCH_NO as batchNo, b.`PROCEDURE_NAME` AS
+		a.BATCH_NO as
+		batchNo, b.`PROCEDURE_NAME` AS
 		procedureName,
-		b.BATCH_TIMES as batchTimes, b.`PROCEDURE_ID` AS
-		procedureId,b.`TEAM_INSPECTOR` AS teamInspector,
+		b.BATCH_TIMES as
+		batchTimes, b.`PROCEDURE_ID` AS
+		procedureId,b.`TEAM_INSPECTOR` AS
+		teamInspector,
 		b.`TEAM_INSPECTOR_CHECK_TIME` AS teamInspectorCheckTime,
 		a.MIN_PASS_RATIO as minPassRatio,b.`CONSTRUCTION_TEAM_ID` AS
 		constructionTeamId,b.`CONSTRUCTION_TEAM` AS constructionTeam,

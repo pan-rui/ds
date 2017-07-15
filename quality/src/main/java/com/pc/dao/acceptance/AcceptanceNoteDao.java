@@ -7,14 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Repository;
 
+import com.pc.core.DataSource;
+
 import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 1158 $
- * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @version: \$Rev: 3514 $
+ * @UpdateAuthor: \$Author: zhangj $
+ * @UpdateDateTime: \$Date: 2017-07-11 09:13:04 +0800 (周二, 11 7月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -37,14 +41,36 @@ public class AcceptanceNoteDao {
 	public SqlSessionTemplate getSqlSessionTemplate() {
 		return sqlSessionTemplate;
 	}
-
-	/*@DataSource
-	@Cacheable(value = "auth", key = "Constants.CACHE_AUTHENTICATION_PREFIX+#dbName+'_'+#uName")
-	public String authenticationQuery(String uName, String dbName) {
-		Map<String, Object> paramsMap = ParamsMap.newMap("uName", uName).addParams("dbName", dbName);
-		return sqlSessionTemplate.selectOne(className + ".authenticationQuery", paramsMap);
-	}*/
-
 	
-
+	
+	@DataSource
+	public List<Map<String, Object>> queryAcceptanceNoteByMonthInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryAcceptanceNoteByMonthInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryUserAcceptanceCountByMonthInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryUserAcceptanceCountByMonthInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryUserAcceptanceStatisticsByPostInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryUserAcceptanceStatisticsByPostInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryProjectAcceptanceStatisticsRankingInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryProjectAcceptanceStatisticsRankingInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryTeamAcceptanceStatisticsRankingInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryTeamAcceptanceStatisticsRankingInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryCompanyAcceptanceStatisticsRankingInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryCompanyAcceptanceStatisticsRankingInTab", paramsMap);
+	}
+	
 }

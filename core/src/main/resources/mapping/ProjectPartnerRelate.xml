@@ -19,6 +19,15 @@
 		<if test="PERIOD_NAME != null">
 			AND b.`PERIOD_NAME` LIKE #{PERIOD_NAME}
 		</if>
-
+	</select>
+	
+	<select id="queryTeamListByProjectInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT c.* FROM ${tTableName} c,${pTableName} b,${pprTableName} a
+		WHERE a.`TEAM_ID`=c.`ID` AND a.`PROJECT_PERIOD_ID`=b.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND c.`IS_SEALED`=0 
+		<if test="projectPeriodId != null">
+			AND a.`PROJECT_PERIOD_ID`= #{projectPeriodId}
+		</if>
 	</select>
 </mapper>

@@ -1,11 +1,11 @@
 package com.pc.util;
 
-import com.alibaba.druid.util.StringUtils;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import com.alibaba.druid.util.StringUtils;
 
 /**
  * 日期转换类 转换一个 java.util.Date 对象到一个字符串以及 一个字符串到一个 java.util.Date 对象.
@@ -34,17 +34,16 @@ public class DateUtil {
 	/**
 	 * 模式:yyyy-MM-dd HH:mm
 	 */
-//	public static final String PATTERN_DATETIME = "yyyy-MM-dd HH:mm";
+	// public static final String PATTERN_DATETIME = "yyyy-MM-dd HH:mm";
 
-//	public static final String PATTERN_DATETIME_ = "yyyyMMddHHmmss";
+	// public static final String PATTERN_DATETIME_ = "yyyyMMddHHmmss";
 
 	/**
 	 * 模式:yyyy-MM-dd
 	 */
 	public static final String PATTERN_DATE = "yyyy-MM-dd";
-	public static final String[] TYPE_ALL = { TYPE_DATE, TYPE_DATETIME,
-			TYPE_TIME };
-    private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	public static final String[] TYPE_ALL = { TYPE_DATE, TYPE_DATETIME, TYPE_TIME };
+	private static final String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
 	/**
 	 * 将字符串转换为Date类型
@@ -73,8 +72,8 @@ public class DateUtil {
 	 * 将Date转换为字符串
 	 * 
 	 * @param aDate
-	 * @param pattern default:yyyy-MM-dd HH:mm:ss
-	 *            格式
+	 * @param pattern
+	 *            default:yyyy-MM-dd HH:mm:ss 格式
 	 * @return
 	 */
 	public static String convertDateTimeToString(Date aDate, String pattern) {
@@ -89,7 +88,8 @@ public class DateUtil {
 	/**
 	 *
 	 * @param aDate
-	 * @param pattern default: yyyy-MM-dd
+	 * @param pattern
+	 *            default: yyyy-MM-dd
 	 * @return
 	 */
 	public static String convertDateToString(Date aDate, String pattern) {
@@ -101,19 +101,19 @@ public class DateUtil {
 		return df.format(aDate);
 	}
 
-    /**
-     * string格式化为string
-     * */
-	public static String stringFormat(String time,String pattern){
+	/**
+	 * string格式化为string
+	 */
+	public static String stringFormat(String time, String pattern) {
 		Date date = null;
 		try {
-		    date = new SimpleDateFormat(DEFAULT_PATTERN).parse(time);
+			date = new SimpleDateFormat(DEFAULT_PATTERN).parse(time);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		return convertDateTimeToString(date, pattern);
 	}
-	
+
 	/**
 	 * 将日期、时间合并成长整型数据
 	 * 
@@ -203,7 +203,7 @@ public class DateUtil {
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal;
 	}
-    
+
 	/**
 	 * 在给定的时间点上增加小时，分钟
 	 * 
@@ -232,21 +232,103 @@ public class DateUtil {
 	public static int transferTimeToSeconds(int hours, int minutes) {
 		return (hours * 60 * 60) + (minutes * 60);
 	}
-	
+
 	/**
 	 * 日期加上天数的时间
+	 * 
 	 * @param date
 	 * @return
 	 */
-	public static Date dateAddDay(Date date,int day){
-		return add(date,Calendar.DAY_OF_YEAR,day);
+	public static Date dateAddDay(Date date, int day) {
+		return add(date, Calendar.DAY_OF_YEAR, day);
 	}
-	
-	private static Date add(Date date,int type,int value){
+
+	private static Date add(Date date, int type, int value) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.add(type, value);
 		return calendar.getTime();
 	}
+
+	// 获得上周日日期
+	public static String getWeekFirstDate() {
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.WEEK_OF_YEAR, -1);
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+		return sf.format(calendar.getTime());
+	}
+
+	// 获得上周六日期
+	public static String getWeekLastDate() {
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.WEEK_OF_YEAR, -1);
+		calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+		return sf.format(calendar.getTime());
+	}
+	
+	//获取上个月的第一天
+	public static String getMonthFirstDate(){
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, -1);
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		return sf.format(calendar.getTime());
+	}
+
+	//获取上个月的最后一天
+	public static String getMonthLastDate(){
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();
+		int month = calendar.get(Calendar.MONTH);
+		calendar.set(Calendar.MONTH, month - 1);
+		calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+		return sf.format(calendar.getTime());
+	}
+	
+	//获取上个季度的第一天
+	public static String getQuarterFirstDate(){
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();  
+		calendar.set(Calendar.MONTH, ((int) calendar.get(Calendar.MONTH) / 3 - 1) * 3);  
+		calendar.set(Calendar.DAY_OF_MONTH, 1);  
+		return sf.format(calendar.getTime());
+	}
+	
+	//获取上个季度的最后一天
+	public static String getQuarterLastDate(){
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();  
+		calendar.set(Calendar.MONTH, ((int) calendar.get(Calendar.MONTH) / 3 - 1) * 3 + 2);  
+		calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH)); 
+		return sf.format(calendar.getTime());
+	}
+	
+	//获取去年的第一天
+	public static String getYearFirstDate(){
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.YEAR, -1);
+		calendar.set(Calendar.DAY_OF_YEAR, 1);
+		return sf.format(calendar.getTime());
+	}
+	
+	//获取去年的最后一天
+	public static String getYearLastDate(){
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.YEAR, 0);
+		calendar.set(Calendar.DAY_OF_YEAR, 0);
+		return sf.format(calendar.getTime());
+	}
+	
+	public static String getMonthmorning() {
+		SimpleDateFormat sf=new SimpleDateFormat(PATTERN_DATE);
+        Calendar calendar = Calendar.getInstance();  
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONDAY), calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);  
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));  
+        return  sf.format(calendar.getTime());
+    }
 	
 }

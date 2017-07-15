@@ -2,8 +2,8 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
-       xmlns="http://www.springframework.org/schema/beans"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"
        default-autowire="byName">
     <import resource="classpath*:common.xml"/>
     <context:component-scan base-package="com.pc.aspect,com.pc.security"/>
@@ -29,7 +29,7 @@
             <property name="authorizationCachingEnabled" value="true"/>
             <property name="authorizationCacheName" value="#{config['AUTHOR_CACHE_NAME']}"/>
         </bean>
-    <bean id="userRealm2" class="com.pc.security.UserRealm">
+    <bean id="tenantRealm" class="com.pc.security.TenantRealm">
         <property name="credentialsMatcher" ref="credentialsMatcher"/>
         <property name="cachingEnabled" value="true"/>
         <property name="cacheManager" ref="shiroCahe"/>
@@ -37,6 +37,7 @@
         <property name="authenticationCacheName" value="#{config['AUTHENT_CACHE_NAME']}"/>
         <property name="authorizationCachingEnabled" value="true"/>
         <property name="authorizationCacheName" value="#{config['AUTHOR_CACHE_NAME']}"/>
+        <!--<property name="authorizationCacheName" value="#{config['TENANT_AUTHOR_NAME']}"/>-->
     </bean>
 
     <bean id="sessionDAO" class="com.pc.security.ShiroSessionDao">
@@ -92,8 +93,8 @@
         <property name="baseImpl" ref="baseImpl"/>
         <property name="userService" ref="userService"/>
     </bean>-->
-    <bean id="sysUserFilter" class="com.pc.security.SysUserFilter" p:baseImpl-ref="baseImpl" p:filterChainManager-ref="filterChainManager" p:jedisPool-ref="jedisPool" p:excludeReg="(^/login$)|(^/manage/.+)"/>
-    <bean id="sysTenantFilter" class="com.pc.security.SysTenantFilter" p:baseImpl-ref="baseImpl" p:realm-ref="userRealm2" p:excludeReg="(^/login$)|(^/manage/.+)"/>
+    <bean id="sysUserFilter" class="com.pc.security.SysUserFilter" p:baseImpl-ref="baseImpl" p:filterChainManager-ref="filterChainManager" p:jedisPool-ref="jedisPool" p:excludeReg="(.*/login$)|(^/manage/.+)"/>
+    <bean id="sysTenantFilter" class="com.pc.security.SysTenantFilter" p:baseImpl-ref="baseImpl" p:realm-ref="tenantRealm" p:excludeReg="(.*/login$)|(^/manage/.+)" p:permissonTable="dems.TENANT_PRIVILEGES"/>
     <bean id="filterChainManager" class="com.pc.security.CustomDefaultFilterChainManager" init-method="init">
         <property name="loginUrl" value="/login"/>
         <property name="successUrl" value="/success"/>
@@ -175,10 +176,11 @@
         </property>-->
     </bean>
 
-    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor" p:proxyTargetClass="true"/>
-    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+    <!--<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor" p:proxyTargetClass="true" p:exposeProxy="true"/>-->
+<!--        <aop:config proxy-target-class="true" expose-proxy="true"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor" p:order="900">
         <property name="securityManager" ref="securityManager" />
-    </bean>
+    </bean>-->
 
 <!--    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
         <property name="exceptionMappings">

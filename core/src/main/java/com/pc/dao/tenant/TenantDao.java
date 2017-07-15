@@ -1,5 +1,8 @@
 package com.pc.dao.tenant;
 
+import com.pc.core.DataSource;
+import com.pc.core.DataSourceHolder;
+import com.pc.core.ParamsMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -8,13 +11,14 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
+import java.util.Map;
 
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 1158 $
+ * @version: \$Rev: 3596 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-16 00:27:43 +0800 (周日, 16 7月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -38,12 +42,11 @@ public class TenantDao {
 		return sqlSessionTemplate;
 	}
 
-	/*@DataSource
-	@Cacheable(value = "auth", key = "Constants.CACHE_AUTHENTICATION_PREFIX+#dbName+'_'+#uName")
-	public String authenticationQuery(String uName, String dbName) {
-		Map<String, Object> paramsMap = ParamsMap.newMap("uName", uName).addParams("dbName", dbName);
-		return sqlSessionTemplate.selectOne(className + ".authenticationQuery", paramsMap);
-	}*/
+	@DataSource(DataSourceHolder.DBType.master)
+	public void initProcudure(String tenantId, String tenantPhone,String updateUserId) {
+		Map<String, Object> paramsMap = ParamsMap.newMap("tId", tenantId).addParams("tPhone", tenantPhone).addParams("uId",updateUserId);
+		sqlSessionTemplate.selectOne(className + ".initProcudure", paramsMap);
+	}
 
 	
 

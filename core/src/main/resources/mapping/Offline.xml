@@ -193,8 +193,8 @@ WHERE ph.TENANT_ID=#{tenantId}
         di_errorRange,di.STANDARD_VAL di_standardVal,di.UNIT di_unit,di.CALC_TYPE di_calcType,di.PASS_TEXT
         di_passText,di.NO_PASS_TEXT di_noPassText,di.IS_SEALED di_isSealed,di.REMARK di_remark,di.UPDATE_TIME di_updateTime,
         gi.ID gi_id,gi.PROCEDURE_ID gi_procedureId,gi.GRADING_STANDARD gi_gradingStandard,gi.ERROR_RANGE
-        gi_errorRange,gi.ALLOW_MAX_VALUE gi_allowMaxValue,gi.ALLOW_MIN_VALUE gi_allowMinValue,gi.STANDARD_VAL gi_standardVal,gi.UNIT gi_unit,gi.CALC_TYPE gi_calcType,gi.PASS_TEXT
-        gi_passText,gi.NO_PASS_TEXT gi_noPassText,gi.IS_SEALED gi_isSealed,gi.REMARK gi_remark,gi.UPDATE_TIME gi_updateTime,
+        gi_errorRange,gi.ALLOW_MAX_VALUE gi_allowMaxValue,gi.ALLOW_MIN_VALUE gi_allowMinValue,gi.STANDARD_VAL gi_standardVal,gi.ALLOW_MAX_EXPRESSION gi_allowMaxExpression,gi.ALLOW_MIN_EXPRESSION gi_allowMinExpression
+        ,gi.ALLOW_MAX_VAL gi_allowMaxVal,gi.CALCULATE_TYPE gi_calculateType,gi.UNIT gi_unit,gi.CALC_TYPE gi_calcType,gi.PASS_TEXT gi_passText,gi.NO_PASS_TEXT gi_noPassText,gi.IS_SEALED gi_isSealed,gi.REMARK gi_remark,gi.UPDATE_TIME gi_updateTime,
         tpr.ID tpr_id,tpr.PROCEDURE_ID tpr_procedureId,tpr.TEAM_ID tpr_teamId,tpr.REMARK tpr_remark,tpr.UPDATE_TIME
         tpr_updateTime,
         ti.ID ti_id,ti.TEAM_NAME ti_teamName,ti.PARTNER_ID ti_partnerId,ti.UPDATE_TIME ti_updateTime
@@ -304,6 +304,10 @@ WHERE ph.TENANT_ID=#{tenantId}
                 <result property="allowMaxValue" column="allowMaxValue"/>
                 <result property="allowMinValue" column="allowMinValue"/>
                 <result property="standardVal" column="standardVal"/>
+                <result property="allowMaxExpression" column="allowMaxExpression"/>
+                <result property="allowMinExpression" column="allowMinExpression"/>
+                <result property="allowMaxVal" column="allowMaxVal"/>
+                <result property="calculateType" column="calculateType"/>
                 <result property="unit" column="unit"/>
                 <result property="calcType" column="calcType"/>
                 <result property="passText" column="passText"/>

@@ -10,6 +10,8 @@ import com.pc.core.TableConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.web.filter.PathMatchingFilter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import redis.clients.jedis.JedisPool;
 
@@ -68,7 +70,7 @@ public class SysUserFilter extends PathMatchingFilter {
             } else isFail = true;
             //访问日志统计
             try {
-                baseImpl.baseDao.insertByProsInTab("dems.ACCESS_STATISTICS", genLog(request).addParams("URI", uri));
+                baseImpl.getBaseDao().insertByProsInTab("dems.ACCESS_STATISTICS", genLog(request).addParams("URI", uri));
             } catch (Exception e) {
                 e.printStackTrace();
             }

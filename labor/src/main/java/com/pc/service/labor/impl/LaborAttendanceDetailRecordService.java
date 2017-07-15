@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
 import com.pc.dao.labor.LaborAttendanceDetailRecordDao;
-import com.pc.dao.labor.LaborContractorCompanyInfoDao;
 import com.pc.service.BaseService;
 
 @Service

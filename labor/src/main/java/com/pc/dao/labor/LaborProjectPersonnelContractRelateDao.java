@@ -46,6 +46,11 @@ public class LaborProjectPersonnelContractRelateDao {
 	public SqlSessionTemplate getSqlSessionTemplate() {
 		return sqlSessionTemplate;
 	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryLaborContractListByFileInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryLaborContractListByFileInTab", paramsMap);
+	}
 
 	@DataSource
 	public List<Map<String, Object>> queryLaborContractToPushListInTab(Map<String, Object> paramsMap) {

@@ -62,9 +62,12 @@ public class OrganizationClientController extends BaseController  {
 		
 		List<Map<String, Object>> projectPeriodList=projectPeriodService.getProjectPeriodListByUser(params, ddBB);
 		
+		if(projectPeriodList.size()==0){
+			return new BaseResult(ReturnCode.NO_AUTH);
+		}
+		
 		Map<String, Object> orgParams = new HashMap<>();
 		orgParams.put("list", projectPeriodList);
-		
 		List<Map<String, Object>> projectOrganizationInfoList=organizationInfoService.getProjectOrganizationInfoList(orgParams, ddBB);
 		
 		return new BaseResult(ReturnCode.OK,TreeUtil.getTree(projectOrganizationInfoList, projectPeriodList, TableConstants.ProjectPeriod.comId.name()));

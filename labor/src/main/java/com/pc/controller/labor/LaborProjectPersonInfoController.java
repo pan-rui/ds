@@ -3,6 +3,7 @@ package com.pc.controller.labor;
  
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -26,8 +27,9 @@ import com.pc.util.DateUtil;
 import com.pc.vo.ParamsVo;
 
 import com.pc.core.TableConstants;
- 
+import com.pc.service.labor.impl.LaborPersonInfoService;
 import com.pc.service.labor.impl.LaborProjectPersonInfoService;
+import com.pc.service.project.impl.ProjectPeriodService;
 
 /**
  * @Description: 
@@ -41,8 +43,40 @@ import com.pc.service.labor.impl.LaborProjectPersonInfoService;
 public class LaborProjectPersonInfoController extends BaseController {
 	@Autowired
 	private LaborProjectPersonInfoService laborProjectPersonInfoService;
+	
+	@Autowired
+	private LaborPersonInfoService laborPersonInfoService;
+	
+	@Autowired
+	private ProjectPeriodService projectPeriodService;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	
+	@RequestMapping("/laborProjectPersonInfo/getDetailPage")
+	@ResponseBody
+	public BaseResult getDetailPage(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess Page page,
+			@RequestAttribute String ddBB) {
+		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
+		map.put(TableConstants.TENANT_ID, tenantId);
+		page.setParams(map);
+		return new BaseResult(ReturnCode.OK, laborProjectPersonInfoService.getLaborProjectPersonInfoDetailPage(page,ddBB));
+	}
+	
+	@RequestMapping("/laborProjectPersonInfo/getLast")
+	@ResponseBody
+	public BaseResult getLast(@RequestAttribute(Constants.USER_ID) String userId, @RequestAttribute String ddBB) {
+		Map<String, Object> map = new LinkedHashMap<>();
+		map.put(TableConstants.LaborPersonInfo.USER_ID.name(), userId);
+		Map<String, Object> laborPersonInfo=laborPersonInfoService.getLaborPersonInfo(map, ddBB);
+    	if(laborPersonInfo==null){
+    		return  new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+    	}
+		
+    	List<Map<String, Object>> list=laborProjectPersonInfoService.getLaborProjectList(ddBB, (String) laborPersonInfo.get(TableConstants.LaborPersonInfo.id.name()));
+    	
+		return new BaseResult(ReturnCode.OK, list);
+	}
 	
 	@RequestMapping("/laborProjectPersonInfo/add")
 	@ResponseBody
@@ -50,7 +84,7 @@ public class LaborProjectPersonInfoController extends BaseController {
 			@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params,
 			@RequestAttribute String ddBB) {
 		
-                Map<String, Object> map = new LinkedHashMap<>(params.getParams());
+        Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
@@ -111,7 +145,6 @@ public class LaborProjectPersonInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborProjectPersonInfoService.getLaborProjectPersonInfoPage(page, ddBB));

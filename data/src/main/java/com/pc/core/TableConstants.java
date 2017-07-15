@@ -73,6 +73,7 @@ public class TableConstants {
 	public static final String DATA_TYPE="DATA_TYPE";
 	//
 	public static final String DOMINANT_ITEM="DOMINANT_ITEM";
+	public static final String DOMINANT_ITEM_COMMON="DOMINANT_ITEM_COMMON";
 	//
 	public static final String ELEVATION_CHART="ELEVATION_CHART";
 	//
@@ -95,6 +96,7 @@ public class TableConstants {
 	public static final String FUNC_ROLE_PRIVILEGES_RELATE="FUNC_ROLE_PRIVILEGES_RELATE";
 	//
 	public static final String GENERAL_ITEM="GENERAL_ITEM";
+	public static final String GENERAL_ITEM_COMMON="GENERAL_ITEM_COMMON";
 	//
 	public static final String HIDDEN_PHOTOS="HIDDEN_PHOTOS";
 	//
@@ -171,10 +173,12 @@ public class TableConstants {
 	public static final String PROCEDURE_BATCH_STATUS="PROCEDURE_BATCH_STATUS";
 	//
 	public static final String PROCEDURE_INFO="PROCEDURE_INFO";
+	public static final String PROCEDURE_INFO_COMMON="PROCEDURE_INFO_COMMON";
 	//
 	public static final String PROCEDURE_SCHEDULE_RELATE="PROCEDURE_SCHEDULE_RELATE";
 	//
 	public static final String PROCEDURE_TYPE="PROCEDURE_TYPE";
+	public static final String PROCEDURE_TYPE_COMMON="PROCEDURE_TYPE_COMMON";
 	//
 	public static final String PROJECT_BUILDING="PROJECT_BUILDING";
 	//
@@ -243,6 +247,13 @@ public class TableConstants {
 	public static final String WX_CORPORATES="WX_CORPORATES";
 	//
 	public static final String WX_SUITE_INFO="WX_SUITE_INFO";
+	
+	public static final String ROLE_PRIVILEGES_RELATE="ROLE_PRIVILEGES_RELATE";
+	public static final String TENANT_PRIVILEGES="TENANT_PRIVILEGES";
+	public static final String TENANT_ROLE="TENANT_ROLE";
+	public static final String TENANT_ROLE_RELATE="TENANT_ROLE_RELATE";
+	
+	
 	//表名列表 
 	public enum Tables{
 		ACCEPTANCE_ATTACH,	//
@@ -555,10 +566,22 @@ public class TableConstants {
 		projectOwnerRandomTime,	//甲方抽验时间
 		PROJECT_OWNER_ID,	//甲方抽查人ID
 		projectOwnerId,	//甲方抽查人ID
+		PROJECT_OWNER_NAME,
+		projectOwnerName,
 		PROJECT_OWNER_CHECKED,	//甲方抽查状态
 		projectOwnerChecked,	//甲方抽查状态
 		PROJECT_OWNER_CHECK_RESULT,	//甲方抽查结果
 		projectOwnerCheckResult,	//甲方抽查结果
+		PROJECT_CONSTRUCTION_RANDOM_TIME,	//乙方抽验时间
+		projectConstructionRandomTime,	//乙方抽验时间
+		PROJECT_CONSTRUCTION_ID,	//乙方抽查人ID
+		projectConstructionId,	//乙方抽查人ID
+		PROJECT_CONSTRUCTION_NAME,
+		projectConstructionName,
+		PROJECT_CONSTRUCTION_CHECKED,	//乙方抽查状态
+		projectConstructionChecked,	//乙方抽查状态
+		PROJECT_CONSTRUCTION_CHECK_RESULT,	//乙方抽查结果
+		projectConstructionCheckResult,	//乙方抽查结果
 		CONSTRUCTION_INSPECTOR,	//施工检验员
 		constructionInspector,	//施工检验员
 		CONSTRUCTION_INSPECTOR_ID,	//施工检验员ID
@@ -569,6 +592,16 @@ public class TableConstants {
 		constructionInspectorCheckResult,	//施工验收结果
 		CONSTRUCTION_INSPECTOR_CHECK_DATE,	//施工验收时间
 		constructionInspectorCheckDate,	//施工验收时间
+		OTHER_INSPECTOR_NAME,	//其他检查人员
+		otherInspectorName,	//其他检查人员
+		OTHER_INSPECTOR_ID,	//其他检查人员ID
+		otherInspectorId,	//其他检查人员ID
+		OTHER_INSPECTOR_CHECKED,	//其他检查验收状态
+		otherInspectorChecked,	//其他检查验收状态
+		OTHER_INSPECTOR_CHECK_RESULT,	//其他检查验收结果
+		otherInspectorCheckResult,	//其他检查验收结果
+		OTHER_INSPECTOR_CHECK_TIME,	//其他检查验收时间
+		otherInspectorCheckTime,	//其他检查验收时间
 		TEAM_INSPECTOR,	//班组检验员
 		teamInspector,	//班组检验员
 		TEAM_INSPECTOR_ID,	//班组检验员ID
@@ -2067,8 +2100,6 @@ public class TableConstants {
 	public enum LaborPayWagesInfo{
 		ID,	//
 		id,	//
-		PROJECT_ID,	//
-		projectId,	//
 		COMPANY_NAME,	//
 		companyName,	//
 		PROJECT_PERSON_ID,	//
@@ -2102,6 +2133,8 @@ public class TableConstants {
 		payWagesId,	//
 		PAY_NET,	//
 		payNet,	//
+		PAY_NET0,	//
+		payNet0,	//
 		PAY_STATUS,	//
 		payStatus,	//
 		PAY_TIME,	//
@@ -2229,6 +2262,8 @@ public class TableConstants {
 		contractNo,	//
 		CONTRACT_DATE,	//
 		contractDate,	//
+		CONTRACT_EXPIRE_DATE,
+		contractExpireDate,
 		CONTRACT_FILE,	//
 		contractFile,	//
 		IS_SYNCHRO,	//

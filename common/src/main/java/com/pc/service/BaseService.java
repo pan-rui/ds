@@ -23,12 +23,15 @@ public class BaseService {
 	 * @param params
 	 * @param tableName
 	 */
-	public void add(Map<String, Object> params, String tableName) {
+	public String add(Map<String, Object> params, String tableName) {
 		Assert.notNull(params);
+		String id = (String) params.get("ID");
 		if(!params.containsKey("ID")){
-			params.put("ID", UUID.randomUUID().toString().replace("-", ""));
+			id=UUID.randomUUID().toString().replace("-", "");
+			params.put("ID", id);
 		}
 		baseDao.insertByProsInTab(tableName, params);
+		return id;
 	}
 	
 	public void addList(List<Map<String, Object>> list, String tableName) {
@@ -36,6 +39,13 @@ public class BaseService {
 			baseDao.insertBatchByProsInTab(tableName, list);
 		}
 	}
+	
+	public void addOrUpdateList(List<Map<String, Object>> list, String tableName) {
+		if(list!=null&&list.size()>0){
+			baseDao.insertUpdateBatchByProsInTab(tableName, list);
+		}
+	}
+	
 
 	/**
 	 * 根据ID获取对象数据
@@ -109,7 +119,7 @@ public class BaseService {
 	 * @return
 	 */
 	public List<Map<String, Object>> queryList(Map<String, Object> params, Map<String, Object> orderMap,
-			String tableName) {
+											   String tableName) {
 		Assert.notNull(params);
 		Map<String, Object> map = new LinkedHashMap<>(params);
 		if (map.containsKey("ID")) {

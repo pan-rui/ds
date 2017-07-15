@@ -18,7 +18,7 @@ public class TreeUtil {
 	public static final String PARENT_ID = "parentId";
 	public static final String TREE_CODE = "treeCode";
 
-	public static List<Map<String, Object>> getRegionTrees(Boolean isContains,List<Map<String, Object>> listProjects, 
+	public static List<Map<String, Object>> getRegionTrees(Boolean hasProject,Boolean isContains,List<Map<String, Object>> listProjects, 
 			List<Map<String, Object>> listProjectPeriods,
 			List<Map<String, Object>> listBuildings, List<Map<String, Object>> listFloors,
 			List<Map<String, Object>> listRooms) {
@@ -214,6 +214,7 @@ public class TreeUtil {
 						building.put(TableConstants.ProjectHousehold.roomName.name(), DataConstants.REGION_BUILDING_KEY);
 						building.put(TableConstants.ProjectHousehold.id.name(), mapBuilding.get(TableConstants.ProjectBuilding.id.name()));
 						building.put(TableConstants.ProjectHousehold.nameTree.name(), mapBuilding.get(TableConstants.ProjectBuilding.nameTree.name()));
+						building.put(TableConstants.ProjectHousehold.idTree.name(), mapBuilding.get(TableConstants.ProjectBuilding.idTree.name()));
 						listFloorsByBuilding.add(0,building);
 					}
 					
@@ -282,6 +283,7 @@ public class TreeUtil {
 						period.put(TableConstants.ProjectBuilding.buildingName.name(), DataConstants.REGION_PERIOD_KEY);
 						period.put(TableConstants.ProjectBuilding.id.name(), mapPeriod.get(TableConstants.ProjectPeriod.id.name()));
 						period.put(TableConstants.ProjectBuilding.nameTree.name(), mapPeriod.get(TableConstants.ProjectPeriod.nameTree.name()));
+						period.put(TableConstants.ProjectBuilding.idTree.name(), mapPeriod.get(TableConstants.ProjectPeriod.idTree.name()));
 						listBuildingsByPeriod.add(0,period);
 					}
 
@@ -320,7 +322,9 @@ public class TreeUtil {
 					period.put(TableConstants.ProjectBuilding.buildingName.name(), DataConstants.REGION_PERIOD_KEY);
 					period.put(TableConstants.ProjectBuilding.id.name(), listBuildingsByPeriod.get(0).get(TableConstants.ProjectBuilding.projectPeriodId.name()));
 					String nameTree=(String)listBuildingsByPeriod.get(0).get(TableConstants.ProjectBuilding.nameTree.name());
+					String idTree=(String)listBuildingsByPeriod.get(0).get(TableConstants.ProjectBuilding.idTree.name());
 					period.put(TableConstants.ProjectBuilding.nameTree.name(), (nameTree).substring(0, nameTree.lastIndexOf(TableConstants.SEPARATE_TREE)));
+					period.put(TableConstants.ProjectBuilding.idTree.name(), (idTree).substring(0, idTree.lastIndexOf(TableConstants.SEPARATE_TREE)));
 					listBuildingsByPeriod.add(0,period);
 				}
 				regionTrees = listBuildingsByPeriod;
@@ -362,11 +366,12 @@ public class TreeUtil {
 						}
 					});
 					
-					if(isContains){
+					if(isContains&&hasProject){
 						Map<String, Object> project=new HashMap<String, Object>();
 						project.put(TableConstants.ProjectPeriod.periodName.name(), DataConstants.REGION_PROJECT_KEY);
 						project.put(TableConstants.ProjectPeriod.id.name(), mapProject.get(TableConstants.ProjectInfo.id.name()));
 						project.put(TableConstants.ProjectPeriod.nameTree.name(), mapProject.get(TableConstants.ProjectInfo.projectName.name()));
+						project.put(TableConstants.ProjectPeriod.idTree.name(), mapProject.get(TableConstants.ProjectInfo.id.name()));
 						listPeriodsByProject.add(0,project);
 					}
 					

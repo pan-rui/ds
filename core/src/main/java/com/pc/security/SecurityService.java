@@ -7,18 +7,20 @@ import com.pc.dao.BaseDao;
 import com.pc.dao.auth.AuthDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-03-27 14:12)
- * @version: \$Rev: 1158 $
+ * @version: \$Rev: 3596 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-16 00:27:43 +0800 (周日, 16 7月 2017) $
  */
 @Service
 public class SecurityService {
@@ -37,7 +39,7 @@ public class SecurityService {
      * @param principals 用户名
      * @return
      */
-    @Cacheable(value = "auth", cacheManager = "cacheManager", key = "'roles$'+#ddBB+'-'+#principalsr", sync = true)
+//    @Cacheable(value = "auth", cacheManager = "cacheManager", key = "'roles$'+#ddBB+'-'+#principals", sync = true)
     public List<Map<String, Object>> findFuncRoles(String ddBB, String principals) {
         return authDao.queryFuncRolesByUserTab(ddBB + TableConstants.SEPARATE + TableConstants.USER_FUNC_ROLE_RELATE, ddBB + TableConstants.SEPARATE + TableConstants.USER,
                 ddBB + TableConstants.SEPARATE + TableConstants.FUNC_ROLE, principals);
@@ -75,5 +77,28 @@ public class SecurityService {
         return baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.USER_FUNC_PRIVILEGES_RELATE, ParamsMap.newMap("USER_ID", userId));
     }
 
+    /**
+     * 查询租户功能角色
+     *
+     * @param ddBB
+     * @param principals 租户ID
+     * @return
+     */
+//    @Cacheable(value = "auth", cacheManager = "cacheManager", key = "'roles$'+#ddBB+'-'+#principals", sync = true)
+    public List<Map<String, Object>> findTenantRoles(String ddBB, String principals) {
+        return authDao.queryTenantRoles(ddBB, principals);
+    }
 
+    /**
+     * 查询租户功能权限
+     *
+     * @param ddBB
+     * @param tenantId 租户ID
+     * @param roles 租户角色
+     * @return
+     */
+//    @Cacheable(value = "auth", cacheManager = "cacheManager", key = "'permiss$'+#ddBB+'-'+#tenantId", sync = true)
+    public List<Map<String, Object>> queryTenantPermissByRoles(String ddBB, String tenantId,List<String> roles) {
+        return authDao.queryTenantPermissByRoles(ddBB, tenantId,roles);
+    }
 }

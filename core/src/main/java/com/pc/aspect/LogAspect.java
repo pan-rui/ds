@@ -15,6 +15,7 @@ import com.pc.util.SendMail;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -73,6 +74,14 @@ public class LogAspect extends BaseController {
 	@Pointcut("execution(* com.pc.dao..*Dao*.*(..)) && @annotation(com.pc.core.DataSource)")
 	public void dataSource() {
 	}
+
+	@Pointcut("execution(* com.pc.service..*.get*(..)) || execution(* com.pc.service..*.query*(..))")
+	public void serviceSource() {
+	}
+
+/*	@Pointcut("")
+	public void serviceSource2() {
+	}*/
 
 	@Before("TradeLog()")
 	public void doBefore(JoinPoint joinPoint) {
@@ -215,6 +224,18 @@ public void logBefore(JoinPoint joinPoint) {
 		DataSourceHolder.DBType dbType = DataSourceHolder.DBType.valueOf(getMethodValue(joinPoint, 3));
 		DataSourceHolder.setLocalDataSource(dbType);
 	}
+
+	@AfterReturning("serviceSource()")
+	@Order(1000)
+	public void serviceReturning(JoinPoint joinPoint) {
+		DataSourceHolder.setLocalDataSource(DataSourceHolder.DBType.master);
+	}
+/*
+	@AfterReturning("serviceSource2()")
+	@Order(999)
+	public void serviceReturning2(JoinPoint joinPoint) {
+		DataSourceHolder.setLocalDataSource(DataSourceHolder.DBType.master);
+	}*/
 
 /*	@AfterThrowing(pointcut = "dataSource()", throwing = "e")
 	public void connectException(JoinPoint joinPoint, MyBatisSystemException e) throws DataAccessException {

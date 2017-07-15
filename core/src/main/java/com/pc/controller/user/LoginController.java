@@ -168,7 +168,7 @@ public class LoginController extends BaseController {
 		subjectContext.setAuthenticationToken(new UsernamePasswordToken(username, password, tenantId));
 		PrincipalCollection principalCollection = new SimplePrincipalCollection(
 				ParamsMap.newMap("ddBB", ddBB).addParams("tenantId",tenantId).addParams("username", username), realm);
-		subjectContext.setAuthenticationInfo(new SimpleAuthenticationInfo(principalCollection, tenantId));
+		subjectContext.setAuthenticationInfo(new SimpleAuthenticationInfo(principalCollection, password));
 		subjectContext.setSubject(SecurityUtils.getSubject());
 		SecurityUtils.getSecurityManager().createSubject(subjectContext);
 	}

@@ -18,6 +18,10 @@ public class AcceptancePointService extends BaseService {
     public void addAcceptancePoint(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_POINT);
 	}
+    
+    public void addAcceptancePointList(List<Map<String, Object>> params, String ddBB) {
+		super.addList(params, ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_POINT);
+	}
 
 	public Page getAcceptancePointPage(Page<Map<String, Object>> page, String ddBB) {
 		 

@@ -171,9 +171,10 @@ public class ProcedureTypeController extends BaseController {
 			if(parentId != null) {
 
 				Map<String, Object> parentParams = new LinkedHashMap<>();
-				parentParams.put(TableConstants.ProcedureType.ID.name(), parentId);
-				Map<String, Object> data = procedureTypeService.getProcedureType(parentParams, ddBB);
-				if(data != null && !data.isEmpty())
+				parentParams.put(TableConstants.ProcedureType.PARENT_ID.name(), parentId);
+				parentParams.put(TableConstants.ProcedureType.IS_SEALED.name(), 0);
+				List<Map<String, Object>> data = procedureTypeService.getProcedureTypeList(parentParams, ddBB);
+				if(data == null || data.size()==0)
 				{
 					Map<String, Object> parentParam = new LinkedHashMap<>();
 					parentParam.put(TableConstants.ProcedureType.ID.name(), parentId);

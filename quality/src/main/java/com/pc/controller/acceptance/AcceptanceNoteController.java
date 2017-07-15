@@ -71,6 +71,7 @@ public class AcceptanceNoteController extends BaseController {
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
+	
 	/**
 	 * 获取报验记录
 	 * @param userId
@@ -140,7 +141,6 @@ public class AcceptanceNoteController extends BaseController {
 		if(constructionId!=null){
 			construction=(String)companyService.getByID(constructionId, ddBB).get(TableConstants.Company.corporateName.name());
 		}
-		
 		
 		String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
 		String regionName = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_NAME.name());

@@ -3,5 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.tenant.TenantDao">
-	
+    <select id="initProcudure" statementType="CALLABLE" parameterType="map">
+        <![CDATA[
+           {call dems.initProcedure(
+           #{tId,mode=IN,jdbcType=VARCHAR},#{tPhone,mode=IN,jdbcType=VARCHAR},#{uId,mode=IN,jdbcType=VARCHAR}
+           )}
+       ]]>
+    </select>
 </mapper>

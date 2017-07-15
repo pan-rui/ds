@@ -5,23 +5,24 @@ import java.util.Map;
  
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
-import com.pc.dao.labor.LaborTrainingInfoDao;
 import com.pc.service.BaseService;
 
 @Service
 public class LaborTrainingInfoService extends BaseService {
     private Logger logger = LogManager.getLogger(this.getClass());
-
+    
+    public void addLaborTrainingInfoList(List<Map<String, Object>> params, String ddBB) {
+		super.addList(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_INFO);
+	}
      
     public void addLaborTrainingInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_INFO);
 	}
-
+    
 	public Page getLaborTrainingInfoPage(Page<Map<String, Object>> page, String ddBB) {
 		 
 		return queryPage(page, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_INFO);

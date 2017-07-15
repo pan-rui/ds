@@ -111,8 +111,6 @@ public class LaborPayWagesInfoController extends BaseController {
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
 		map.put(TableConstants.TENANT_ID, tenantId);
-		
-		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, laborPayWagesInfoService.getLaborPayWagesInfoPage(page, ddBB));
 	}

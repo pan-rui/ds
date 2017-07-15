@@ -3,38 +3,57 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.privilege.UserDao">
+
+	<select id="queryPostUserListByProjectInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT a.* FROM ${uTableName} a,${abTableName} b,${anTableName} c
+		WHERE a.`ID`=b.`ACCEPTANCE_PERSON_ID` AND
+		b.`ACCEPTANCE_NOTE_ID`=c.`ID`
+		AND a.`IS_SEALED`=0 AND b.`INSPECTOR_ROLE`=#{INSPECTOR_ROLE} AND
+		c.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+	</select>
+
 	<select id="queryUserListByPostAuthInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
-		SELECT DISTINCT a.* FROM ${uTableName} a,${pbTableName} c,${phTableName}
+		SELECT DISTINCT a.* FROM ${uTableName}
+		a,${pbTableName} c,${phTableName}
 		d,${rdprTableName} e,${rdprTableName}
 		e1,${dpTableName} f,${dpTableName} f1,
-		${rTableName} g,${rTableName} g1,${urrTableName} h,${urrTableName} h1 WHERE
-		(a.`ID`=h.`USER_ID` AND h.`ROLE_ID`=g.`ID` AND g.`ID`=e.`ROLE_ID` AND
+		${rTableName} g,${rTableName}
+		g1,${urrTableName} h,${urrTableName} h1 WHERE
+		(a.`ID`=h.`USER_ID` AND
+		h.`ROLE_ID`=g.`ID` AND g.`ID`=e.`ROLE_ID` AND
 		e.`DATA_PRIVILEGE_ID`=f.`ID`
 		AND f.`DATA_TYPE_ID`=#{pDataTypeId} AND
 		f.`DATA_ID`=#{procedureId}) AND (a.`ID`=h1.`USER_ID` AND
 		h1.`ROLE_ID`=g1.`ID` AND
-		g1.`ID`=e1.`ROLE_ID` AND e1.`DATA_PRIVILEGE_ID`=f1.`ID` AND
+		g1.`ID`=e1.`ROLE_ID` AND
+		e1.`DATA_PRIVILEGE_ID`=f1.`ID` AND
 		f1.`DATA_TYPE_ID`=#{gDataTypeId} AND
 		f1.`DATA_ID`=d.`ID` AND d.`BUILDING_ID`=c.`ID` AND
 		c.`PROJECT_PERIOD_ID`=#{projectPeriodId}) AND
-		a.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND
-		d.`IS_SEALED`=0 AND f.`IS_SEALED`=0 AND f1.`IS_SEALED`=0 AND g.`IS_SEALED`=0 AND
-		g1.`IS_SEALED`=0 AND a.`TENANT_ID`=#{tenantId} AND a.`POST_ID`=#{postId}
+		a.`IS_SEALED`=0 AND
+		c.`IS_SEALED`=0 AND
+		d.`IS_SEALED`=0 AND f.`IS_SEALED`=0 AND
+		f1.`IS_SEALED`=0 AND g.`IS_SEALED`=0 AND
+		g1.`IS_SEALED`=0 AND
+		a.`TENANT_ID`=#{tenantId} AND a.`POST_ID`=#{postId}
 	</select>
-	
+
 	<select id="queryUserDetailPageInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
-		SELECT a.*,b.`POST_NAME` AS postName,c.`CORPORATE_NAME` AS corporateName FROM ${uTableName} a,${pTableName} b,${cTableName} c WHERE
-		a.`POST_ID`=b.`ID` AND a.`COMPANY_ID`=c.`ID` AND a.`IS_SEALED`=0 
-		<if  test="TENANT_ID != null">
-        	AND a.`TENANT_ID`=#{TENANT_ID} 
-        </if>
-        <if  test="REAL_NAME != null">
-        	AND a.`REAL_NAME` LIKE #{REAL_NAME} 
-        </if>
-        <if  test="PHONE != null">
-        	AND a.`PHONE` LIKE #{PHONE} 
-        </if>
+		SELECT a.*,b.`POST_NAME` AS postName,c.`CORPORATE_NAME` AS
+		corporateName FROM ${uTableName} a,${pTableName} b,${cTableName} c
+		WHERE
+		a.`POST_ID`=b.`ID` AND a.`COMPANY_ID`=c.`ID` AND a.`IS_SEALED`=0
+		<if test="TENANT_ID != null">
+			AND a.`TENANT_ID`=#{TENANT_ID}
+		</if>
+		<if test="REAL_NAME != null">
+			AND a.`REAL_NAME` LIKE #{REAL_NAME}
+		</if>
+		<if test="PHONE != null">
+			AND a.`PHONE` LIKE #{PHONE}
+		</if>
 	</select>
 </mapper>

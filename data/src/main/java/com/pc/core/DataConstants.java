@@ -114,13 +114,13 @@ public class DataConstants {
     //状态类型
     public final static  String PROCEDURE_STATUS = "1";
     
-    //验收角色(甲方抽验员1、监理验收员2、质检验收员3、班组验收员4)
-    public final static  String INSPECTOR_ROLE_JF = "1";
-    public final static  String INSPECTOR_ROLE_NAME_JL = "监理";  //岗位名称
+    //验收角色(班组1、监理验收员2、质检验收员3、甲方抽验员4、乙方抽验员4、)
+    public final static  String INSPECTOR_ROLE_QT = "6";
+    public final static  String INSPECTOR_ROLE_YF = "5";
+    public final static  String INSPECTOR_ROLE_JF = "4";
     public final static  String INSPECTOR_ROLE_JL = "2";
-    public final static  String INSPECTOR_ROLE_NAME_ZJ = "质检";  //岗位名称
     public final static  String INSPECTOR_ROLE_ZJ = "3";
-    public final static  String INSPECTOR_ROLE_BZ = "4";
+    public final static  String INSPECTOR_ROLE_BZ = "1";
     
     public final static  String CHECK_SUCCESS = "1";
     public final static  String CHECK_FAIL = "0";
@@ -156,6 +156,22 @@ public class DataConstants {
     public final static  String BATCH_STATUS_ID_JLNFY = "9";
     //监理已验收
     public final static  String BATCH_STATUS_ID_JLYYS = "10";
+    //甲方抽验未验收
+    public final static  String BATCH_STATUS_ID_JFWYS = "15";
+    public final static  String BATCH_STATUS_ID_JFNFY = "16";
+    public final static  String BATCH_STATUS_ID_JFYYS = "17";
+    //乙方抽验未验收
+    public final static  String BATCH_STATUS_ID_YFWYS = "18";
+    public final static  String BATCH_STATUS_ID_YFNFY = "19";
+    public final static  String BATCH_STATUS_ID_YFYYS = "20";
+    
+    public final static  String BATCH_STATUS_ID_BZWYS = "24";
+    public final static  String BATCH_STATUS_ID_BZNFY = "25";
+    public final static  String BATCH_STATUS_ID_BZYYS = "26";
+    
+    public final static  String BATCH_STATUS_ID_QTWYS = "21";
+    public final static  String BATCH_STATUS_ID_QTNFY = "22";
+    public final static  String BATCH_STATUS_ID_QTYYS = "23";
     
     //验收批流程状态
     public final static  String ACCEPTANCE_BATCH_STATUS_ID_WBY="11";

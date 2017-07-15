@@ -19,6 +19,15 @@ public class ProjectPartnerRelateService extends BaseService {
     @Autowired
 	private ProjectPartnerRelateDao projectPartnerRelateDao;
     
+    public List<Map<String, Object>> getTeamListByProject(String projectPeriodId, String ddBB) {
+		Map<String, Object> map=new HashMap<String, Object>();
+		map.put("pprTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PARTNER_RELATE);
+		map.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD);
+		map.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.TEAM_INFO);
+		map.put(TableConstants.ProjectPartnerRelate.projectPeriodId.name(), projectPeriodId);
+		return projectPartnerRelateDao.queryTeamListByProjectInTab(map);
+	}
+    
     public Page getPageByTeamProject(Page page, String ddBB) {
 		Map<String, Object> map=new HashMap<String, Object>(page.getParams());
 		map.put("pprTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PARTNER_RELATE);

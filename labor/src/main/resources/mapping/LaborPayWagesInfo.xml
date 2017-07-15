@@ -3,5 +3,33 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborPayWagesInfoDao">
-	
+
+    <select id="queryPayWagesPageInTab" parameterType="map" resultType="map">
+        SELECT lpi.EMP_NAME empName
+        ,lpwi.PAY_GROSS payGross
+        ,lpwr.PAY_NET payNet
+        ,lpwr.PAY_STATUS payStatus
+        ,lpwr.PAY_TIME payTime
+        ,lpwr.IS_SYNCHRO isSynchro
+        FROM ${ddBB}.LABOR_PAY_WAGES_INFO lpwi JOIN ${ddBB}.LABOR_PAY_WAGES_RECORD lpwr ON
+        lpwi.ID = lpwr.PAY_WAGES_ID JOIN ${ddBB}.LABOR_PROJECT_PERSON_INFO lppi ON lpwi.PROJECT_PERSON_ID = lppi.ID JOIN
+        ${ddBB}.LABOR_PERSON_INFO lpi ON lppi.PERSON_ID = lpi.ID WHERE lpwi.IS_SEALED='0' AND lppi.IS_SEALED='0'
+        <if test="null != page.params">
+            <trim prefix=" and " prefixOverrides="or | and">
+                <foreach collection="page.params" item="item" index="key" separator=" and ">
+                    <choose>
+                        <when test='key =="EMP_NAME"'>
+                            lpi.${key} LIKE '%${item}%'
+                        </when>
+                        <when test='key =="TENANT_ID"'>
+                            lpwi.${key} LIKE '%${item}%'
+                        </when>
+                        <otherwise>
+                            ${key} LIKE '%${item}%'
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </trim>
+        </if>
+    </select>
 </mapper>

@@ -17,9 +17,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-03-27 14:21)
- * @version: \$Rev: 1179 $
+ * @version: \$Rev: 3223 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 19:33:22 +0800 (周二, 18 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-23 11:54:45 +0800 (周五, 23 6月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -250,10 +250,27 @@ public class AuthDao {
 		return sqlSessionTemplate.selectList(className + ".queryRoleByFunPermissTab", paramsMap);
 	}
 
+
+	@DataSource
+	public List<Map<String, Object>> queryTenantRoleAsNamePageMul(final Page page,String ddBB) {
+		Map<String, Object> paramsMap = ParamsMap.newMap("page", page).addParams("ddBB",ddBB);
+		return sqlSessionTemplate.selectList(className + ".queryTenantRoleAsNamePageMul",paramsMap);
+	}
 /*	@DataSource
 	public List<Map<String, Object>> queryFuncPermissByUser(String funUserPerTab, String userId) {
 		Map<String,Object> paramsMap=ParamsMap.newMap("funUserPerTab",funUserPerTab).addParams("userId",userId);
 		return sqlSessionTemplate.selectList(className + ".queryFuncPermissByUser", paramsMap);
 	}*/
 
+	@DataSource
+	public List<Map<String, Object>> queryTenantRoles(String ddBB,String tenantId) {
+		Map<String, Object> paramsMap = ParamsMap.newMap("tenantId", tenantId).addParams("ddBB",ddBB);
+		return sqlSessionTemplate.selectList(className + ".queryTenantRoles",paramsMap);
+	}
+
+	@DataSource
+	public List<Map<String, Object>> queryTenantPermissByRoles(String ddBB,String tenantId,List<String> roles) {
+		Map<String, Object> paramsMap = ParamsMap.newMap("tenantId", tenantId).addParams("ddBB", ddBB).addParams("roles", roles);
+		return sqlSessionTemplate.selectList(className + ".queryTenantRoles",paramsMap);
+	}
 }

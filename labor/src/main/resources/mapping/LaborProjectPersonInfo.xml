@@ -3,6 +3,62 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborProjectPersonInfoDao">
+	<select id="queryLaborProjectPersonInfoFailListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${lpTableName}
+		a,${lppTableName} b WHERE a.`ID`=b.`PERSON_ID` AND
+		b.`IS_SEALED`=0 AND b.`PROJECT_ID`=#{PROJECT_ID} AND
+		b.`IS_SYNCHRO`=#{IS_SYNCHRO} AND
+		b.`EMP_TYPE`=0 AND
+		a.`ID_CODE` IS NOT NULL
+	</select>
+
+	<select id="queryLaborProjectListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${pTableName}
+		a,${lppTableName} b WHERE a.`ID`=b.`PROJECT_ID` AND
+		b.`IS_SEALED`=0 AND b.`PERSON_ID`=#{personId}
+	</select>
+
+	<select id="queryLaborProjectPersonInfoDetailPageInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id,a.`PERSON_ID` AS personId,
+		b.`EMP_NAME` AS
+		empName,b.`ID_CODE` AS idCode,b.`EMP_PHONE` AS
+		empPhone,c.`COMPANY_NAME` AS companyName,a.`IS_SYNCHRO` AS isSynchro
+		FROM ${lppTableName} a,${lpTableName}
+		b,${cTableName} c WHERE
+		a.`PERSON_ID`=b.`ID` AND
+		a.`EMP_COMPANT_ID`=c.`ID` AND a.`IS_SEALED`=0
+		AND a.`TENANT_ID`=#{TENANT_ID}
+		<if test="PROJECT_ID != null">
+			AND a.`PROJECT_ID`=#{PROJECT_ID}
+		</if>
+		<if test="IS_SYNCHRO != null">
+			AND a.`IS_SYNCHRO`=#{IS_SYNCHRO}
+		</if>
+	</select>
+
+	<select id="queryLaborPersonListByFileTypeInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id,a.`PERSON_ID` AS personId,b.`ID_CODE` AS
+		idCode,b.`EMP_NAME` AS empName FROM
+		${lppTableName} a,${lpTableName} b
+		WHERE a.`PERSON_ID`=b.`ID` AND a.`IS_SEALED`=0 AND 
+		b.`IS_SEALED`=0 AND a.`EMP_TYPE`=0 AND
+		b.`ID_CODE` IS NOT NULL AND a.`PROJECT_ID`=#{PROJECT_ID}
+		<if test="type == 1">
+			AND (b.`IDPHOTO_SCAN` IS NULL OR b.`IDPHOTO_SCAN2` IS
+			NULL)
+		</if>
+		<if test="type == 3">
+			AND b.`ID_PHOTO` IS NULL
+		</if>
+		<if test="type == 4">
+			AND a.`FACEPHOTO` IS NULL
+		</if>
+	</select>
+
 	<select id="queryLaborPersonToPushListInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT a.ID as id,h.`PROJECT_CODE` AS
@@ -11,20 +67,34 @@
 		b.`EMP_NATIVEPLACE` AS emp_nativeplace,b.`EMP_NATION` AS
 		emp_nation,a.`PASS_PERIOD` AS pass_period,a.`MATCH_FLAG` AS
 		match_flag,a.`FACEPHOTO` AS facephoto,
-		c.`COMPANY_NAME` AS emp_company,g.`NAME` AS work_typename,d.`CODE` AS
+		c.`COMPANY_NAME` AS
+		emp_company,g.`NAME` AS work_typename,d.`CODE` AS
 		emp_category,a.`CWR_ISKEYPSN` AS cwr_iskeypsn,a.`EMP_DEPT` AS
 		emp_dept,f.`CODE` AS job_typename,
-		e.`CODE` AS job_name,a.`CONTRACT_STATUS` AS contract_status,b.`ID_AGENCY` AS
-		id_agency,b.`ID_VALIDDATE` AS id_validdate,a.`EMP_BANKNAME` AS emp_bankname,
-		a.`EMP_CARDNUM` AS emp_cardnum,a.`JOB_DEPT` AS job_dept,b.`IDPHOTO_SCAN` AS
-		idphoto_scan,b.`IDPHOTO_SCAN2` AS idphoto_scan2 FROM
-		${lppTableName} a,${lpTableName} b,${lcciTableName} c,
-		${leciTableName} d,${lgniTableName} e,
-		${lgtiTableName} f,${lwtiTableName} g,${lpiTableName} h WHERE
-		a.`PERSON_ID`=b.`ID` AND a.`EMP_COMPANT_ID`=c.`ID` AND
-		a.`EMP_CATEGORY_ID`=d.`ID`
-		AND a.`JOB_NAME_ID`=e.`ID` AND a.`JOB_TYPENAME_ID`=f.`ID` AND
-		a.`WORK_TYPENAME_ID`=g.`ID` AND a.`PROJECT_ID`=h.`ID` AND
-		a.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND a.`PROJECT_ID`=#{PROJECT_ID}
+		e.`CODE` AS
+		job_name,a.`CONTRACT_STATUS` AS contract_status,b.`ID_AGENCY` AS
+		id_agency,b.`ID_VALIDDATE` AS id_validdate,a.`EMP_BANKNAME` AS
+		emp_bankname,
+		a.`EMP_CARDNUM` AS emp_cardnum,a.`JOB_DEPT` AS
+		job_dept,b.`IDPHOTO_SCAN` AS
+		idphoto_scan,b.`IDPHOTO_SCAN2` AS
+		idphoto_scan2 FROM
+		${lppTableName} a,${lpTableName} b,${lcciTableName}
+		c,
+		${leciTableName} d,${ljniTableName} e,
+		${ljtiTableName}
+		f,${lwtiTableName} g,${lpiTableName} h WHERE
+		a.`PERSON_ID`=b.`ID` AND
+		a.`EMP_COMPANT_ID`=c.`ID` AND
+		a.`EMP_CATEGORY_ID`=d.`ID` AND
+		b.`ID_CODE` IS NOT NULL AND
+		a.`JOB_NAME_ID`=e.`ID` AND
+		a.`JOB_TYPENAME_ID`=f.`ID` AND
+		a.`WORK_TYPENAME_ID`=g.`ID` AND
+		a.`PROJECT_ID`=h.`ID` AND
+		a.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND
+		a.`PROJECT_ID`=#{PROJECT_ID} AND
+		a.`EMP_TYPE`=0 AND
+		b.`ID_CODE` IS NOT NULL
 	</select>
 </mapper>

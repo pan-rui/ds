@@ -13,9 +13,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Create: 潘锐 (2016-11-28 16:50)
- * @version: \$Rev: 1158 $
+ * @version: \$Rev: 3284 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-27 15:00:06 +0800 (周二, 27 6月 2017) $
  */
 @Component
 public class MyKeyGenerator implements KeyGenerator {
@@ -30,7 +30,7 @@ public class MyKeyGenerator implements KeyGenerator {
 //            Collection values=dataMap.values();
 //            for (Object obj: dataMap.values())
             if(dataMap.size()>0)
-                return objects[0] + "~" + dataMap.values().toArray()[dataMap.size()-1];
+                return objects[0] + "$" + dataMap.values().toArray()[dataMap.size()-1];
         }
         return null;
     }

@@ -78,5 +78,9 @@ public class TokenService {
 	public void clearOfflineCache() {
 		System.out.println("清除Offline缓存....");
 	}
-	
+
+	@CacheEvict(value ="system",allEntries = true,cacheManager = "cacheManager")
+	public void clearSystemCache() {
+		System.out.println("清除Offline缓存....");
+	}
 }

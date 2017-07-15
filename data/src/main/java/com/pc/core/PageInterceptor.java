@@ -90,7 +90,7 @@ public class PageInterceptor implements Interceptor {
             Connection connection = (Connection) invocation.getArgs()[0];
             //获取当前要执行的sql语句
             String sql = boundSql.getSql();
-            this.setTotalRecord(obj, mappedStatement, connection);
+            this.setTotalRecord(obj, mappedStatement, connection,sql);
             String pageSql = this.getPageSql(page, sql);
             Constants.ReflectUtil.setFieldValue(boundSql, "sql", pageSql);
 //            Constants.ReflectUtil.setFieldValue(boundSql, "parameterObject", page.getParams());
@@ -161,10 +161,10 @@ public class PageInterceptor implements Interceptor {
         this.mulitEncryptSql = properties.getProperty("mulitEncryptSql");
     }
 
-    private void setTotalRecord(Object paramsObj, MappedStatement mappedStatement, Connection connection) {
+    private void setTotalRecord(Object paramsObj, MappedStatement mappedStatement, Connection connection,String eSql) {
         BoundSql boundSql = mappedStatement.getBoundSql(paramsObj);
-        String sql = boundSql.getSql();
-        String countSql = "select count(1) from (" + sql + ") as total";
+//        String sql = boundSql.getSql();
+        String countSql = "select count(1) from (" + eSql + ") as total";
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
 //        BoundSql countBoundSql = new BoundSql(mappedStatement.getConfiguration(), countSql, parameterMappings, page.getParams());
         BoundSql countBoundSql = new BoundSql(mappedStatement.getConfiguration(), countSql, parameterMappings, paramsObj);

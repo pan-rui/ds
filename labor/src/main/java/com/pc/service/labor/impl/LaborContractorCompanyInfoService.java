@@ -26,12 +26,16 @@ public class LaborContractorCompanyInfoService extends BaseService {
     	params.put(TableConstants.LaborContractorCompanyInfo.PROJECT_ID.name(), projectId);
     	params.put("ctTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_COMPANY_TYPE_INFO);
     	params.put("cTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
-    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_INFO);
+    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD);
 		return laborContractorCompanyInfoDao.queryLaborCompanyToPushListInTab(params);
 	}
      
     public void addLaborContractorCompanyInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
+	}
+    
+    public void addLaborContractorCompanyInfoList(List<Map<String, Object>> params, String ddBB) {
+		super.addList(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
 	}
 
 	public Page getLaborContractorCompanyInfoPage(Page<Map<String, Object>> page, String ddBB) {

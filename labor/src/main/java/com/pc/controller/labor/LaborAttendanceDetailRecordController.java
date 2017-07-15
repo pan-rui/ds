@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -18,22 +18,21 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.pc.controller.BaseController;
 import com.pc.annotation.EncryptProcess;
 import com.pc.base.BaseResult;
 import com.pc.base.Constants;
 import com.pc.base.ReturnCode;
+import com.pc.controller.BaseController;
 import com.pc.core.DataConstants;
 import com.pc.core.Page;
-import com.pc.core.ParamsMap;
-import com.pc.util.DateUtil;
-import com.pc.vo.ParamsVo;
-
 import com.pc.core.TableConstants;
- 
 import com.pc.service.labor.impl.LaborAttendanceDetailRecordService;
 import com.pc.service.labor.impl.LaborDeviceInfoService;
-import com.pc.service.labor.impl.LaborProjectInfoService;
+import com.pc.service.labor.impl.LaborPersonInfoService;
+import com.pc.service.labor.impl.LaborProjectPersonInfoService;
+import com.pc.service.project.impl.ProjectPeriodService;
+import com.pc.util.DateUtil;
+import com.pc.vo.ParamsVo;
 
 /**
  * @Description: 
@@ -49,10 +48,16 @@ public class LaborAttendanceDetailRecordController extends BaseController {
 	private LaborAttendanceDetailRecordService laborAttendanceDetailRecordService;
 	
 	@Autowired
-	private LaborProjectInfoService laborProjectInfoService;
+	private ProjectPeriodService projectPeriodService;
 	
 	@Autowired
 	private LaborDeviceInfoService laborDeviceInfoService;
+	
+	@Autowired
+	private LaborPersonInfoService laborPersonInfoService;
+	
+	@Autowired
+	private LaborProjectPersonInfoService laborProjectPersonInfoService;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
@@ -65,13 +70,29 @@ public class LaborAttendanceDetailRecordController extends BaseController {
 		List<Map<String, Object>> list=(List<Map<String, Object>>) params.getParams().get("LIST");
 		String projectId=(String) params.getParams().get(TableConstants.LaborAttendanceDetailRecord.PROJECT_ID.name());
 		
-		Map<String, Object> project=laborProjectInfoService.getByID(projectId, ddBB);
+		if(StringUtils.isBlank(projectId)){
+			Map<String, Object> lpparams = new LinkedHashMap<>();
+			lpparams.put(TableConstants.LaborPersonInfo.USER_ID.name(), userId);
+			Map<String, Object> laborPersonInfo=laborPersonInfoService.getLaborPersonInfo(lpparams, ddBB);
+	    	if(laborPersonInfo==null){
+	    		return  new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+	    	}
+	    	Map<String, Object> lppparams = new LinkedHashMap<>();
+	    	lppparams.put(TableConstants.LaborProjectPersonInfo.PERSON_ID.name(), laborPersonInfo.get(TableConstants.LaborPersonInfo.id.name()));
+			
+	    	projectId=(String) laborProjectPersonInfoService.getLaborProjectPersonInfo(lppparams, ddBB).get(TableConstants.LaborProjectPersonInfo.projectId.name());
+		}
+		
+		Map<String, Object> project=projectPeriodService.getByID(projectId, ddBB);
 		
 		if(project==null||list==null||list.size()==0){
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 		}
 		
 		Map<String, Object> device=laborDeviceInfoService.getLaborDeviceInfoByProject(projectId, ddBB);
+		if(device==null){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
+		}
 		
 		List<Map<String, Object>> attendanceList=new ArrayList<Map<String,Object>>();
 		for(Map<String, Object> map:list){

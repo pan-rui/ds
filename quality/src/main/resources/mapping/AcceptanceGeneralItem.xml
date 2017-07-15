@@ -3,5 +3,45 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.acceptance.AcceptanceGeneralItemDao">
-	
+	<select id="queryAcceptanceGeneralDetailRecordInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT
+		a.*,zj.`ID`AS zjId,zj.`SCORE` AS zjScore,zj.`ELIGIBLE` AS
+		zjEligible,zj.`ELIGIBLE_RATE` AS zjEligibleRate,zj.`CHECK_POINT_SIZE`
+		AS zjCheckPointSize,zj.`CHECK_POINT_MAX_DIFF` AS
+		zjCheckPointMaxDiff,zj.`MAX_VAL` AS zjMaxVal,zj.`MIN_VAL` AS zjMinVal,
+		
+		jl.`ID`AS jlId,jl.`SCORE` AS jlScore,jl.`ELIGIBLE` AS
+		jlEligible,jl.`ELIGIBLE_RATE` AS jlEligibleRate,jl.`CHECK_POINT_SIZE`
+		AS jlCheckPointSize,jl.`CHECK_POINT_MAX_DIFF` AS
+		jlCheckPointMaxDiff,jl.`MAX_VAL` AS jlMaxVal,jl.`MIN_VAL` AS jlMinVal,
+		
+		jf.`ID`AS jfId,jf.`SCORE` AS jfScore,jf.`ELIGIBLE` AS
+		jfEligible,jf.`ELIGIBLE_RATE` AS jfEligibleRate,jf.`CHECK_POINT_SIZE`
+		AS jfCheckPointSize,jf.`CHECK_POINT_MAX_DIFF` AS
+		jfCheckPointMaxDiff,jf.`MAX_VAL` AS jfMaxVal,jf.`MIN_VAL` AS jfMinVal,
+		
+		yf.`ID`AS yfId,yf.`SCORE` AS yfScore,yf.`ELIGIBLE` AS
+		yfEligible,yf.`ELIGIBLE_RATE` AS yfEligibleRate,yf.`CHECK_POINT_SIZE`
+		AS yfCheckPointSize,yf.`CHECK_POINT_MAX_DIFF` AS
+		yfCheckPointMaxDiff,yf.`MAX_VAL` AS yfMaxVal,yf.`MIN_VAL` AS yfMinVal,
+		
+		qt.`ID`AS qtId,qt.`SCORE` AS qtScore,qt.`ELIGIBLE` AS
+		qtEligible,qt.`ELIGIBLE_RATE` AS qtEligibleRate,qt.`CHECK_POINT_SIZE`
+		AS qtCheckPointSize,qt.`CHECK_POINT_MAX_DIFF` AS
+		qtCheckPointMaxDiff,qt.`MAX_VAL` AS qtMaxVal,qt.`MIN_VAL` AS qtMinVal
+		
+		FROM ${giTableName} a LEFT JOIN ${agiTableName} zj ON
+		a.`ID`=zj.`GENERAL_ITEM_ID` AND zj.`ACCEPTANCE_BATCH_ID`=#{zjBantchId}
+		LEFT JOIN ${agiTableName} jl ON a.`ID`=jl.`GENERAL_ITEM_ID` AND
+		jl.`ACCEPTANCE_BATCH_ID`=#{jlBantchId}
+		LEFT JOIN ${agiTableName} jf ON a.`ID`=jf.`GENERAL_ITEM_ID` AND
+		jf.`ACCEPTANCE_BATCH_ID`=#{jfBantchId} 
+		LEFT JOIN ${agiTableName} yf ON a.`ID`=yf.`GENERAL_ITEM_ID` AND
+		yf.`ACCEPTANCE_BATCH_ID`=#{yfBantchId} 
+		LEFT JOIN ${agiTableName} qt ON a.`ID`=qt.`GENERAL_ITEM_ID` AND
+		qt.`ACCEPTANCE_BATCH_ID`=#{qtBantchId} WHERE
+		a.`IS_SEALED`=0 AND a.`PROCEDURE_ID`=#{procedureId}
+		ORDER BY CAST(SUBSTRING_INDEX(a.ITEM_CODE,'.',1) AS SIGNED) ASC
+	</select>
 </mapper>

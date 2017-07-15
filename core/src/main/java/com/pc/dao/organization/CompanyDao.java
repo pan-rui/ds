@@ -15,9 +15,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 1158 $
- * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-04-18 15:53:47 +0800 (周二, 18 4月 2017) $
+ * @version: \$Rev: 3373 $
+ * @UpdateAuthor: \$Author: zhangj $
+ * @UpdateDateTime: \$Date: 2017-07-04 11:18:49 +0800 (周二, 04 7月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -46,5 +46,8 @@ public class CompanyDao {
 		return sqlSessionTemplate.selectList(className + ".queryPartnerCompanyInTab", paramsMap);
 	}
 	
-
+	@DataSource
+	public List<Map<String, Object>> queryCompanyListByAcceptanceInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryCompanyListByAcceptanceInTab", paramsMap);
+	}
 }

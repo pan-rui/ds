@@ -3,5 +3,23 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.acceptance.AcceptanceDominantItemDao">
-	
+	<select id="queryAcceptanceDominantDetailRecordInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT
+		a.*,zj.`ELIGIBLE` AS zjEligible,jl.`ELIGIBLE` AS jlEligible,
+		jf.`ELIGIBLE` AS jfEligible,yf.`ELIGIBLE` AS yfEligible,qt.`ELIGIBLE` AS qtEligible FROM
+		${diTableName} a LEFT JOIN ${adiTableName} zj ON
+		a.`ID`=zj.`DOMINANT_ITEM_ID` AND
+		zj.`ACCEPTANCE_BATCH_ID`=#{zjBantchId} LEFT JOIN ${adiTableName} jl ON
+		a.`ID`=jl.`DOMINANT_ITEM_ID` AND
+		jl.`ACCEPTANCE_BATCH_ID`=#{jlBantchId} LEFT JOIN ${adiTableName} jf ON
+		a.`ID`=jf.`DOMINANT_ITEM_ID` AND
+		jf.`ACCEPTANCE_BATCH_ID`=#{jfBantchId} LEFT JOIN ${adiTableName} yf ON
+		a.`ID`=yf.`DOMINANT_ITEM_ID` AND
+		yf.`ACCEPTANCE_BATCH_ID`=#{yfBantchId} LEFT JOIN ${adiTableName} qt ON
+		a.`ID`=qt.`DOMINANT_ITEM_ID` AND
+		qt.`ACCEPTANCE_BATCH_ID`=#{qtBantchId} WHERE
+		a.`IS_SEALED`=0 AND a.`PROCEDURE_ID`=#{procedureId}
+		ORDER BY CAST(SUBSTRING_INDEX(a.ITEM_CODE,'.',1) AS SIGNED) ASC
+	</select>
 </mapper>

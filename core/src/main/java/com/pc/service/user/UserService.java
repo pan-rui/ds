@@ -17,6 +17,13 @@ public class UserService extends BaseService {
 	@Autowired
 	private UserDao userDao;
 	
+	public List<Map<String, Object>> getPostUserListByProject(Map<String, Object> params, String ddBB) {
+		params.put("uTableName", ddBB + TableConstants.SEPARATE + TableConstants.USER);
+		params.put("abTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_BATCH);
+		params.put("anTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_NOTE);
+		return userDao.queryPostUserListByProjectInTab(params);
+	}
+	
 	public Page<Map<String, Object>> getUserDetailPage(Page page, String ddBB) {
 		Map<String, Object> params=new HashMap<String, Object>(page.getParams());
 		if(params.containsKey(TableConstants.User.REAL_NAME.name())){

@@ -3,5 +3,19 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborPayWagesRecordDao">
-	
+	<select id="queryLaborPayWagesRecordToPushListInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS
+		id,d.`ID_CODE` AS person_id,b.`PAY_YEAR` AS pay_year,b.`PAY_MONTH` AS
+		pay_month,b.`PAY_GROSS` AS pay_gross,b.`PAY_NET` AS pay_net,
+		a.`PAY_TIME` AS pay_time,a.`PAY_BANKNAME` AS
+		pay_bankname,a.`PAY_CARDNUM` AS pay_cardnum,a.`PAY_STATUS` AS
+		pay_status FROM ${lpwrTableName} a,${lpwiTableName}
+		b,${lppTableName} c,${lpTableName} d WHERE
+		a.`PAY_WAGES_ID`=b.`ID` AND
+		b.`PROJECT_PERSON_ID`=c.`ID` AND c.`PERSON_ID`=d.`ID` AND a.`IS_SEALED`=0
+		AND b.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND
+		d.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND
+		c.`PROJECT_ID`=#{PROJECT_ID}
+	</select>
 </mapper>

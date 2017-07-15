@@ -3,17 +3,32 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborProjectPersonnelContractRelateDao">
+
+	<select id="queryLaborContractListByFileInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT a.`ID` AS id,a.`CONTRACT_NO` AS
+		contractNo,c.`ID_CODE` AS idCode,c.`EMP_NAME` AS empName FROM
+		${lppcrTableName} a, ${lppTableName} b, ${lpTableName} c WHERE
+		a.`PROJECT_PERSON_ID`=b.`ID` AND b.`PERSON_ID`=c.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0
+		AND a.`CONTRACT_FILE` IS NULL AND a.`CONTRACT_NO` IS NOT NULL AND
+		b.`PROJECT_ID`=#{PROJECT_ID}
+	</select>
+
 	<select id="queryLaborContractToPushListInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT a.`ID` AS id, d.`PROJECT_CODE`
 		AS Project_ID,c.`ID_CODE` AS id_code,c.`EMP_NAME` AS
-		emp_name,a.`CONTRACT_NO` AS contract_no,a.`CONTRACT_DATE` AS contract_date,
-		a.`CONTRACT_EXPIRE_DATE` AS contract_expire,a.`CONTRACT_FILE` AS contract_file FROM
+		emp_name,a.`CONTRACT_NO` AS contract_no,a.`CONTRACT_DATE` AS
+		contract_date,
+		a.`CONTRACT_EXPIRE_DATE` AS
+		contract_expire,a.`CONTRACT_FILE` AS contract_file FROM
 		${lppcrTableName} a, ${lppTableName}
 		b, ${lpTableName} c, ${pTableName} d WHERE
 		a.`PROJECT_PERSON_ID`=b.`ID` AND b.`PERSON_ID`=c.`ID` AND
 		b.`PROJECT_ID`=d.`ID` AND
-		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND c.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND
-		d.`PROJECT_ID`=#{PROJECT_ID}
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND
+		c.`IS_SEALED`=0 AND a.`IS_SYNCHRO`=0 AND
+		d.`ID`=#{PROJECT_ID}
 	</select>
 </mapper>

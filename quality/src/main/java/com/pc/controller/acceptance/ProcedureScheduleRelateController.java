@@ -230,7 +230,7 @@ public class ProcedureScheduleRelateController extends BaseController {
 			room.put("zxSchedule", zxSchedule);
 		}
 		
-		return new BaseResult(ReturnCode.OK,TreeUtil.getRegionTrees(false, null, null, buildingList, floorList, roomList));
+		return new BaseResult(ReturnCode.OK,TreeUtil.getRegionTrees(false,false, null, null, buildingList, floorList, roomList));
 		
 	}
 	

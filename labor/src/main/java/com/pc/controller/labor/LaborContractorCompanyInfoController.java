@@ -132,7 +132,7 @@ public class LaborContractorCompanyInfoController extends BaseController {
 	@RequestMapping(value = "/laborContractorCompanyInfo/import",method = RequestMethod.POST)
 	@ResponseBody
 	public BaseResult importData(HttpServletRequest request,@RequestAttribute String ddBB, @RequestAttribute(Constants.USER_ID) String userId, @RequestHeader(Constants.TENANT_ID) String tenantId,@RequestParam String projectId, MultipartFile file) {
-		List fields = Arrays.asList("COMPANY_NAME", "", "COMPANY_CREDIT_CODE", "COMPANY_LEGAL_PERSON", "COMPANY_LINKER", "COMPANY_EMAIL", "COMPANY_PHONE", "COMPANY_ADDR", "COMPANY_CODE","","","OPEN_BANK_NAME","BANK_ACCOUNT","","","","COMPANY_TYPE_ID");
+		List fields = Arrays.asList("COMPANY_NAME", "", "COMPANY_CREDIT_CODE", "COMPANY_LEGAL_PERSON", "COMPANY_LINKER", "COMPANY_EMAIL", "COMPANY_PHONE", "COMPANY_ADDR", "COMPANY_CODE","","ISSUED_CAPITAL_STOCK","OPEN_BANK_NAME","BANK_ACCOUNT","","","","COMPANY_TYPE_ID");
 		try {
 			excelUtils.importCompany(file,ddBB+TableConstants.SEPARATE+TableConstants.LABOR_CONTRACTOR_COMPANY_INFO,fields,tenantId,userId,projectId);
 		} catch (IOException e) {

@@ -2,7 +2,7 @@
 <beans xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns="http://www.springframework.org/schema/beans"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context.xsd
     http://www.springframework.org/schema/beans
@@ -10,45 +10,48 @@
     http://www.springframework.org/schema/tx
     http://www.springframework.org/schema/tx/spring-tx.xsd
     http://www.springframework.org/schema/aop
-    http://www.springframework.org/schema/aop/spring-aop.xsd" default-autowire="byName">
+    http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd"
+       default-autowire="byName">
     <import resource="classpath*:data.xml"/>
     <!-- 打开Spring的Annotation支持 -->
 	<context:annotation-config />
 	<context:component-scan base-package="com.pc.base,com.pc.util,com.pc.service,com.pc.task"/>
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="master"/>
+        <property name="nestedTransactionAllowed" value="true"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionSynchronization" value="1"/>
     </bean>
-    <tx:advice id="methodAdvice" transaction-manager="transactionManager">
+    <tx:advice id="serviceAdvice" transaction-manager="transactionManager">
         <tx:attributes>
-            <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="save*" propagation="REQUIRED"  rollback-for="Exception"/>
             <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="create*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="merge*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="del*" propagation="REQUIRED" rollback-for="Exception"/>
-            <!--<tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>-->
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="remove*" propagation="REQUIRED" rollback-for="Exception"/>
             <tx:method name="put*" propagation="REQUIRED" rollback-for="Exception"/>
-            <tx:method name="get*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="count*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="find*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="query*" propagation="SUPPORTS" read-only="true" />
-            <tx:method name="list*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="get*" propagation="NOT_SUPPORTED" read-only="true" />
+            <tx:method name="count*" propagation="NOT_SUPPORTED" read-only="true" />
+            <tx:method name="find*" propagation="NOT_SUPPORTED" read-only="true" />
+            <tx:method name="query*" propagation="NOT_SUPPORTED" read-only="true" />
+            <tx:method name="list*" propagation="NOT_SUPPORTED" read-only="true" />
             <tx:method name="*" propagation="SUPPORTS" read-only="true" />
         </tx:attributes>
     </tx:advice>
 
     <aop:aspectj-autoproxy proxy-target-class="true" expose-proxy="true"/>
     <aop:config proxy-target-class="true" expose-proxy="true">
-        <aop:pointcut id="interceptorPointCuts" expression="execution(* com.pc.service.*..*.*(..))"/>
-        <!--<aop:pointcut id="cachePointCuts" expression="@annotation(org.springframework.cache.annotation.Cacheable)" />-->
-        <!--<aop:advisor advice-ref="methodAdvice" pointcut-ref="cachePointCuts" />-->
-        <aop:advisor advice-ref="methodAdvice" pointcut-ref="interceptorPointCuts" order="1003"/>
-        <!--<aop:advisor advice-ref="cacheAdvice" pointcut="execution(*  com.ygo.impl..*(..))" />-->
+        <!--<aop:pointcut id="servicePointCuts" expression="execution(* com.pc.service.*.*.*(..))"/>-->
+        <aop:pointcut id="service2PointCuts" expression="execution(* com.pc.service..*.*(..))"/>
+        <!--<aop:pointcut id="daoPointCuts" expression="execution(* com.pc.dao.*..*(..))"/>-->
+        <!--<aop:advisor advice-ref="serviceAdvice" pointcut-ref="servicePointCuts" order="1003"/>-->
+        <aop:advisor advice-ref="serviceAdvice" pointcut-ref="service2PointCuts" order="1003"/>
     </aop:config>
 
-    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" order="1004" mode="aspectj"/>
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" order="1004"/>
     <!--<cache:annotation-driven cache-manager="cacheManager" mode="aspectj" proxy-target-class="true"/>-->
     <!-- 线程执行器配置，用于任务注册 -->
 <!--    <bean id="executor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
@@ -63,4 +66,5 @@
         <property name="taskExecutor" ref="executor" />
     </bean>-->
     <import resource="classpath*:cache-redis.xml"/>
+    <cache:annotation-driven proxy-target-class="true" cache-manager="cacheManagerSlave" order="1001"/>
 </beans>

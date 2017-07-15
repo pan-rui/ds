@@ -5,12 +5,10 @@ import java.util.Map;
  
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
-import com.pc.dao.labor.LaborUserConstantsDataDao;
 import com.pc.service.BaseService;
 
 @Service

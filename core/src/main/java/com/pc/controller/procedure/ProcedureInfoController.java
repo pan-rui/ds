@@ -142,4 +142,17 @@ public class ProcedureInfoController extends BaseController {
         }
         return new BaseResult(0, "OK");
     }
+
+/*    @RequestMapping(value = "/procedure/common/load", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseResult commonImportData(@RequestHeader(Constants.TENANT_ID)String tenantId,@RequestAttribute(Constants.USER_ID) String userId,@RequestAttribute String ddBB,MultipartFile file) {
+        try {
+            if(!file.getOriginalFilename().contains("工序类型")) return new BaseResult(350,"文件名可能不包含\"工序类型\"等字,请选择正确的文件及文件格式,否则可能导致异常");
+            excelUtils.importData(ddBB+TableConstants.SEPARATE+TableConstants.PROCEDURE_TYPE, "PROCEDURE_TYPE_NAME", ddBB+TableConstants.SEPARATE+TableConstants.PROCEDURE_INFO_COMMON, Arrays.<String>asList("PROCEDURE_NAME", "PROCEDURE_CODE"), "PROCEDURE_TYPE_ID", file,"1",userId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new BaseResult(1, e.getMessage());
+        }
+        return new BaseResult(0, "OK");
+    }*/
 }

@@ -66,13 +66,6 @@ public class ClientCommonController extends BaseController {
 		return new BaseResult(ReturnCode.OK);
 	}
 
-	@RequestMapping("/common/getWeather")
-	@ResponseBody
-	public BaseResult getWeather(@EncryptProcess ParamsVo pv) {
-		String cityName = (String) pv.getParams().get("CITY_NAME");
-		return new BaseResult(ReturnCode.OK, WeatherUtil.getWeather(cityName));
-	}
-	
 	@RequestMapping("/img/upload")
 	@ResponseBody
 	public BaseResult fileUpload(@RequestParam("file") CommonsMultipartFile file) throws IOException {

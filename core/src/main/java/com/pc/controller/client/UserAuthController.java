@@ -182,7 +182,7 @@ public class UserAuthController extends BaseController {
 			listRooms = userDataPrivilegesService.getUserPrivileges(dataTypeSignID, userId);
 		}
 
-		return new BaseResult(ReturnCode.OK, TreeUtil.getRegionTrees(true,null,listProjectPeriods, listBuildings, listFloors, listRooms));
+		return new BaseResult(ReturnCode.OK, TreeUtil.getRegionTrees(true,true,null,listProjectPeriods, listBuildings, listFloors, listRooms));
 	}
 
     @RequestMapping("/userAuth/getProcedureTree")

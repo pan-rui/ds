@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,15 @@ public class CompanyService extends BaseService {
     
     @Autowired
     private CompanyDao companyDao;
-
+    
+    
+    public List<Map<String, Object>> getCompanyListByAcceptance(String tenantId, String ddBB) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("cTableName", ddBB + TableConstants.SEPARATE + TableConstants.COMPANY);
+		params.put("anTableName", ddBB + TableConstants.SEPARATE + TableConstants.ACCEPTANCE_NOTE);
+		params.put(TableConstants.TENANT_ID, tenantId);
+		return companyDao.queryCompanyListByAcceptanceInTab(params);
+	}
      
     public void addCompany(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.COMPANY);

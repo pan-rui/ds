@@ -36,9 +36,9 @@ import java.util.Map;
 /**
  * @Description: 项目对应工序管理
  * @Author: wady (2017-04-10 11:51)
- * @version: \$Rev: 2895 $
- * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-06-07 17:42:18 +0800 (周三, 07 6月 2017) $
+ * @version: \$Rev: 3181 $
+ * @UpdateAuthor: \$Author: zhangj $
+ * @UpdateDateTime: \$Date: 2017-06-22 12:03:06 +0800 (周四, 22 6月 2017) $
  */
 @Controller
 @RequestMapping("/client")
@@ -128,6 +128,12 @@ public class ProjectClientController extends BaseController {
 		if(isContainsString!=null&&StringUtils.isNotBlank(isContainsString)){
 			isContains=Boolean.valueOf(isContainsString);
 		}
+		boolean hasProject=true;
+		String hasProjectString = (String) params.getParams()
+				.get("HAS_PROJECT");
+		if(hasProjectString!=null&&StringUtils.isNotBlank(hasProjectString)){
+			hasProject=Boolean.valueOf(hasProjectString);
+		}
 		
 		if (projectPeriodId != null) {
 			List<Map<String, Object>> buildingList = projectBuildingService
@@ -149,7 +155,7 @@ public class ProjectClientController extends BaseController {
 							DataConstants.REGION_ROOM_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
 			List<Map<String, Object>> roomList = projectHouseholdService.getRoomList(roomMap, ddBB);
 			return new BaseResult(ReturnCode.OK,
-					TreeUtil.getRegionTrees(isContains,null, null, buildingList, floorList, roomList));
+					TreeUtil.getRegionTrees(hasProject,isContains,null, null, buildingList, floorList, roomList));
 		} else {
 			Map<String, Object> paramsMap = new HashMap<String, Object>();
 			paramsMap.put(TableConstants.TENANT_ID, tenantId);
@@ -173,7 +179,7 @@ public class ProjectClientController extends BaseController {
 											DataConstants.REGION_ROOM_TYPE),ddBB).get(TableConstants.ProjectRegionType.id.name()));
 			List<Map<String, Object>> projectRoomList = projectHouseholdService.getProjectHouseholdList(roomMap, ddBB);
 
-			return new BaseResult(ReturnCode.OK, TreeUtil.getRegionTrees(isContains,projectList, projectPeriodList,
+			return new BaseResult(ReturnCode.OK, TreeUtil.getRegionTrees(hasProject,isContains,projectList, projectPeriodList,
 					projectBuildingList, projectFloorList, projectRoomList));
 		}
 	}
@@ -196,6 +202,12 @@ public class ProjectClientController extends BaseController {
 				.get("IS_CONTAINS");
 		if(isContainsString!=null&&StringUtils.isNotBlank(isContainsString)){
 			isContains=Boolean.valueOf(isContainsString);
+		}
+		boolean hasProject=true;
+		String hasProjectString = (String) params.getParams()
+				.get("HAS_PROJECT");
+		if(hasProjectString!=null&&StringUtils.isNotBlank(hasProjectString)){
+			hasProject=Boolean.valueOf(hasProjectString);
 		}
 		
 		Map<String, Object> paramsMap = new LinkedHashMap<>();
@@ -222,7 +234,7 @@ public class ProjectClientController extends BaseController {
 					.get(TableConstants.ProjectRegionType.id.name()));
 			List<Map<String, Object>> roomList = projectHouseholdService.getProjectRoomListByUser(roomParamsMap, ddBB);
 			return new BaseResult(ReturnCode.OK,
-					TreeUtil.getRegionTrees(isContains,null, null, buildingList, floorList, roomList));
+					TreeUtil.getRegionTrees(hasProject,isContains,null, null, buildingList, floorList, roomList));
 		} else {
 
 			List<Map<String, Object>> projectList = projectInfoService.getProjectInfoListByUser(paramsMap, ddBB);
@@ -244,7 +256,7 @@ public class ProjectClientController extends BaseController {
 					.get(TableConstants.ProjectRegionType.id.name()));
 			List<Map<String, Object>> roomList = projectHouseholdService.getProjectRoomListByUser(roomParamsMap, ddBB);
 
-			return new BaseResult(ReturnCode.OK, TreeUtil.getRegionTrees(isContains,projectList, projectPeriodList,
+			return new BaseResult(ReturnCode.OK, TreeUtil.getRegionTrees(hasProject,isContains,projectList, projectPeriodList,
 					buildingList, floorList, roomList));
 		}
 

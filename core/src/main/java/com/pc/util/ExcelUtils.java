@@ -4,7 +4,6 @@ import com.pc.core.ParamsMap;
 import com.pc.core.TableConstants;
 import com.pc.dao.BaseDao;
 import javafx.scene.control.Tab;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -19,12 +18,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,9 +39,9 @@ import java.util.UUID;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-26 16:44)
- * @version: \$Rev: 3020 $
+ * @version: \$Rev: 3594 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-06-12 18:40:12 +0800 (周一, 12 6月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-15 18:00:44 +0800 (周六, 15 7月 2017) $
  */
 @Service
 public class ExcelUtils {
@@ -47,6 +49,7 @@ public class ExcelUtils {
     private final static String xls = "xls";
     private final static String xlsx = "xlsx";
     private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    private static NumberFormat numberFormat = new DecimalFormat("##");
 
     @Autowired
     private BaseDao baseDao;
@@ -152,9 +155,11 @@ public class ExcelUtils {
                 if(HSSFDateUtil.isCellDateFormatted(cell)){
                     cellValue = df.format(cell.getDateCellValue());
                 }else {
-                    cellValue = String.valueOf(cell.getNumericCellValue());
-                    if (cellValue.endsWith(".0"))
+                   double cVal= cell.getNumericCellValue();
+                    cellValue = String.valueOf(cVal%1==0?numberFormat.format(cVal):cVal);
+                    if (cellValue.endsWith(".0")) {
                         cellValue = cellValue.substring(0, cellValue.length() - 2);
+                    }
                 }
                 break;
             case Cell.CELL_TYPE_STRING: //字符串
@@ -208,7 +213,7 @@ public class ExcelUtils {
                 for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
                     Cell cell = row.getCell(cellNum);
                     String cellVal = getCellValue(cell);
-                    if (StringUtils.isNotEmpty(cellVal)) {
+                    if (!StringUtils.isEmpty(cellVal)) {
                         names.put(cellNum, cellVal);
                         String id = UUID.randomUUID().toString().replace("-", "");
                         ids.put(cellNum, id);
@@ -268,7 +273,7 @@ public class ExcelUtils {
                     String cellVal = getCellValue(cell);
                     if (cellNum > firstCellNum) {
                         if (cellNum == lastCellNum - fields.size() - 2) {
-                            if (StringUtils.isNotEmpty(cellVal)) {
+                            if (!StringUtils.isEmpty(cellVal)) {
                                 List<Map<String, Object>> procedure = baseDao.queryByProsInTab(relateTable, ParamsMap.newMap("PROCEDURE_CODE", cellVal));
                                 procedureIdList = new LinkedList<>();
                                 if (!procedure.isEmpty()) {
@@ -277,19 +282,22 @@ public class ExcelUtils {
                                 }
                             }
                         } else if (cellNum == lastCellNum - fields.size() - 1) {
-                            if (StringUtils.isNotEmpty(cellVal))
+                            if (!StringUtils.isEmpty(cellVal))
                                 tableName = tableMap.get(cellVal.trim().substring(0, 2));
                         } else if (cellNum == lastCellNum - 1) {
                             fieldMap.put(fields.get(cellNum - lastCellNum + fields.size()), cellVal);
                             if (StringUtils.isEmpty((String) fieldMap.get("GRADING_STANDARD"))) break a;
                             fieldMap.addParams("UPDATE_TIME", new Date()).addParams("ID", UUID.randomUUID().toString().replace("-", "")).addParams("TENANT_ID", tenantId).addParams("UPDATE_USER_ID", userId);
-                            if (StringUtils.isNotEmpty(tableName) && !procedureIdList.isEmpty()) {
+                            if (!StringUtils.isEmpty(tableName) && !procedureIdList.isEmpty()) {
                                 String tName = tableName;
                                 //一般项目在主控
-                                if (!StringUtils.isEmpty((String) fieldMap.get("PASS_TEXT"))) {
+                                String passText= (String) fieldMap.get("PASS_TEXT");
+                                if (org.apache.commons.lang.StringUtils.isNotBlank(passText)) {
                                     if (tName.equals(tableMap.get("一般")))
                                         fieldMap.put("IS_GENERAL", "1");
-                                    tName = TableConstants.DOMINANT_ITEM;
+                                    tName = tableMap.get("主控");
+                                }else{
+                                    fieldMap.addParams("MIN_PASS_RATIO", 0.8f);
                                 }
                                 for (String procedureId : procedureIdList) {
                                     fieldMap.addParams(relateField, procedureId);
@@ -297,7 +305,8 @@ public class ExcelUtils {
                                 }
                             }
                         } else {
-                            fieldMap.put(fields.get(cellNum - lastCellNum + fields.size()), cellVal);
+                            if(!org.springframework.util.StringUtils.isEmpty(cellVal))
+                                fieldMap.put(fields.get(cellNum - lastCellNum + fields.size()), cellVal);
                         }
                     }
                 }
@@ -333,7 +342,7 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                 for (int cellNum = firstCellNum; cellNum < fields.size(); cellNum++) {
                     Cell cell = row.getCell(cellNum);
                     String cellVal = getCellValue(cell);
-                    if (StringUtils.isNotEmpty(cellVal)) {
+                    if (!StringUtils.isEmpty(cellVal)) {
                         switch (cellNum) {
                             default:
                                     String key = fields.get(cellNum);
@@ -392,7 +401,7 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                     } else if ("否".equals(cellVal.trim())) {
                         cellVal = "0";
                     }
-                    if (StringUtils.isNotEmpty(cellVal)) {
+                    if (!StringUtils.isEmpty(cellVal)) {
                         switch (cellNum) {
                             case 11:
                                 List<Map<String,Object>> list11=baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO, ParamsMap.newMap("COMPANY_NAME", cellVal));
@@ -538,7 +547,7 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                     } else if ("否".equals(cellVal.trim())) {
                         cellVal = "0";
                     }
-                    if (StringUtils.isNotEmpty(cellVal)) {
+                    if (!StringUtils.isEmpty(cellVal)) {
                         switch (cellNum) {
                             case 1:
                                 List<Map<String, Object>> list1 = baseDao.queryByS("SELECT  ppi.ID FROM " + ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO + " ppi JOIN " + ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO + " pi ON ppi.PERSON_ID = pi.ID WHERE pi.ID_CODE='" + cellVal + "'");
@@ -572,6 +581,103 @@ public void importCompany(MultipartFile file, String tableName, List<String> fie
                                 fieldMap2.addParams("TRAINING_ID", qqList.get(0).get("id"));
                             }
                             baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_DETAIL_INFO, fieldMap2);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
+    public void importSalary(MultipartFile file, String ddBB, String tenantId, String userId,String projectId) throws IOException {
+        //检查文件
+        checkFile(file);
+        //获得Workbook工作薄对象
+        Workbook workbook = getWorkBook(file);
+        if (workbook != null) {
+            Sheet sheet = workbook.getSheetAt(0);
+            if (sheet == null) return;
+            //获得当前sheet的开始行
+            int firstRowNum = sheet.getFirstRowNum();
+            int lastRowNum = sheet.getLastRowNum();
+            String table1=ddBB+TableConstants.SEPARATE+TableConstants.LABOR_PAY_WAGES_INFO;
+            String table2=ddBB+TableConstants.SEPARATE+TableConstants.LABOR_PAY_WAGES_RECORD;
+            //循环除了第一行的所有行
+            for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++) {
+                ParamsMap<String, Object> fieldMap = new ParamsMap<>();     //工资发放
+                ParamsMap<String, Object> fieldMap2 = new ParamsMap<>();        //发放记录
+                //获得当前行
+                Row row = sheet.getRow(rowNum);
+                if (row == null)
+                    continue;
+                //获得当前行的开始列
+                int firstCellNum = row.getFirstCellNum();
+                int lastCellNum = row.getLastCellNum();
+                //循环当前行
+                for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
+                    Cell cell = row.getCell(cellNum);
+                    String cellVal = getCellValue(cell);
+                    if ("是".equals(cellVal.trim())) {
+                        cellVal = "1";
+                    } else if ("否".equals(cellVal.trim())) {
+                        cellVal = "0";
+                    }
+                    if (!StringUtils.isEmpty(cellVal)) {
+                        switch (cellNum) {
+/*                            case 1:
+                                fieldMap.put("PROJECT_ID", projectId);
+                                break;*/
+                            case 2:
+                                fieldMap.put("COMPANY_NAME", cellVal);
+                                break;
+                            case 4:
+                                List<Map<String, Object>> list4 = baseDao.queryByS("SELECT lppi.ID FROM "+ddBB+".LABOR_PROJECT_PERSON_INFO lppi JOIN "+ddBB+".LABOR_PERSON_INFO lpi ON lppi.PERSON_ID = lpi.ID WHERE lpi.ID_CODE='" + cellVal + "'");
+                                if(!list4.isEmpty()) fieldMap.put("PROJECT_PERSON_ID", list4.get(0).get("ID"));
+                                break;
+                            case 5:
+                                fieldMap.put("PAY_YEAR", cellVal);
+                                break;
+                            case 6:
+                                fieldMap.put("PAY_MONTH", cellVal);
+                                break;
+                            case 7:
+                                fieldMap.put("PAY_GROSS", cellVal);
+                                break;
+                            case 8:
+                                fieldMap.put("PAY_NET", cellVal);
+                                fieldMap2.put("PAY_NET", cellVal);
+                                break;
+                            case 9:
+                                fieldMap2.put("PAY_TIME", cellVal);
+                                break;
+                            case 10:
+                                fieldMap2.put("PAY_BANKNAME", cellVal);
+                                break;
+                            case 11:
+                                fieldMap2.put("PAY_CARDNUM", cellVal);
+                                break;
+                            case 12:
+                                fieldMap2.put("PAY_STATUS", "未发".equals(cellVal.trim())?0:1);
+                                break;
+                        }
+                    }
+                    if (cellNum ==12) {
+                        Date date = new Date();
+                        String id1=UUID.randomUUID().toString().replace("-", "");
+                        fieldMap.addParams("UPDATE_TIME", date).addParams("UPDATE_USER_ID", userId).addParams("IS_SEALED", "0").addParams("TENANT_ID", tenantId).addParams("ID", id1);
+                        fieldMap2.addParams("UPDATE_TIME", date).addParams("UPDATE_USER_ID", userId).addParams("IS_SEALED", "0").addParams("TENANT_ID", tenantId);
+                        int size=baseDao.insertUpdateByProsInTab(table1, fieldMap);
+                        if(size>0) {
+                            String id2=UUID.randomUUID().toString().replace("-", "");
+                            fieldMap2.addParams("ID",id2 ).addParams("IS_SYNCHRO", "0");
+                            List<Map<String,Object>> qqList=baseDao.queryByProsInTab(table1,ParamsMap.newMap("PROJECT_PERSON_ID",fieldMap.get("PROJECT_PERSON_ID")).addParams("PAY_YEAR",fieldMap.get("PAY_YEAR")).addParams("PAY_MONTH",fieldMap.get("PAY_MONTH")));
+                            if(CollectionUtils.isEmpty(qqList)) {
+                                fieldMap2.addParams("PAY_WAGES_ID", id1);
+                            }else{
+//                                List<Map<String,Object>> qList=baseDao.queryByProsInTab(tableName,ParamsMap.newMap("ID_CODE",fieldMap.get("ID_CODE")));
+                                fieldMap2.addParams("PAY_WAGES_ID", qqList.get(0).get("id"));
+                            }
+                            baseDao.insertUpdateByProsInTab(table2, fieldMap2);
                         }
                     }
                 }

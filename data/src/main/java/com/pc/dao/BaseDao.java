@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -19,9 +20,9 @@ import java.util.Map;
 /**
  * Description: 基本Dao 操作定义,,,第一个参数为表名,第二个参数为传入的条件(Map),顺序不可逆
  * Author: 潘锐 (2017-03-28 14:35)
- * version: \$Rev: 2913 $
+ * version: \$Rev: 3284 $
  * UpdateAuthor: \$Author: panrui $
- * UpdateDateTime: \$Date: 2017-06-08 19:09:46 +0800 (周四, 08 6月 2017) $
+ * UpdateDateTime: \$Date: 2017-06-27 15:00:06 +0800 (周二, 27 6月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheResolver = "baseImpl")
@@ -56,15 +57,17 @@ public class BaseDao {
         return sqlSessionTemplate.selectList(className + ".queryByProsInTab", paramsMap);
     }
 
-    @DataSource
-    @Cacheable(key = "(#tableName).replaceFirst('\\.','-')+'$'+#id")
+//    @Cacheable(key = "(#tableName).replaceFirst('\\.','-')+'$'+#id")
+//@Cacheable(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')")
+@DataSource
+    @Cacheable(key = "#tableName+'$'+#id")
     public Map<String, Object> queryByIdInTab(String tableName, String id) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("id", id);
         return sqlSessionTemplate.selectOne(className + ".queryByIdInTab", paramsMap);
     }
 
     @DataSource
-    @Cacheable(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')")
+    @Cacheable(key = "#tableName")
     public List<Map<String, Object>> queryAllInTab(String tableName) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName);
         return sqlSessionTemplate.selectList(className + ".queryAllInTab", paramsMap);
@@ -76,53 +79,53 @@ public class BaseDao {
         return sqlSessionTemplate.selectList(className + ".queryAllOnSortInTab", paramsMap);
     }
 
-    @CacheEvict(keyGenerator = "myKeyGenerator", cacheManager = "cacheManager")
+    @Caching(evict = {@CacheEvict(keyGenerator = "myKeyGenerator", cacheManager = "cacheManager"),@CacheEvict(key = "#tableName", cacheManager = "cacheManager")})
     @DataSource(DataSourceHolder.DBType.master)
     public int updateByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.update(className + ".updateByProsInTab", paramsMap);
     }
 
-    @CacheEvict(keyGenerator = "myKeyGenerator", cacheManager = "cacheManager")
+    @Caching(evict = {@CacheEvict(keyGenerator = "myKeyGenerator", cacheManager = "cacheManager"),@CacheEvict(key = "#tableName", cacheManager = "cacheManager")})
     @DataSource(DataSourceHolder.DBType.master)
     public int deleteByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.delete(className + ".deleteByProsInTab", paramsMap);
     }
 
-    @CacheEvict(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')", cacheManager = "cacheManager")
+    @CacheEvict(key = "#tableName", cacheManager = "cacheManager")
     @DataSource(DataSourceHolder.DBType.master)
     public int insertByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.insert(className + ".insertByProsInTab", paramsMap);
     }
 
-    @CacheEvict(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')", cacheManager = "cacheManager")
+    @CacheEvict(key = "#tableName", cacheManager = "cacheManager")
     @DataSource(DataSourceHolder.DBType.master)
     public int insertUpdateByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.insert(className + ".insertUpdateByProsInTab", paramsMap);
     }
-    @CacheEvict(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')", cacheManager = "cacheManager")
+    @CacheEvict(key = "#tableName", cacheManager = "cacheManager")
     @DataSource(DataSourceHolder.DBType.master)
     public int insertBatchByProsInTab(String tableName, List<Map<String, Object>> dataList) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("dataList", dataList);
         return sqlSessionTemplate.insert(className + ".insertBatchByProsInTab", paramsMap);
     }
 
-@CacheEvict(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')", cacheManager = "cacheManager")
+@CacheEvict(key = "#tableName", cacheManager = "cacheManager")
 @DataSource(DataSourceHolder.DBType.master)
 public int insertIgnoreBatchByProsInTab(String tableName, List<Map<String, Object>> dataList) {
     Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("dataList", dataList);
     return sqlSessionTemplate.insert(className + ".insertIgnoreBatchByProsInTab", paramsMap);
 }
-    @CacheEvict(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')", cacheManager = "cacheManager")
+    @CacheEvict(key = "#tableName", cacheManager = "cacheManager")
     @DataSource(DataSourceHolder.DBType.master)
     public int insertIgnoreByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.insert(className + ".insertByProsInTab", paramsMap);
     }
-    @CacheEvict(key = "T(java.lang.String).valueOf(#p0).replaceFirst('\\.','-')", cacheManager = "cacheManager")
+    @CacheEvict(key = "#tableName", cacheManager = "cacheManager")
     @DataSource(DataSourceHolder.DBType.master)
     public int insertUpdateBatchByProsInTab(String tableName, List<Map<String, Object>> dataList) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("dataList", dataList);

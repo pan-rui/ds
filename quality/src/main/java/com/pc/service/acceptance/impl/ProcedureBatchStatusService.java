@@ -16,7 +16,7 @@ public class ProcedureBatchStatusService extends BaseService {
 
      
     public void addProcedureBatchStatus(Map<String, Object> params, String ddBB) {
-		add(params, ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_BATCH_STATUS);
+    	add(params, ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_BATCH_STATUS);
 	}
 
 	public Page getProcedureBatchStatusPage(Page<Map<String, Object>> page, String ddBB) {

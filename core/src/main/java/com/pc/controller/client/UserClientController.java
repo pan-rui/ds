@@ -61,7 +61,7 @@ public class UserClientController extends BaseController {
 		map.put(TableConstants.User.ID.name(), userId);
 		boolean b = userService.updateUser(map, ddBB);
 		if (b) {
-			return new BaseResult(ReturnCode.OK);
+			return new BaseResult(ReturnCode.OK,userService.getByID(userId, ddBB));
 		} else {
 			return new BaseResult(ReturnCode.FAIL);
 		}

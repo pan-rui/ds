@@ -5,9 +5,19 @@
 <mapper namespace="com.pc.dao.organization.CompanyDao">
 	<select id="queryPartnerCompanyInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
-		SELECT DISTINCT a.* FROM ${cTableName} a, ${pTableName}
-		b,${pprTableName} c,${tTableName} d WHERE a.`ID`=b.`CORPORATE_ID`
+		SELECT DISTINCT a.* FROM ${cTableName}
+		a, ${pTableName}
+		b,${pprTableName} c,${tTableName} d WHERE
+		a.`ID`=b.`CORPORATE_ID`
 		AND d.`PARTNER_ID`=b.`ID` AND
-		c.`TEAM_ID`=d.`ID` AND a.`IS_SEALED`=0 AND a.`TENANT_ID`=#{tenantId} AND c.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+		c.`TEAM_ID`=d.`ID` AND a.`IS_SEALED`=0 AND a.`TENANT_ID`=#{tenantId}
+		AND c.`PROJECT_PERIOD_ID`=#{projectPeriodId}
+	</select>
+
+	<select id="queryCompanyListByAcceptanceInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT a.* FROM ${cTableName}
+		a,${anTableName} b WHERE a.`ID`=b.`SUPERVISOR_COMPANY_ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND b.`TENANT_ID`=#{TENANT_ID}
 	</select>
 </mapper>

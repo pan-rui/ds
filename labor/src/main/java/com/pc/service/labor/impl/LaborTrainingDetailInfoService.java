@@ -20,6 +20,16 @@ public class LaborTrainingDetailInfoService extends BaseService {
 
 	@Autowired
 	private LaborTrainingDetailInfoDao laborTrainingDetailInfoDao;
+	
+	public Page getLaborTrainingDetailPage(Page<Map<String, Object>> page,String ddBB) {
+    	Map<String, Object> params=new HashMap<>(page.getParams());
+    	params.put("lppTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO);
+    	params.put("lpTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO);
+    	params.put("cTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
+    	params.put("page", page);
+    	page.setResults(laborTrainingDetailInfoDao.queryLaborTrainingDetailPageInTab(params));
+		return page;
+	}
 
 	public List<Map<String, Object>> getLaborTrainingToPushList(String projectId, String ddBB) {
 		Map<String, Object> params = new HashMap<>();
@@ -31,8 +41,6 @@ public class LaborTrainingDetailInfoService extends BaseService {
 		return laborTrainingDetailInfoDao.queryLaborTrainingToPushListInTab(params);
 	}
 	
-	
-
 	public void addLaborTrainingDetailInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_DETAIL_INFO);
 	}
