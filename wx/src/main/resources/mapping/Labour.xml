@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pc.wx.dao.LabourDao">
+    <select id="queryUserInfoMul" parameterType="map" resultType="map" statementType="PREPARED">
+SELECT lpi.*,lppi.*,pp.*,ljni.*,lwti.*,ljti.*,leci.* ,lcci.* FROM ${ddBB}.LABOR_PERSON_INFO lpi
+JOIN ${ddBB}.LABOR_PROJECT_PERSON_INFO lppi ON lpi.ID = lppi.PERSON_ID
+JOIN ${ddBB}.PROJECT_PERIOD pp ON lppi.PROJECT_ID = pp.ID
+JOIN ${ddBB}.LABOR_JOB_NAME_INFO ljni ON lppi.JOB_NAME_ID = ljni.ID
+JOIN ${ddBB}.LABOR_WORK_TYPENAME_INFO lwti ON lppi.WORK_TYPENAME_ID = lwti.ID
+JOIN ${ddBB}.LABOR_JOB_TYPENAME_INFO ljti ON lppi.JOB_TYPENAME_ID = ljti.ID
+JOIN ${ddBB}.LABOR_EMP_CATEGORY_INFO leci ON lppi.EMP_CATEGORY_ID = leci.ID
+JOIN ${ddBB}.LABOR_CONTRACTOR_COMPANY_INFO lcci ON lppi.EMP_COMPANT_ID= lcci.ID
+WHERE lpi.USER_ID=#{userId} AND lppi.IS_SEALED='0' AND lppi.TENANT_ID=#{tenantId} AND lppi.PROJECT_ID=#{projectId}
+  </select>
+
+    <select id="queryCheckWork" parameterType="map" statementType="PREPARED" resultType="map">
+        SELECT DATE_FORMAT(lae.DATE,'%Y年%m月%d日') date,TIME_FORMAT(lae.IN_TIME,'%H:%i:%s') inTime,TIME_FORMAT(lae.OUT_TIME,'%H:%i:%s') outTime,lae.WORK_DURATION FROM ${ddBB}.SOCIAL_LOGIN sl
+        JOIN ${ddBB}.LABOR_PERSON_INFO lpi ON sl.USER_ID=lpi.USER_ID
+        JOIN ${ddBB}.LABOR_PROJECT_PERSON_INFO lppi ON lpi.ID = lppi.PERSON_ID
+        JOIN ${ddBB}.LABOR_ATTENDANCE_RECORD lae ON lppi.ID = lae.PROJECT_PERSON_ID
+        JOIN ${ddBB}.PROJECT_PERIOD pp ON lppi.PROJECT_ID = pp.ID
+        WHERE sl.SOCIAL_UID=#{openId} AND lppi.IS_SEALED='0' and lppi.TENANT_ID=#{tenantId} and
+        pp.PROJECT_CODE=#{projectCode}
+        <choose>
+            <when test='null == month or "" == month'>
+                AND DATE_FORMAT(lae.DATE,'%Y-%m') > DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 2 MONTH),'%Y-%m')
+            </when>
+            <otherwise>
+                AND DATE_FORMAT(lae.DATE,'%Y-%m')=#{month}
+            </otherwise>
+        </choose>
+        ORDER BY lae.DATE DESC
+    </select>
+
+    <select id="querySalary" parameterType="map" statementType="PREPARED" resultType="map">
+        SELECT CONCAT(lpwi.PAY_YEAR,'年') payYear,CONCAT(lpwi.PAY_MONTH,'月份') payMonth,DATE_FORMAT(lpwr.PAY_TIME,'%Y/%m/%d') payTime,lpwr.PAY_NET,lpwr.PAY_STATUS,lpwr.PAY_BANKNAME,lpwr.PAY_CARDNUM FROM ${ddBB}.SOCIAL_LOGIN sl
+        JOIN ${ddBB}.LABOR_PERSON_INFO lpi ON sl.USER_ID=lpi.USER_ID
+        JOIN ${ddBB}.LABOR_PROJECT_PERSON_INFO lppi ON lpi.ID = lppi.PERSON_ID
+        JOIN ${ddBB}.PROJECT_PERIOD pp ON lppi.PROJECT_ID = pp.ID
+        JOIN ${ddBB}.LABOR_PAY_WAGES_INFO lpwi ON lppi.ID = lpwi.PROJECT_PERSON_ID
+        JOIN ${ddBB}.LABOR_PAY_WAGES_RECORD lpwr ON lpwi.ID = lpwr.PAY_WAGES_ID
+        WHERE sl.SOCIAL_UID=#{openId} AND lppi.IS_SEALED='0' and lppi.TENANT_ID=#{tenantId} and pp.PROJECT_CODE=#{projectCode} ORDER BY lpwr.PAY_TIME DESC
+    </select>
+
+</mapper>
