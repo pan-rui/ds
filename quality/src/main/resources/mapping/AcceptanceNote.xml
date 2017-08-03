@@ -3,26 +3,365 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.acceptance.AcceptanceNoteDao">
+
+	<select id="queryNoteForUpdateInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.* FROM ${anTableName} a WHERE a.`ID`=#{ID} FOR UPDATE
+	</select>
+
+	<select id="queryProjectAcceptanceDetailCountInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT
+		t.companyName,t.userName,t.checkedTimes AS totalCheckedTimes,
+		IFNULL(zt.checkedTimes,0) AS ztCheckedTimes,
+		IFNULL(zx.checkedTimes,0) AS zxCheckedTimes,
+		IFNULL(dj.checkedTimes,0) AS djCheckedTimes,
+		IFNULL(qt.checkedTimes,0) AS qtCheckedTimes 
+		FROM
+		(SELECT ci.`CORPORATE_NAME` AS companyName,ui.`REAL_NAME` AS userName,ui.`ID`
+		AS id,COUNT(1) AS checkedTimes FROM
+		${abTableName} ab,${anTableName} an,${uiTableName} ui,${ciTableName} ci,${pTableName}
+		p,${ptTableName} pt WHERE
+		ab.`ACCEPTANCE_NOTE_ID`=an.`ID` AND ab.`ACCEPTANCE_PERSON_ID`=ui.`ID` AND ui.`COMPANY_ID`=ci.`ID` AND
+		an.`PROCEDURE_ID`=p.`ID`
+		AND p.`PROCEDURE_TYPE_ID`=pt.`ID` AND ab.`TOTAL_CHECK_RESULT` IS NOT NULL
+		AND ab.`BATCH_STATUS`=#{BATCH_STATUS} 
+		<if test="INSPECTOR_ROLE != null">
+			AND ab.`INSPECTOR_ROLE`=#{INSPECTOR_ROLE}
+		</if>
+		<if test="INSPECTOR_ROLE == null">
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleZJ}
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND ab.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>ab.`UPDATE_TIME`
+		</if>
+		AND an.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		GROUP BY ci.`CORPORATE_NAME`,ui.`ID`) t
+
+		LEFT JOIN
+		(SELECT ab.`ACCEPTANCE_PERSON_ID`,COUNT(1) AS checkedTimes FROM
+		${abTableName} ab,${anTableName} an,${pTableName} p,${ptTableName}
+		pt WHERE
+		ab.`ACCEPTANCE_NOTE_ID`=an.`ID` AND an.`PROCEDURE_ID`=p.`ID` AND p.`PROCEDURE_TYPE_ID`=pt.`ID`
+		AND ab.`TOTAL_CHECK_RESULT` IS NOT NULL AND ab.`BATCH_STATUS`=#{BATCH_STATUS}
+		<if test="INSPECTOR_ROLE != null">
+			AND ab.`INSPECTOR_ROLE`=#{INSPECTOR_ROLE}
+		</if>
+		<if test="INSPECTOR_ROLE == null">
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleZJ}
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND ab.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>ab.`UPDATE_TIME`
+		</if>
+		AND an.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		AND LEFT(pt.`ID_TREE`,32)=#{ztTypeId}
+		GROUP BY ab.`ACCEPTANCE_PERSON_ID`) zt ON zt.`ACCEPTANCE_PERSON_ID`=t.id
+		
+		LEFT JOIN
+		(SELECT ab.`ACCEPTANCE_PERSON_ID`,COUNT(1) AS checkedTimes FROM
+		${abTableName} ab,${anTableName} an,${pTableName} p,${ptTableName}
+		pt WHERE
+		ab.`ACCEPTANCE_NOTE_ID`=an.`ID` AND an.`PROCEDURE_ID`=p.`ID` AND p.`PROCEDURE_TYPE_ID`=pt.`ID`
+		AND ab.`TOTAL_CHECK_RESULT` IS NOT NULL AND ab.`BATCH_STATUS`=#{BATCH_STATUS}
+		<if test="INSPECTOR_ROLE != null">
+			AND ab.`INSPECTOR_ROLE`=#{INSPECTOR_ROLE}
+		</if>
+		<if test="INSPECTOR_ROLE == null">
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleZJ}
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND ab.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>ab.`UPDATE_TIME`
+		</if>
+		AND an.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		AND LEFT(pt.`ID_TREE`,32)=#{zxTypeId}
+		GROUP BY ab.`ACCEPTANCE_PERSON_ID`) zx ON zx.`ACCEPTANCE_PERSON_ID`=t.id
+		
+		LEFT JOIN
+		(SELECT ab.`ACCEPTANCE_PERSON_ID`,COUNT(1) AS checkedTimes FROM
+		${abTableName} ab,${anTableName} an,${pTableName} p,${ptTableName}
+		pt WHERE
+		ab.`ACCEPTANCE_NOTE_ID`=an.`ID` AND an.`PROCEDURE_ID`=p.`ID` AND p.`PROCEDURE_TYPE_ID`=pt.`ID`
+		AND ab.`TOTAL_CHECK_RESULT` IS NOT NULL AND ab.`BATCH_STATUS`=#{BATCH_STATUS}
+		<if test="INSPECTOR_ROLE != null">
+			AND ab.`INSPECTOR_ROLE`=#{INSPECTOR_ROLE}
+		</if>
+		<if test="INSPECTOR_ROLE == null">
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleZJ}
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND ab.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>ab.`UPDATE_TIME`
+		</if>
+		AND an.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		AND LEFT(pt.`ID_TREE`,32)=#{djTypeId}
+		GROUP BY ab.`ACCEPTANCE_PERSON_ID`) dj ON dj.`ACCEPTANCE_PERSON_ID`=t.id
+
+		LEFT JOIN
+		(SELECT ab.`ACCEPTANCE_PERSON_ID`,COUNT(1) AS checkedTimes FROM
+		${abTableName} ab,${anTableName} an,${pTableName} p,${ptTableName}
+		pt WHERE
+		ab.`ACCEPTANCE_NOTE_ID`=an.`ID` AND an.`PROCEDURE_ID`=p.`ID` AND p.`PROCEDURE_TYPE_ID`=pt.`ID`
+		AND ab.`TOTAL_CHECK_RESULT` IS NOT NULL AND ab.`BATCH_STATUS`=#{BATCH_STATUS}
+		<if test="INSPECTOR_ROLE != null">
+			AND ab.`INSPECTOR_ROLE`=#{INSPECTOR_ROLE}
+		</if>
+		<if test="INSPECTOR_ROLE == null">
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleZJ}
+			AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND ab.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND ab.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>ab.`UPDATE_TIME`
+		</if>
+		AND an.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		AND LEFT(pt.`ID_TREE`,32)!=#{ztTypeId} AND LEFT(pt.`ID_TREE`,32)!=#{zxTypeId} AND LEFT(pt.`ID_TREE`,32)!=#{djTypeId}
+		GROUP BY ab.`ACCEPTANCE_PERSON_ID`) qt ON qt.`ACCEPTANCE_PERSON_ID`=t.id
+
+		ORDER BY t.companyName ASC,t.checkedTimes DESC
+
+	</select>
+
+	<select id="queryProjectAcceptanceCountInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT pp.`ID` AS id,pp.`PERIOD_NAME`
+		AS periodName,
+		IFNULL(zj.personTotal,0) AS zjPersonTotal,IFNULL(zj.checkedTotal,0) AS
+		zjCheckedTotal,
+		IFNULL(jl.personTotal,0) AS
+		jlPersonTotal,IFNULL(jl.checkedTotal,0) AS
+		jlCheckedTotal,
+		IFNULL(jf.personTotal,0) AS jfPersonTotal,IFNULL(jf.checkedTotal,0) AS
+		jfCheckedTotal,
+		IFNULL(yf.personTotal,0) AS
+		yfPersonTotal,IFNULL(yf.checkedTotal,0) AS
+		yfCheckedTotal,
+		IFNULL(qt.personTotal,0) AS qtPersonTotal,IFNULL(qt.checkedTotal,0) AS
+		qtCheckedTotal,
+		IFNULL(hp.roomTotal,0) AS
+		roomTotal,IFNULL(hp.photoTotal,0) AS
+		photoTotal
+		FROM ${ppTableName} pp
+
+		LEFT JOIN (SELECT c.`PROJECT_PERIOD_ID`,COUNT(1) AS
+		personTotal,SUM(c.total) AS checkedTotal FROM
+		(SELECT COUNT(1)
+		total,b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID` FROM
+		${abTableName} a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`ACCEPTANCE_PERSON_ID` IS
+		NOT NULL AND `TOTAL_CHECK_RESULT` IS NOT
+		NULL AND
+		a.`INSPECTOR_ROLE`=#{inspectorRoleZJ}
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`UPDATE_TIME`
+		</if>
+		GROUP BY b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID`) c GROUP BY
+		c.`PROJECT_PERIOD_ID`) zj ON pp.`ID`=zj.`PROJECT_PERIOD_ID`
+
+		LEFT JOIN
+		(SELECT c.`PROJECT_PERIOD_ID`,COUNT(1) AS
+		personTotal,SUM(c.total) AS
+		checkedTotal FROM
+		(SELECT COUNT(1)
+		total,b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID` FROM
+		${abTableName} a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`ACCEPTANCE_PERSON_ID` IS
+		NOT NULL AND `TOTAL_CHECK_RESULT` IS NOT
+		NULL AND
+		a.`INSPECTOR_ROLE`=#{inspectorRoleJL}
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`UPDATE_TIME`
+		</if>
+		GROUP BY b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID`) c GROUP BY
+		c.`PROJECT_PERIOD_ID`) jl ON pp.`ID`=jl.`PROJECT_PERIOD_ID`
+
+		LEFT JOIN
+		(SELECT c.`PROJECT_PERIOD_ID`,COUNT(1) AS
+		personTotal,SUM(c.total) AS
+		checkedTotal FROM
+		(SELECT COUNT(1)
+		total,b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID` FROM
+		${abTableName} a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`ACCEPTANCE_PERSON_ID` IS
+		NOT NULL AND `TOTAL_CHECK_RESULT` IS NOT
+		NULL AND
+		a.`INSPECTOR_ROLE`=#{inspectorRoleJF}
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`UPDATE_TIME`
+		</if>
+		GROUP BY b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID`) c GROUP BY
+		c.`PROJECT_PERIOD_ID`) jf ON pp.`ID`=jf.`PROJECT_PERIOD_ID`
+
+		LEFT JOIN
+		(SELECT c.`PROJECT_PERIOD_ID`,COUNT(1) AS
+		personTotal,SUM(c.total) AS
+		checkedTotal FROM
+		(SELECT COUNT(1)
+		total,b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID` FROM
+		${abTableName} a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`ACCEPTANCE_PERSON_ID` IS
+		NOT NULL AND `TOTAL_CHECK_RESULT` IS NOT
+		NULL AND
+		a.`INSPECTOR_ROLE`=#{inspectorRoleYF}
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`UPDATE_TIME`
+		</if>
+		GROUP BY b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID`) c GROUP BY
+		c.`PROJECT_PERIOD_ID`) yf ON pp.`ID`=yf.`PROJECT_PERIOD_ID`
+
+		LEFT JOIN
+		(SELECT c.`PROJECT_PERIOD_ID`,COUNT(1) AS
+		personTotal,SUM(c.total) AS
+		checkedTotal FROM
+		(SELECT COUNT(1)
+		total,b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID` FROM
+		${abTableName} a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`ACCEPTANCE_PERSON_ID` IS
+		NOT NULL AND `TOTAL_CHECK_RESULT` IS NOT NULL
+		AND
+		a.`INSPECTOR_ROLE`!=#{inspectorRoleJL} AND
+		a.`INSPECTOR_ROLE`!=#{inspectorRoleZJ} AND
+		a.`INSPECTOR_ROLE`!=#{inspectorRoleJF} AND
+		a.`INSPECTOR_ROLE`!=#{inspectorRoleYF}
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`UPDATE_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`UPDATE_TIME`
+		</if>
+		GROUP BY b.`PROJECT_PERIOD_ID`,a.`ACCEPTANCE_PERSON_ID`) c GROUP BY
+		c.`PROJECT_PERIOD_ID`) qt ON pp.`ID`=qt.`PROJECT_PERIOD_ID`
+
+		LEFT JOIN
+		(SELECT c.`PROJECT_PERIOD_ID`,COUNT(1) AS roomTotal,SUM(c.total)
+		AS
+		photoTotal FROM
+		(SELECT COUNT(1) total,b.`PROJECT_PERIOD_ID`,a.`ID`
+		FROM ${phTableName}
+		a,${pbTableName} b,${ppTableName} c,${hprTableName}
+		d,${hpTableName} f WHERE a.`BUILDING_ID`=b.`ID` AND
+		b.`PROJECT_PERIOD_ID`=c.`ID` AND d.`ROOM_ID`=a.`ID` AND
+		d.`ID`=f.`HIDDEN_PHOTO_RECORD_ID` AND a.`IS_SEALED`=0
+		<if test="beginTime != null and beginTime != ''">
+			AND f.`UPLOAD_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>f.`UPLOAD_TIME`
+		</if>
+		GROUP BY b.`PROJECT_PERIOD_ID`,a.`ID`) c GROUP BY
+		c.`PROJECT_PERIOD_ID`) hp ON
+		pp.`ID`=hp.`PROJECT_PERIOD_ID`
+
+		WHERE
+		pp.`TENANT_ID`=#{TENANT_ID} AND pp.`IS_SEALED`=0 ORDER BY
+		pp.`PERIOD_NAME` ASC
+
+	</select>
+
+	<select id="queryTeamInspectorListInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		SELECT DISTINCT a.`TEAM_INSPECTOR_ID` AS
+		teamInspectorId,a.`TEAM_INSPECTOR` AS teamInspector
+		FROM ${anTableName}
+		a,${turTableName} b WHERE
+		a.`TEAM_INSPECTOR_ID`=b.`USER_ID` AND
+		a.`IS_SEALED`=0
+		<if test="PROJECT_PERIOD_ID != null and PROJECT_PERIOD_ID != ''">
+			AND a.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		</if>
+	</select>
+
+	<select id="queryTeamAcceptanceCountByProjectInTab"
+		parameterType="map" resultType="map" statementType="PREPARED">
+		SELECT a.`TEAM_INSPECTOR` AS teamInspector,c.`TEAM_NAME` AS
+		teamName,COUNT(1) AS tatolTimes FROM ${anTableName}
+		a,${turTableName}
+		b,${tTableName} c WHERE
+		a.`TEAM_INSPECTOR_ID`=b.`USER_ID` AND
+		a.`IS_SEALED`=0 AND c.`ID`=b.`TEAM_ID`
+		<if test="PROJECT_PERIOD_ID != null and PROJECT_PERIOD_ID != ''">
+			AND a.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
+		</if>
+		<if test="beginTime != null and beginTime != ''">
+			AND a.`TEAM_INSPECTOR_CHECK_TIME`>#{beginTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND #{endTime}>a.`TEAM_INSPECTOR_CHECK_TIME`
+		</if>
+		<if test="null != list">
+			<trim prefix="AND">
+				<foreach collection="list" item="item" index="key" open="("
+					close=")" separator=" OR ">
+					<if test="null != item">a.`TEAM_INSPECTOR_ID`=#{item.TEAM_INSPECTOR_ID}</if>
+				</foreach>
+			</trim>
+		</if>
+		GROUP BY a.`TEAM_INSPECTOR_ID` ORDER BY tatolTimes DESC
+	</select>
+
 	<select id="queryAcceptanceNoteByMonthInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT a.* FROM ${anTableName}
-		a WHERE a.`IS_SEALED`=0 AND a.`TEAM_INSPECTOR_ID`=#{TEAM_INSPECTOR_ID} AND 
+		a WHERE a.`IS_SEALED`=0 AND
+		a.`TEAM_INSPECTOR_ID`=#{TEAM_INSPECTOR_ID} AND
 		a.`TEAM_INSPECTOR_CHECK_TIME`>#{beginTime}
 		<if test="PROJECT_PERIOD_ID != null and PROJECT_PERIOD_ID != ''">
-			AND a.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID} 
+			AND a.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
 		</if>
 	</select>
 
 	<select id="queryUserAcceptanceCountByMonthInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT a.* FROM ${abTableName}
-		a,${anTableName} b WHERE a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
-		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0 AND
-		a.`TOTAL_CHECK_RESULT` IS NOT NULL AND a.`TOTAL_CHECK_SCORE` IS NOT NULL AND
-		a.`BATCH_STATUS`=#{BATCH_STATUS} AND a.`ACCEPTANCE_PERSON_ID`=#{ACCEPTANCE_PERSON_ID} AND 
+		a,${anTableName} b WHERE
+		a.`ACCEPTANCE_NOTE_ID`=b.`ID` AND
+		a.`IS_SEALED`=0 AND b.`IS_SEALED`=0
+		AND
+		a.`TOTAL_CHECK_RESULT` IS NOT NULL AND a.`TOTAL_CHECK_SCORE` IS NOT
+		NULL AND
+		a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`ACCEPTANCE_PERSON_ID`=#{ACCEPTANCE_PERSON_ID} AND
 		a.`UPDATE_TIME`>#{beginTime}
 		<if test="PROJECT_PERIOD_ID != null and PROJECT_PERIOD_ID != ''">
-			AND b.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID} 
+			AND b.`PROJECT_PERIOD_ID`=#{PROJECT_PERIOD_ID}
 		</if>
 	</select>
 
@@ -35,13 +374,14 @@
 		${abTableName} b ON a.`ACCEPTANCE_NOTE_ID`=b.`ACCEPTANCE_NOTE_ID`
 		AND
 		a.`BATCH_NO`=b.`BATCH_NO`
-		AND b.`BATCH_STATUS`=1 AND
+		AND b.`BATCH_STATUS`=#{BATCH_STATUS} AND
 		b.`INSPECTOR_ROLE`=#{checkRole} LEFT JOIN ${anTableName}
 		c ON
 		a.`ACCEPTANCE_NOTE_ID`=c.`ID`
 		WHERE a.`INSPECTOR_ROLE`=#{inspectorRole}
-		AND a.`BATCH_STATUS`=1 AND
-		a.`TOTAL_CHECK_RESULT` IS NOT NULL AND
+		AND a.`BATCH_STATUS`=#{BATCH_STATUS} AND
+		a.`TOTAL_CHECK_RESULT` IS NOT
+		NULL AND
 		b.`TOTAL_CHECK_RESULT` IS NOT
 		NULL AND
 		c.`PROJECT_PERIOD_ID`=#{projectPeriodId}
@@ -73,9 +413,11 @@
 		(SELECT
 		b1.`PROJECT_PERIOD_ID`,COUNT(1) AS count1 FROM ${abTableName}
 		a1,${anTableName} b1 WHERE a1.`ACCEPTANCE_NOTE_ID`=b1.`ID` AND
-		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND a1.`BATCH_STATUS`=1
+		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND
+		a1.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
-		a1.`TOTAL_CHECK_RESULT` IS NOT NULL
+		a1.`TOTAL_CHECK_RESULT` IS NOT
+		NULL
 		<if test="inspectorRoleList != null">
 			<trim prefix="AND">
 				<foreach collection="inspectorRoleList" item="item" index="key"
@@ -99,7 +441,7 @@
 		a2,${anTableName} b2 WHERE
 		a2.`ACCEPTANCE_NOTE_ID`=b2.`ID` AND
 		a2.`IS_SEALED`=0 AND
-		b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=1
+		b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
 		a2.`TOTAL_CHECK_RESULT`=1
 		<if test="inspectorRoleList != null">
@@ -125,7 +467,7 @@
 		a3,${anTableName} b3 WHERE
 		a3.`ACCEPTANCE_NOTE_ID`=b3.`ID` AND
 		a3.`IS_SEALED`=0 AND
-		b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=1
+		b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
 		a3.`TOTAL_CHECK_RESULT` IS
 		NOT NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
@@ -167,9 +509,11 @@
 		(SELECT
 		b1.`CONSTRUCTION_TEAM_ID`,COUNT(1) AS count1 FROM ${abTableName}
 		a1,${anTableName} b1 WHERE a1.`ACCEPTANCE_NOTE_ID`=b1.`ID` AND
-		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND a1.`BATCH_STATUS`=1
+		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND
+		a1.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
-		a1.`TOTAL_CHECK_RESULT` IS NOT NULL
+		a1.`TOTAL_CHECK_RESULT` IS NOT
+		NULL
 		<if test="inspectorRole != null and inspectorRole != ''">
 			AND a1.`INSPECTOR_ROLE`=#{inspectorRole}
 		</if>
@@ -186,7 +530,8 @@
 		(SELECT
 		b2.`CONSTRUCTION_TEAM_ID`,COUNT(1) AS count2 FROM ${abTableName}
 		a2,${anTableName} b2 WHERE a2.`ACCEPTANCE_NOTE_ID`=b2.`ID` AND
-		a2.`IS_SEALED`=0 AND b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=1
+		a2.`IS_SEALED`=0 AND b2.`IS_SEALED`=0 AND
+		a2.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
 		a2.`TOTAL_CHECK_RESULT`=1
 		<if test="inspectorRole != null and inspectorRole != ''">
@@ -204,9 +549,11 @@
 		(SELECT
 		b3.`CONSTRUCTION_TEAM_ID`,COUNT(1) AS count3 FROM ${abTableName}
 		a3,${anTableName} b3 WHERE a3.`ACCEPTANCE_NOTE_ID`=b3.`ID` AND
-		a3.`IS_SEALED`=0 AND b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=1
+		a3.`IS_SEALED`=0 AND b3.`IS_SEALED`=0 AND
+		a3.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
-		a3.`TOTAL_CHECK_RESULT` IS NOT NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
+		a3.`TOTAL_CHECK_RESULT` IS NOT
+		NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
 		<if test="inspectorRole != null and inspectorRole != ''">
 			AND a3.`INSPECTOR_ROLE`=#{inspectorRole}
 		</if>
@@ -246,9 +593,11 @@
 		(SELECT
 		b1.`SUPERVISOR_COMPANY_ID`,COUNT(1) AS count1 FROM ${abTableName}
 		a1,${anTableName} b1 WHERE a1.`ACCEPTANCE_NOTE_ID`=b1.`ID` AND
-		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND a1.`BATCH_STATUS`=1
+		a1.`IS_SEALED`=0 AND b1.`IS_SEALED`=0 AND
+		a1.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
-		a1.`TOTAL_CHECK_RESULT` IS NOT NULL
+		a1.`TOTAL_CHECK_RESULT` IS NOT
+		NULL
 		<if test="inspectorRole != null and inspectorRole != ''">
 			AND a1.`INSPECTOR_ROLE`=#{inspectorRole}
 		</if>
@@ -265,7 +614,8 @@
 		(SELECT
 		b2.`SUPERVISOR_COMPANY_ID`,COUNT(1) AS count2 FROM ${abTableName}
 		a2,${anTableName} b2 WHERE a2.`ACCEPTANCE_NOTE_ID`=b2.`ID` AND
-		a2.`IS_SEALED`=0 AND b2.`IS_SEALED`=0 AND a2.`BATCH_STATUS`=1
+		a2.`IS_SEALED`=0 AND b2.`IS_SEALED`=0 AND
+		a2.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
 		a2.`TOTAL_CHECK_RESULT`=1
 		<if test="inspectorRole != null and inspectorRole != ''">
@@ -283,9 +633,11 @@
 		(SELECT
 		b3.`SUPERVISOR_COMPANY_ID`,COUNT(1) AS count3 FROM ${abTableName}
 		a3,${anTableName} b3 WHERE a3.`ACCEPTANCE_NOTE_ID`=b3.`ID` AND
-		a3.`IS_SEALED`=0 AND b3.`IS_SEALED`=0 AND a3.`BATCH_STATUS`=1
+		a3.`IS_SEALED`=0 AND b3.`IS_SEALED`=0 AND
+		a3.`BATCH_STATUS`=#{BATCH_STATUS}
 		AND
-		a3.`TOTAL_CHECK_RESULT` IS NOT NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
+		a3.`TOTAL_CHECK_RESULT` IS NOT
+		NULL AND a3.`BATCH_ACCEPTANCE_NO`>1
 		<if test="inspectorRole != null and inspectorRole != ''">
 			AND a3.`INSPECTOR_ROLE`=#{inspectorRole}
 		</if>

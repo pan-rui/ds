@@ -22,22 +22,27 @@
 		zj1.`TOTAL_CHECK_SCORE` AS totalCheckSocreZJ1,zj2.`TOTAL_CHECK_SCORE` AS
 		totalCheckSocreZJ2,b.`CONSTRUCTION_INSPECTOR` AS constructionInspector,
 		b.`CONSTRUCTION_INSPECTOR_CHECK_DATE` AS constructionCheckTime,
+		zj1.`TOTAL_CHECK_RESULT` AS totalCheckResultZJ1,zj2.`TOTAL_CHECK_RESULT` AS totalCheckResultZJ2,
 		
 		jl1.`TOTAL_CHECK_SCORE` AS totalCheckSocreJL1,jl2.`TOTAL_CHECK_SCORE` AS
 		totalCheckSocreJL2,b.`SUPERVISOR_NAME` AS supervisorInspector,
 		b.`SUPERVISOR_CHECK_TIME` AS supervisorCheckTime,
+		jl1.`TOTAL_CHECK_RESULT` AS totalCheckResultJL1,jl2.`TOTAL_CHECK_RESULT` AS totalCheckResultJL2,
 		
 		jf1.`TOTAL_CHECK_SCORE` AS totalCheckSocreJF1,jf2.`TOTAL_CHECK_SCORE` AS
 		totalCheckSocreJF2,b.`PROJECT_OWNER_NAME` AS projectOwnerName,
 		b.`PROJECT_OWNER_RANDOM_TIME` AS projectOwnerCheckTime,
+		jf1.`TOTAL_CHECK_RESULT` AS totalCheckResultJF1,jf2.`TOTAL_CHECK_RESULT` AS totalCheckResultJF2,
 		
 		yf1.`TOTAL_CHECK_SCORE` AS totalCheckSocreYF1,yf2.`TOTAL_CHECK_SCORE` AS
 		totalCheckSocreYF2,b.`PROJECT_CONSTRUCTION_NAME` AS projectConstructionName,
 		b.`PROJECT_CONSTRUCTION_RANDOM_TIME` AS projectConstructionCheckTime,
+		yf1.`TOTAL_CHECK_RESULT` AS totalCheckResultYF1,yf2.`TOTAL_CHECK_RESULT` AS totalCheckResultYF2,
 		
 		qt1.`TOTAL_CHECK_SCORE` AS totalCheckSocreQT1,qt2.`TOTAL_CHECK_SCORE` AS
 		totalCheckSocreQT2,b.`OTHER_INSPECTOR_NAME` AS otherInspectorName,
-		b.`OTHER_INSPECTOR_CHECK_TIME` AS otherInspectorCheckTime
+		b.`OTHER_INSPECTOR_CHECK_TIME` AS otherInspectorCheckTime,
+		qt1.`TOTAL_CHECK_RESULT` AS totalCheckResultQT1,qt2.`TOTAL_CHECK_RESULT` AS totalCheckResultQT2
 		
 		FROM ${pbsTableName} a LEFT JOIN ${anTableName} b ON
 		a.`ACCEPTANCE_NOTE_ID`=b.`ID`
@@ -128,7 +133,7 @@
 		a.`ACCEPTANCE_NOTE_ID`=b.`ID` LEFT JOIN ${rTableName} c ON c.`ID`=b.`REGION_ID`
 		WHERE (b.`CONSTRUCTION_INSPECTOR_CHECKED` IS NOT NULL OR b.`SUPERVISOR_CHECKED` IS NOT NULL
 		OR b.`PROJECT_OWNER_CHECKED` IS NOT NULL OR b.`PROJECT_CONSTRUCTION_CHECKED` IS NOT NULL
-		OR b.`OTHER_INSPECTOR_CHECKED` IS NOT NULL) AND 
+		OR b.`OTHER_INSPECTOR_CHECKED` IS NOT NULL OR b.`TEAM_INSPECTOR_CHECKED` IS NOT NULL) AND 
 		b.`REGION_TYPE`=#{REGION_TYPE} AND c.${REGION_COLUMN}=#{REGION_ID} GROUP BY c.`ID`
 	</select>
 

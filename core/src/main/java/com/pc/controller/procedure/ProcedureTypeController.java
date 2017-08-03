@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,12 +198,32 @@ public class ProcedureTypeController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		boolean b = procedureTypeService.updateProcedureType(map, ddBB);
-		if (b) {
-			return new BaseResult(ReturnCode.OK);
-		} else {
-			return new BaseResult(ReturnCode.FAIL);
+		
+		Map<String, Object> old=procedureTypeService.getByID((String) map.get(TableConstants.ProcedureType.ID.name()), ddBB);
+		
+		if(!((String)old.get(TableConstants.ProcedureType.procedureTypeName.name())).equals((String)map.get(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name()))){
+			String oldNameTree=(String) old.get(TableConstants.ProcedureType.nameTree.name());
+			if(oldNameTree.contains(TableConstants.SEPARATE_TREE)){
+				String tree=oldNameTree.substring(0,oldNameTree.lastIndexOf(TableConstants.SEPARATE_TREE))+TableConstants.SEPARATE_TREE+map.get(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name());
+				map.put(TableConstants.ProcedureType.NAME_TREE.name(), tree);
+				
+				Map<String, Object> treeParams=new HashMap<String, Object>();
+				treeParams.put("oldName", TableConstants.SEPARATE_TREE+old.get(TableConstants.ProcedureType.procedureTypeName.name())+TableConstants.SEPARATE_TREE);
+				treeParams.put("newName", TableConstants.SEPARATE_TREE+map.get(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name())+TableConstants.SEPARATE_TREE);
+				treeParams.put("id", "%"+TableConstants.SEPARATE_TREE+map.get(TableConstants.ProcedureType.ID.name())+TableConstants.SEPARATE_TREE+"%");
+				procedureTypeService.updateProcedureTypeTree(treeParams, ddBB);
+			}else{
+				map.put(TableConstants.ProcedureType.NAME_TREE.name(), map.get(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name()));
+				
+				Map<String, Object> treeParams=new HashMap<String, Object>();
+				treeParams.put("oldName", old.get(TableConstants.ProcedureType.procedureTypeName.name())+TableConstants.SEPARATE_TREE);
+				treeParams.put("newName", map.get(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name())+TableConstants.SEPARATE_TREE);
+				treeParams.put("id", map.get(TableConstants.ProcedureType.ID.name())+TableConstants.SEPARATE_TREE+"%");
+				procedureTypeService.updateProcedureTypeTree(treeParams, ddBB);
+			}
 		}
+		procedureTypeService.updateProcedureType(map, ddBB);
+		return new BaseResult(ReturnCode.OK);
 
 	}
 

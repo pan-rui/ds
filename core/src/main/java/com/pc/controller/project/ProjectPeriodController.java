@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -83,13 +84,17 @@ public class ProjectPeriodController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		boolean b = projectPeriodService.updateProjectPeriod(map, ddBB);
-		if (b) {
-			return new BaseResult(ReturnCode.OK);
-		} else {
-			return new BaseResult(ReturnCode.FAIL);
-		}
-
+		map.put(TableConstants.ProjectPeriod.NAME_TREE.name(), map.get(TableConstants.ProjectPeriod.PERIOD_NAME.name()));
+		projectPeriodService.updateProjectPeriod(map, ddBB);
+		
+		Map<String, Object> old =projectPeriodService.getByID((String) map.get(TableConstants.ProjectBuilding.ID.name()), ddBB);
+		Map<String, Object> treeParams=new HashMap<String, Object>();
+		treeParams.put("oldName", old.get(TableConstants.ProjectPeriod.periodName.name())+TableConstants.SEPARATE_TREE);
+		treeParams.put("newName", map.get(TableConstants.ProjectPeriod.PERIOD_NAME.name())+TableConstants.SEPARATE_TREE);
+		treeParams.put("id", map.get(TableConstants.ProjectPeriod.ID.name())+TableConstants.SEPARATE_TREE+"%");
+		projectPeriodService.updateProjectPeriodTree(treeParams, ddBB);
+		
+		return new BaseResult(ReturnCode.OK);
 	}
 
 	@RequestMapping("/projectPeriod/get")

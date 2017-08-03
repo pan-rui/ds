@@ -70,6 +70,10 @@ public class ProjectHouseholdService extends BaseService {
 	public boolean updateProjectHousehold(Map<String, Object> params, String ddBB) {
 		return update(params, ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_HOUSEHOLD) > 0;
 	}
+	
+	public boolean updateProjectHouseholdTree(Map<String, Object> params, String ddBB) {
+		return updateTree(params, ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_HOUSEHOLD) > 0;
+	}
 
 	public Map<String, Object> getProjectHousehold(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,

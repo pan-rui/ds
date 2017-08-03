@@ -20,9 +20,9 @@ import java.util.Map;
 /**
  * Description: 基本Dao 操作定义,,,第一个参数为表名,第二个参数为传入的条件(Map),顺序不可逆
  * Author: 潘锐 (2017-03-28 14:35)
- * version: \$Rev: 3284 $
- * UpdateAuthor: \$Author: panrui $
- * UpdateDateTime: \$Date: 2017-06-27 15:00:06 +0800 (周二, 27 6月 2017) $
+ * version: \$Rev: 3902 $
+ * UpdateAuthor: \$Author: zhangj $
+ * UpdateDateTime: \$Date: 2017-08-02 14:43:05 +0800 (周三, 02 8月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheResolver = "baseImpl")
@@ -50,11 +50,22 @@ public class BaseDao {
         return sqlSessionTemplate.selectList(className + ".queryListInTab", paramsMap);
     }
 
+    @DataSource
+    public List<Map<String, Object>> queryListInT(String tableName, Map<String, Object> params, Map<String, Object> orderMap) {
+        Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params).addParams("orderMap", orderMap);
+        return sqlSessionTemplate.selectList(className + ".queryListInT", paramsMap);
+    }
     //    @Cacheable(keyGenerator = "myKeyGenerator")
     @DataSource
     public List<Map<String, Object>> queryByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.selectList(className + ".queryByProsInTab", paramsMap);
+    }
+
+    @DataSource
+    public List<Map<String, Object>> queryByProsInT(String tableName, Map<String, Object> params) {
+        Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
+        return sqlSessionTemplate.selectList(className + ".queryByProsInT", paramsMap);
     }
 
 //    @Cacheable(key = "(#tableName).replaceFirst('\\.','-')+'$'+#id")
@@ -84,6 +95,11 @@ public class BaseDao {
     public int updateByProsInTab(String tableName, Map<String, Object> params) {
         Map<String, Object> paramsMap = ParamsMap.newMap("tableName", tableName).addParams("params", params);
         return sqlSessionTemplate.update(className + ".updateByProsInTab", paramsMap);
+    }
+    
+    @DataSource(DataSourceHolder.DBType.master)
+    public int updateTreeInTab(Map<String, Object> params) {
+        return sqlSessionTemplate.update(className + ".updateTreeInTab", params);
     }
 
     @Caching(evict = {@CacheEvict(keyGenerator = "myKeyGenerator", cacheManager = "cacheManager"),@CacheEvict(key = "#tableName", cacheManager = "cacheManager")})

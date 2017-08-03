@@ -403,12 +403,21 @@ public class ProjectHouseholdController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		boolean b = projectHouseholdService.updateProjectHousehold(map, ddBB);
-		if (b) {
-			return new BaseResult(ReturnCode.OK);
-		} else {
-			return new BaseResult(ReturnCode.FAIL);
+		
+		Map<String, Object> old=projectHouseholdService.getByID((String) map.get(TableConstants.ProjectHousehold.ID.name()), ddBB);
+		if(!((String)old.get(TableConstants.ProjectHousehold.roomName.name())).equals((String)map.get(TableConstants.ProjectHousehold.ROOM_NAME.name()))){
+			String oldNameTree=(String) old.get(TableConstants.ProjectHousehold.nameTree.name());
+			String tree=oldNameTree.substring(0,oldNameTree.lastIndexOf(TableConstants.SEPARATE_TREE))+TableConstants.SEPARATE_TREE+map.get(TableConstants.ProjectHousehold.ROOM_NAME.name());
+			map.put(TableConstants.ProjectHousehold.NAME_TREE.name(), tree);
+			
+			Map<String, Object> treeParams=new HashMap<String, Object>();
+			treeParams.put("oldName", TableConstants.SEPARATE_TREE+old.get(TableConstants.ProjectHousehold.roomName.name())+TableConstants.SEPARATE_TREE);
+			treeParams.put("newName", TableConstants.SEPARATE_TREE+map.get(TableConstants.ProjectHousehold.ROOM_NAME.name())+TableConstants.SEPARATE_TREE);
+			treeParams.put("id", "%"+TableConstants.SEPARATE_TREE+map.get(TableConstants.ProjectHousehold.ID.name())+TableConstants.SEPARATE_TREE+"%");
+			projectHouseholdService.updateProjectHouseholdTree(treeParams, ddBB);
 		}
+		projectHouseholdService.updateProjectHousehold(map, ddBB);
+		return new BaseResult(ReturnCode.OK);
 
 	}
 

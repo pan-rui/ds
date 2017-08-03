@@ -1,15 +1,36 @@
+import com.alibaba.fastjson.JSON;
 import com.pc.core.Base64;
 import com.pc.core.ColumnProcess;
 import com.pc.core.ParamsMap;
 import com.pc.dao.BaseDao;
+import com.pc.util.ImgUtil;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.security.DigestException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,9 +43,20 @@ public class TestMain {
     //    @Autowired
     public static BaseDao baseDao;
 
-    public static void main2(String[] args) {
+    public static void main2(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException, DigestException {
+        MessageDigest md=MessageDigest.getInstance("MD5");
+//        md.update(new String("123456".getBytes("utf-8"),"gbk").getBytes());
+        byte[] bb="123456".getBytes();
+        System.out.println(bb.length);
+//        System.out.println(Base64.encode(Integer.toHexString(md.digest(bb,0,16)).getBytes()));
+        System.out.println(Base64.encode(DigestUtils.md5Hex("123456").getBytes()));
         System.out.println(Long.MAX_VALUE);
         System.out.println(Base64.encode(DigestUtils.md5("12345678".getBytes())));
+        System.out.println(Base64.encode(DigestUtils.md5("123456".getBytes("GBK"))));
+        System.out.println(com.pc.codec.Base64.encodeToString(DigestUtils.md5("123456".getBytes("UTF-8"))));
+        System.out.println(com.pc.codec.Base64.encodeToString(DigestUtils.md5("123456")));
+        System.out.println(com.pc.codec.Base64.encodeToString(DigestUtils.md5(new String("123456".getBytes("utf-8"),"ISO-8859-1"))));
+        System.out.println(org.apache.commons.codec.binary.Base64.encodeBase64String(DigestUtils.md5("123456".getBytes("ISO-8859-1"))));
         HashedCredentialsMatcher matcher3=new HashedCredentialsMatcher("md5");
         SimpleCredentialsMatcher matcher4=new SimpleCredentialsMatcher();
         matcher3.setHashIterations(1);
@@ -92,11 +124,62 @@ public class TestMain {
         System.out.println(str.replaceAll("([A-Z_]+)\\s(\\w+)", prefix+"$1 " + prefix.replace(".","_")+"$2"));
     }
 
-    public static void main(String[] args) {
+    public static void main5(String[] args) {
         System.out.println(Long.MAX_VALUE);
         ParamsMap paramsMap = ParamsMap.newMap("sdddddddddfd", "39ufr");
         paramsMap.addParams("tList", Arrays.asList("fdf", "0j", "3fdf"));
         System.out.println(paramsMap);
+        int i = 0, j = 0;
+        System.out.println("--------------");
+        System.out.println(i++);
+        System.out.println(++j);
     }
 
+    public static void main6(String[] args) throws IOException {
+        Runtime r = Runtime.getRuntime();
+        System.out.println(r.availableProcessors());
+//        r.exec("cmd /c start winword");
+       Process process= r.exec("C:\\Users\\ThinkPad\\Desktop\\stS.bat");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader reader2 = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+//        BufferedWriter reader3 = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+        String str="";
+        while ((str = reader.readLine()) != null) {
+            System.out.println("接收到=======\t"+str);
+        }
+        while ((str = reader2.readLine()) != null) {
+            System.out.println("Err接收到=======\t"+str);
+        }
+        System.out.println(r.availableProcessors());
+    }
+
+    public static void main7(String[] args) {
+//        System.out.println(System.getProperty("user.home"));
+//        System.out.println(System.getProperty("user.name"));
+        double cVal=158000000000d;
+        String  cellValue = String.valueOf(cVal%1==0?(long)cVal:cVal);
+        System.out.println(cellValue);
+        System.out.println(new DecimalFormat("##").format(cVal));
+        String dd = "   ";
+        System.out.println(StringUtils.isBlank(null));
+    }
+
+    public static void main(String[] args) throws Exception{
+        List<Map> menuList = new ArrayList<>();
+        menuList.add(ParamsMap.newMap("name","查询信息").addParams("sub_button",Arrays.asList(
+                ParamsMap.newMap("type","view").addParams("name","工资查询").addParams("url","http://www.qugongdi.com/weChat/view/labour/salary.html"),
+                ParamsMap.newMap("type","view").addParams("name",new String("考勤查询".getBytes(),"UTF-8")).addParams("url","http://www.qugongdi.com/weChat/view/labour/clocking-in.html")
+        )));
+        menuList.add(ParamsMap.newMap("name", new String("关于我们".getBytes(),"UTF-8")).addParams("sub_button", Arrays.asList(
+                ParamsMap.newMap("type", "view").addParams("name", new String("产品简介".getBytes(),"UTF-8")).addParams("url", "http://www.qugongdi.com/weChat/login.html"),
+                ParamsMap.newMap("type", "view").addParams("name", new String("推广活动".getBytes(),"UTF-8")).addParams("url", "http://www.qugongdi.com/weChat/login.html"),
+                ParamsMap.newMap("type", "view").addParams("name", new String("关于靠得筑".getBytes(),"UTF-8")).addParams("url", "http://www.qugongdi.com/weChat/login.html")
+        )));
+        menuList.add(ParamsMap.newMap("name",new String("个人信息".getBytes(),"UTF-8")).addParams("sub_button",Arrays.asList(
+                ParamsMap.newMap("type", "view").addParams("name", new String("绑定项目".getBytes(),"UTF-8")).addParams("url", "http://www.qugongdi.com/weChat/login.html"),
+                ParamsMap.newMap("type", "view").addParams("name", new String("信息录入".getBytes(),"UTF-8")).addParams("url", "http://www.qugongdi.com/weChat/view/labour/user-message.html"),
+                ParamsMap.newMap("type", "view").addParams("name", new String("个人信息".getBytes(),"UTF-8")).addParams("url", "http://www.qugongdi.com/weChat/login.html")
+        )));
+        System.out.println(JSON.toJSONString(ParamsMap.newMap("button", menuList)));
+    }
 }

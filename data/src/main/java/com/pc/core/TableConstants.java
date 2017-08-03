@@ -3399,6 +3399,8 @@ public class TableConstants {
 		tenantName,	//租户名称
 		TENANT_TYPE,	//租户类型
 		tenantType,	//租户类型
+		TENANT_CODE,	//租户编码
+		tenantCode,	//租户编码
 		TENANT_PHONE,	//租户手机
 		tenantPhone,	//租户手机
 		TENANT_LINKER,	//租户名

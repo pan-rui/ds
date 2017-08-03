@@ -10,6 +10,7 @@ import com.pc.service.organization.impl.CompanyService;
 import com.pc.service.organization.impl.OrganizationInfoService;
 import com.pc.service.organization.impl.PartnerInfoService;
 import com.pc.service.organization.impl.PostInfoService;
+import com.pc.service.tenant.impl.TenantService;
 import com.pc.service.user.TokenService;
 import com.pc.service.user.UserService;
 import com.pc.vo.ParamsVo;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,6 +50,8 @@ public class LoginController extends BaseController {
 	private TokenService tokenService;
 	@Autowired
 	private PostInfoService postInfoService;
+	@Autowired
+	private TenantService tenantService;
 
 	@Autowired
 	private OrganizationInfoService organizationInfoService;
@@ -61,21 +66,24 @@ public class LoginController extends BaseController {
 	@RequestMapping("/login")
 	@ResponseBody
 	public BaseResult login(HttpServletRequest request, @RequestBody ParamsVo params) {
-		String tenantId = String.valueOf(params.getParams().get("tenantId"));
+		String tenantCode = String.valueOf(params.getParams().get("tenantId"));
 		String phone = String.valueOf(params.getParams().get("phone"));
 		String password = String.valueOf(params.getParams().get("password"));
 
 //		tokenService.clearAllCache();
 //		baseImpl.initColumns();
+		
 
 		Boolean isAdmin = Boolean.valueOf(String.valueOf(params.getParams().getOrDefault("admin", "true")));
 		String ddBB = null;
+		String tenantId=null;
 		List<Map<String, Object>> tentants = baseImpl.getSystemValue("dems-" + TableConstants.TENANT, List.class);
 		Optional<Map<String, Object>> tentant = tentants.stream().filter(map -> {
-			return map.get("id").equals(tenantId);
+			return map.get(TableConstants.Tenant.tenantCode.name()).equals(tenantCode);
 		}).findFirst();
 		if (tentant.isPresent()) {
 			ddBB = (String) tentant.get().get("dbName");
+			tenantId = (String) tentant.get().get("id");
 		} else {
 			return new BaseResult(ReturnCode.NO_AUTH);
 		}
@@ -93,20 +101,10 @@ public class LoginController extends BaseController {
 				map.put(TableConstants.PostInfo.postName.name(), postName);
 			}
 
-			if (map.get(TableConstants.User.ownOrgType.name()) != null
-					&& Integer.valueOf((String) map.get(TableConstants.User.ownOrgType.name())) == 1) {
-				map.put("orgName",
-						(String) organizationInfoService
-								.getByID((String) map.get(TableConstants.User.ownOrgId.name()), ddBB)
-								.get(TableConstants.OrganizationInfo.organizationName.name()));
+			if (map.get(TableConstants.User.companyId.name()) != null) {
 				map.put("companyName",
 						(String) companyService.getByID((String) map.get(TableConstants.User.companyId.name()), ddBB)
 								.get(TableConstants.Company.corporateName.name()));
-			} else if (map.get(TableConstants.User.ownOrgType.name()) != null
-					&& Integer.valueOf((String) map.get(TableConstants.User.ownOrgType.name())) == 2) {
-				map.put("companyName",
-						(String) partnerInfoService.getByID((String) map.get(TableConstants.User.ownOrgId.name()), ddBB)
-								.get(TableConstants.PartnerInfo.partnerName.name()));
 			}
 
 			String userId = (String) map.get(TableConstants.User.id.name());
@@ -119,12 +117,11 @@ public class LoginController extends BaseController {
             if (isAdmin) {
 				request.getSession().setAttribute("admin", map);
 			}
-
+            map.remove(TableConstants.User.pwd.name());
 			return new BaseResult(ReturnCode.OK, map);
 		} else {
 			return new BaseResult(ReturnCode.LOGIN_PHONE_ERROR);
 		}
-
 	}
 
 	@RequestMapping("/loginOut")

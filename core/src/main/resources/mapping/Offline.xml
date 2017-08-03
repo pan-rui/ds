@@ -225,7 +225,7 @@ WHERE ph.TENANT_ID=#{tenantId}
         ab_eligibleRate,ab.ACCEPTANCE_PERSON_ID ab_acceptancePersonId,ab.ACCEPTER ab_accepter,
         ab.INSPECTOR_ROLE ab_inspectorRole,ab.DOMINANT_ITEM_CHECK_RESULT
         ab_dominantItemCheckResult,ab.GENERAL_ITEM_CHECK_RESULT ab_generalItemCheckResult,ab.MIN_PASS_RATIO
-        ab_minPassRatio,ab.CREATE_DATE ab_createDate,ab.BATCH_STATUS_ID ab_batchStatusId,ab.UPDATE_TIME ab_updateTime,
+        ab_minPassRatio,ab.CREATE_DATE ab_createDate,ab.BATCH_STATUS_ID ab_batchStatusId,ab.BATCH_STATUS ab_batchStatus,ab.UPDATE_TIME ab_updateTime,
         s.ID s_id,s.STATUS_NAME s_statusName,s.STATUS_NUM s_statusNum,s.NOTIFY_ORGANIZATION_TYPE
         s_notifyOrganizationType,s.NOTIFY_ORGANIZATION_ID s_notifyOrganizationId,s.STATUS_TYPE
         s_statusType,s.STATUS_TRAIT s_statusTrait,s.REMARK s_remark,s.UPDATE_TIME s_updateTime,
@@ -368,6 +368,7 @@ WHERE ph.TENANT_ID=#{tenantId}
                     <result property="minPassRatio" column="ab_minPassRatio"/>
                     <result property="createDate" column="ab_createDate"/>
                     <result property="batchStatusId" column="ab_batchStatusId"/>
+                    <result property="batchStatus" column="ab_batchStatus"/>
                     <result property="updateTime" column="ab_updateTime"/>
                     <association property="statusInfo" javaType="map" columnPrefix="s_" autoMapping="true">
                         <id property="id" column="id"/>

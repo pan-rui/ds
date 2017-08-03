@@ -22,6 +22,6 @@
 		${anTableName} b ON b.`REGION_ID`=a.`ID` AND b.`REGION_TYPE`=#{regionType} AND
 		b.`IS_SEALED`=0 AND b.`PROCEDURE_ID`=#{procedureId} WHERE a.`IS_SEALED`=0 AND
 		a.`REGION_TYPE_ID`=#{regionTypeId} AND a.`TENANT_ID`=#{tenantId} AND
-		a.`BUILDING_ID`=#{buildingId} ORDER BY a.`ROOM` ASC
+		a.`BUILDING_ID`=#{buildingId} GROUP BY a.`ID` ORDER BY a.`ROOM` ASC
 	</select>
 </mapper>

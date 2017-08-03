@@ -19,6 +19,7 @@ public class DataConstants {
 	//工序第一级分类名  装修/土建
 	public final static String PROCEDURE_TYPE_TJ = "主体结构";
 	public final static String PROCEDURE_TYPE_ZX = "建筑装饰装修";
+	public final static String PROCEDURE_TYPE_DJ = "地基与基础";
 	
 	
 	//批次验收主状态

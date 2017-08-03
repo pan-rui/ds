@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,33 @@ public class AppClientController extends BaseController {
 	private UpdateVesionInfoService updateVesionInfoService;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	@RequestMapping("/appInfo/getLastVersion")
+	@ResponseBody
+	public BaseResult getLastVersion(@EncryptProcess ParamsVo params, @RequestAttribute String ddBB) {
+		String packageName=(String) params.getParams().get(TableConstants.AppInfo.APP_PACKAGE_NAME.name());
+		String versionCode=(String) params.getParams().get(TableConstants.UpdateVesionInfo.VERSION_CODE.name()); 
+		
+		Map<String, Object> paramsMap=new HashMap<String, Object>();
+		paramsMap.put(TableConstants.AppInfo.APP_PACKAGE_NAME.name(), packageName);
+		paramsMap.put(TableConstants.IS_SEALED, 0);
+		Map<String, Object> appInfo=appInfoService.getAppInfo(paramsMap, ddBB);
+		
+		Map<String, Object> updateVesionInfo=updateVesionInfoService.getByID((String)appInfo.get(TableConstants.AppInfo.latestVersionId.name()), ddBB);
+		appInfo.put(TableConstants.UpdateVesionInfo.updateContent.name(), updateVesionInfo.get(TableConstants.UpdateVesionInfo.updateContent.name()));
+		appInfo.put(TableConstants.UpdateVesionInfo.updateType.name(), updateVesionInfo.get(TableConstants.UpdateVesionInfo.updateType.name()));
+		appInfo.put(TableConstants.UpdateVesionInfo.versionCode.name(), updateVesionInfo.get(TableConstants.UpdateVesionInfo.versionCode.name()));
+		appInfo.put(TableConstants.UpdateVesionInfo.versionName.name(), updateVesionInfo.get(TableConstants.UpdateVesionInfo.versionName.name()));
+		appInfo.put(TableConstants.UpdateVesionInfo.fileSize.name(), updateVesionInfo.get(TableConstants.UpdateVesionInfo.fileSize.name()));
+		
+		if(versionCode.equals((String)updateVesionInfo.get(TableConstants.UpdateVesionInfo.versionCode.name()))){
+			return new BaseResult(ReturnCode.APP_IS_LAST_VERSION);
+		}else{
+			return new BaseResult(ReturnCode.OK, appInfo);
+		}
+		
+		
+	}
 
 	@RequestMapping("/appInfo/get")
 	@ResponseBody
@@ -65,7 +93,6 @@ public class AppClientController extends BaseController {
 	@ResponseBody
 	public BaseResult getList(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params, @RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
-		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
 		if(map.containsKey(TableConstants.AppInfo.NAME.name())){
 			map.put(TableConstants.AppInfo.NAME.name(), "%"+map.get(TableConstants.AppInfo.NAME.name())+"%");
@@ -78,7 +105,6 @@ public class AppClientController extends BaseController {
 	public BaseResult getPage(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess Page page,
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
-		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, appInfoService.getAppInfoDeatilPage(page, ddBB));

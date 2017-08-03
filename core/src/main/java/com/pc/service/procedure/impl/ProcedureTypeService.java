@@ -32,6 +32,10 @@ public class ProcedureTypeService extends BaseService {
 	public boolean updateProcedureType(Map<String, Object> params, String ddBB) {
 		return update(params, ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_TYPE) > 0;
 	}
+	
+	public boolean updateProcedureTypeTree(Map<String, Object> params, String ddBB) {
+		return updateTree(params, ddBB + TableConstants.SEPARATE + TableConstants.PROCEDURE_TYPE) > 0;
+	}
 
 	public Map<String, Object> getProcedureType(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,

@@ -39,6 +39,15 @@ public class PostInfoController extends BaseController {
 
 	private Logger logger = LogManager.getLogger(this.getClass());
 	
+	@RequestMapping("/postInfo/getListByTenant")
+	@ResponseBody
+	public BaseResult getListByTenant(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params, @RequestAttribute String ddBB) {
+		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
+		map.put(TableConstants.TENANT_ID, tenantId);
+		map.put(TableConstants.IS_SEALED, 0);
+		return new BaseResult(ReturnCode.OK, postInfoService.getTenantPostInfoList(map, ddBB));
+	}
+	
 	@RequestMapping("/postInfo/add")
 	@ResponseBody
 	public BaseResult add(@RequestAttribute(Constants.USER_ID) String userId,

@@ -57,7 +57,7 @@ public class PartnerInfoController extends BaseController {
 
 		if(paramsmMap.containsKey(PARTNER_PARAM_KEY.COMPANY.name())) {
 			commap = new LinkedHashMap<>((Map) paramsmMap.get(PARTNER_PARAM_KEY.COMPANY.name()));
-			corporateId = companyService.companyAdd(userId, tenantId, commap, ddBB, datestr);
+			corporateId = companyService.addCompany(userId, tenantId, commap, ddBB, datestr);
 		}
 
 		// 合作伙伴信息新增
@@ -112,7 +112,7 @@ public class PartnerInfoController extends BaseController {
 		commap = (Map) paramsmMap.get(PARTNER_PARAM_KEY.COMPANY.name());
 
 		if(commap != null) {
-			corporateId = companyService.companyAdd(userId, tenantId, commap, ddBB, datestr);
+			corporateId = companyService.addCompany(userId, tenantId, commap, ddBB, datestr);
 		}
 
 		// 合作伙伴信息新增

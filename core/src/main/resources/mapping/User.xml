@@ -38,6 +38,15 @@
 		f1.`IS_SEALED`=0 AND g.`IS_SEALED`=0 AND
 		g1.`IS_SEALED`=0 AND
 		a.`TENANT_ID`=#{tenantId} AND a.`POST_ID`=#{postId}
+		<if test="regionType == 2">
+			AND d.`BUILDING_ID`=#{regionId}
+		</if>
+		<if test="regionType == 3">
+			AND (d.`ID`=#{regionId} OR d.`FLOOR_ID`=#{regionId})
+		</if>
+		<if test="regionType == 4">
+			AND d.`ID`=#{regionId}
+		</if>
 	</select>
 
 	<select id="queryUserDetailPageInTab" parameterType="map"

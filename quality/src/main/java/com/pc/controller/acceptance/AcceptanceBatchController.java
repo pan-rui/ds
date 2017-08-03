@@ -470,6 +470,8 @@ public class AcceptanceBatchController extends BaseController {
 			acceptanceBatchService.addAcceptanceBatch(jlAcceptanceBatch, ddBB);
 		}else{
 			Map<String, Object> updateAcceptanceBatch=new HashMap<>();
+			updateAcceptanceBatch.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
+			updateAcceptanceBatch.put(TableConstants.UPDATE_USER_ID, userId);
 			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ACCEPTER.name(),
 					(String) acceptancePerson.get(TableConstants.User.realName.name()));
 			updateAcceptanceBatch.put(TableConstants.AcceptanceBatch.ACCEPTANCE_PERSON_ID.name(),
@@ -579,7 +581,8 @@ public class AcceptanceBatchController extends BaseController {
 
 		Map<String, Object> noteMap = acceptanceNoteService
 				.getByID((String) oldBatch.get(TableConstants.AcceptanceBatch.acceptanceNoteId.name()), ddBB);
-
+		Integer batchTimes = 1 + (Integer) noteMap.get(TableConstants.AcceptanceNote.batchTimes.name());
+		
 		Map<String, Object> batchStatusParamsMap = new HashMap<>();
 		batchStatusParamsMap.put(TableConstants.ProcedureBatchStatus.PROCEDURE_ID.name(),
 				noteMap.get(TableConstants.AcceptanceNote.procedureId.name()));
@@ -594,8 +597,6 @@ public class AcceptanceBatchController extends BaseController {
 		if (oldBatch == null || noteMap == null || batchStatus == null||user==null) {
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 		}
-
-		Integer batchTimes = 1 + (Integer) noteMap.get(TableConstants.AcceptanceNote.batchTimes.name());
 
 		Map<String, Object> batchMap = new HashMap<>();
 		batchMap.put(TableConstants.TENANT_ID, tenantId);
@@ -1237,7 +1238,7 @@ public class AcceptanceBatchController extends BaseController {
 				return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 			}*/
 			
-			batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId,batchNo);
+			batchId=acceptanceBatchService.addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId,batchNo);
 			try {
 				Thread.currentThread().sleep(500);
 			} catch (InterruptedException e) {
@@ -1276,7 +1277,7 @@ public class AcceptanceBatchController extends BaseController {
 		
 		String acceptanceNoteId = (String) acceptanceBatch.get(TableConstants.AcceptanceBatch.acceptanceNoteId.name());
 		Map<String, Object> acceptanceNote = acceptanceNoteService.getByID(acceptanceNoteId, ddBB);
-		if (acceptanceNote == null) {
+		if (acceptanceNote == null||params.getParams().get(TableConstants.AcceptanceBatch.TOTAL_CHECK_RESULT.name())==null) {
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_VERIFY_ERROR);
 		}
 		Map<String, Object> updateAcceptanceNote = new HashMap<>();
@@ -1536,6 +1537,10 @@ public class AcceptanceBatchController extends BaseController {
 				List<Map<String, Object>> list=new ArrayList<>();
 				for (Map<String, Object> point : pointList) {
 					LinkedHashMap<String, Object> p=new LinkedHashMap<>(point);
+					if(StringUtils.isBlank((String)p.get(TableConstants.AcceptancePoint.REAL_VAL.name()))){
+						p.remove(TableConstants.AcceptancePoint.REAL_VAL.name());
+					}
+					
 					p.put(TableConstants.AcceptancePoint.TENANT_ID.name(), tenantId);
 					p.put(TableConstants.AcceptancePoint.ACCEPTANCE_GENERAN_NOTE_ID.name(),
 							(String) item.get(TableConstants.AcceptanceGeneralItem.ID.name()));
@@ -1943,7 +1948,7 @@ public class AcceptanceBatchController extends BaseController {
 				}
 				batchId = (String) acceptanceBatchService.getAcceptanceBatch(bmap, ddBB).get(TableConstants.AcceptanceBatch.id.name());
 			}else{
-				batchId=addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId, batchNo);
+				batchId=acceptanceBatchService.addNoteBatch(ddBB, tenantId, projectPeriodId, inspectorRole, userId, regionType, regionId, procedureId, batchNo);
 				try {
 					Thread.currentThread().sleep(500);
 				} catch (InterruptedException e) {
@@ -2318,7 +2323,6 @@ public class AcceptanceBatchController extends BaseController {
 			acceptanceNoteId=(String) map.get(TableConstants.AcceptanceNote.id.name());
 			nmap.put(TableConstants.AcceptanceNote.ID.name(), acceptanceNoteId);
 			nmap.put(TableConstants.AcceptanceNote.STATEMENT_ID.name(), DataConstants.PROCEDURE_STATUS_ID_YBY);
-			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
 					DateUtil.convertDateTimeToString(new Date(), null));
 			nmap.put(TableConstants.AcceptanceNote.BATCH_TIMES.name(), batchNo);
@@ -2356,7 +2360,6 @@ public class AcceptanceBatchController extends BaseController {
 			map.put(TableConstants.AcceptanceNote.BATCH_TIMES.name(), 1);
 			map.put(TableConstants.AcceptanceNote.CHECK_TIMES.name(), 0);
 
-			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
 					DateUtil.convertDateTimeToString(new Date(), null));
 

@@ -157,7 +157,8 @@ public class ProcedureScheduleRelateController extends BaseController {
 						DataConstants.REGION_FLOOR_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
 		tjFloorParams.put(TableConstants.ProcedureScheduleRelate.procedureTypeId.name(), (String)procedureTypeService.getProcedureType(ParamsMap
 				.newMap(TableConstants.ProcedureType.NAME_TREE.name(),DataConstants.PROCEDURE_TYPE_TJ)
-				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_TJ), ddBB)
+				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_TJ)
+				.addParams(TableConstants.ProcedureType.TENANT_ID.name(),tenantId), ddBB)
 				.get(TableConstants.ProcedureType.id.name()));
 		List<Map<String, Object>> tjFloorList=procedureScheduleRelateService.getProcedureScheduleRoomidList(tjFloorParams, ddBB);
 		
@@ -168,7 +169,8 @@ public class ProcedureScheduleRelateController extends BaseController {
 						DataConstants.REGION_FLOOR_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
 		zxFloorParams.put(TableConstants.ProcedureScheduleRelate.procedureTypeId.name(), (String)procedureTypeService.getProcedureType(ParamsMap
 				.newMap(TableConstants.ProcedureType.NAME_TREE.name(),DataConstants.PROCEDURE_TYPE_ZX)
-				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_ZX), ddBB)
+				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_ZX)
+				.addParams(TableConstants.ProcedureType.TENANT_ID.name(),tenantId), ddBB)
 				.get(TableConstants.ProcedureType.id.name()));
 		List<Map<String, Object>> zxFloorList=procedureScheduleRelateService.getProcedureScheduleRoomidList(zxFloorParams, ddBB);
 		
@@ -202,7 +204,8 @@ public class ProcedureScheduleRelateController extends BaseController {
 						DataConstants.REGION_ROOM_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
 		tjParams.put(TableConstants.ProcedureScheduleRelate.procedureTypeId.name(), (String)procedureTypeService.getProcedureType(ParamsMap
 				.newMap(TableConstants.ProcedureType.NAME_TREE.name(),DataConstants.PROCEDURE_TYPE_TJ)
-				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_TJ), ddBB)
+				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_TJ)
+				.addParams(TableConstants.ProcedureType.TENANT_ID.name(),tenantId), ddBB)
 				.get(TableConstants.ProcedureType.id.name()));
 		List<Map<String, Object>> tjRoomList=procedureScheduleRelateService.getProcedureScheduleRoomidList(tjParams, ddBB);
 		
@@ -213,7 +216,8 @@ public class ProcedureScheduleRelateController extends BaseController {
 						DataConstants.REGION_ROOM_TYPE), ddBB).get(TableConstants.ProjectRegionType.id.name()));
 		zxParams.put(TableConstants.ProcedureScheduleRelate.procedureTypeId.name(), (String)procedureTypeService.getProcedureType(ParamsMap
 				.newMap(TableConstants.ProcedureType.NAME_TREE.name(),DataConstants.PROCEDURE_TYPE_ZX)
-				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_ZX), ddBB)
+				.addParams(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(),DataConstants.PROCEDURE_TYPE_ZX)
+				.addParams(TableConstants.ProcedureType.TENANT_ID.name(),tenantId), ddBB)
 				.get(TableConstants.ProcedureType.id.name()));
 		List<Map<String, Object>> zxRoomList=procedureScheduleRelateService.getProcedureScheduleRoomidList(zxParams, ddBB);
 		

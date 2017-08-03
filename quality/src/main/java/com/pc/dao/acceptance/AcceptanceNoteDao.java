@@ -16,9 +16,9 @@ import java.util.Map;
 /**
  * @Description: ${Description}
  * @Author: wady (2017-03-27 14:21)
- * @version: \$Rev: 3514 $
+ * @version: \$Rev: 3694 $
  * @UpdateAuthor: \$Author: zhangj $
- * @UpdateDateTime: \$Date: 2017-07-11 09:13:04 +0800 (周二, 11 7月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-19 18:25:08 +0800 (周三, 19 7月 2017) $
  */
 @Repository
 @CacheConfig(cacheNames = "qCache", cacheManager = "cacheManagerSlave", cacheResolver = "baseImpl")
@@ -42,6 +42,30 @@ public class AcceptanceNoteDao {
 		return sqlSessionTemplate;
 	}
 	
+	@DataSource
+	public List<Map<String, Object>> queryNoteForUpdateInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryNoteForUpdateInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryProjectAcceptanceDetailCountInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryProjectAcceptanceDetailCountInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryProjectAcceptanceCountInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryProjectAcceptanceCountInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryTeamInspectorListInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryTeamInspectorListInTab", paramsMap);
+	}
+	
+	@DataSource
+	public List<Map<String, Object>> queryTeamAcceptanceCountByProjectInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.selectList(className + ".queryTeamAcceptanceCountByProjectInTab", paramsMap);
+	}
 	
 	@DataSource
 	public List<Map<String, Object>> queryAcceptanceNoteByMonthInTab(Map<String, Object> paramsMap) {

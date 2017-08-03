@@ -19,6 +19,7 @@ http://www.springframework.org/schema/task/spring-task-3.1.xsd http://www.spring
     <task:annotation-driven executor="executor" scheduler="scheduler" />
     <task:scheduled-tasks>
         <task:scheduled ref="pushLaborDataTask" method="pushData" cron="0 */15 * * * *"/>
+        <task:scheduled ref="pushLaborDataTask" method="updateErrorData" cron="0 0 0 * * ?"/>
     </task:scheduled-tasks>
 	 
     <!--<cache:annotation-driven proxy-target-class="true" cache-manager="cacheManager"/>-->

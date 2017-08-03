@@ -5,9 +5,9 @@ import java.io.Serializable;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2015-09-27 14:21)
- * @version: \$Rev: 2656 $
+ * @version: \$Rev: 3621 $
  * @UpdateAuthor: \$Author: zhangj $
- * @UpdateDateTime: \$Date: 2017-05-31 09:00:46 +0800 (周三, 31 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-17 19:24:34 +0800 (周一, 17 7月 2017) $
  */
 public enum ReturnCode implements Serializable {
     OK(0, "操作成功"),
@@ -44,14 +44,16 @@ public enum ReturnCode implements Serializable {
     BA_FLOOR_ID_MISSING_ERROR(4007, "请求层ID参数缺失"),
 
 	//其他错误
+    APP_IS_LAST_VERSION(5006, "app已经为最新版本"),
     ACCEPTANCE_EXIST_ERROR(5005, "验收已存在"),
     ACCEPTANCE_IS_SUCCEED(5004, "验收已合格"),
     ACCEPTANCE_EXIST(5002, "请勿重复报验"),
     CANNOT_SEND_WITH_CHECK_FAIL(5003, "验收失败不能通知监理"),
     
     NO_POST_AUTH(5000, "无此岗位权限"),
-	NO_HOUSEHOLD_CHART(5001, "没有户型图");
-    
+	NO_HOUSEHOLD_CHART(5001, "没有户型图"),
+    Server_Exec_Error(8001,"服务端执行失败"),
+    Server_Exec_Timeout(8002, "服务端执行超时");
     
     private String msg;
     private int code;

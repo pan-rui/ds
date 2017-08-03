@@ -215,7 +215,6 @@ public class AcceptanceNoteController extends BaseController {
 			nmap.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(), constructionInspector);
 			nmap.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(), constructionInspectorId);
 
-			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
 					DateUtil.convertDateTimeToString(new Date(), null));
 			nmap.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR.name(), teamInspector);
@@ -257,7 +256,6 @@ public class AcceptanceNoteController extends BaseController {
 			map.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR.name(), constructionInspector);
 			map.put(TableConstants.AcceptanceNote.CONSTRUCTION_INSPECTOR_ID.name(), constructionInspectorId);
 
-			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
 					DateUtil.convertDateTimeToString(new Date(), null));
 			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR.name(), teamInspector);

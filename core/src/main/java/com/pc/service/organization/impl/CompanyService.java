@@ -77,7 +77,7 @@ public class CompanyService extends BaseService {
 		return deleteByState(params, ddBB + TableConstants.SEPARATE + TableConstants.COMPANY) > 0;
 	}
 
-	public String companyAdd(String userId,
+	public String addCompany(String userId,
 									String tenantId, Map<String, Object> commap,
 									String ddBB, String datestr)
 	{
@@ -105,50 +105,7 @@ public class CompanyService extends BaseService {
 				Map<String, Object> company = getCompany(param, ddBB);
 				if(company != null) {
 					id = (String)commap.get(TableConstants.Company.ID.name());
-
-					if (!((company.get(TableConstants.Company.corporateType.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_TYPE.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateType.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_TYPE.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateType.name()) == null && commap.get(TableConstants.Company.CORPORATE_TYPE.name()) == null))
-							|| !((company.get(TableConstants.Company.corporatePhone.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_PHONE.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporatePhone.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_PHONE.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporatePhone.name()) == null && commap.get(TableConstants.Company.CORPORATE_PHONE.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateName.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_NAME.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateName.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_NAME.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateName.name()) == null && commap.get(TableConstants.Company.CORPORATE_NAME.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateLinker.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_LINKER.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateLinker.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_LINKER.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateLinker.name()) == null && commap.get(TableConstants.Company.CORPORATE_LINKER.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateLegalPerson.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_LEGAL_PERSON.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateLegalPerson.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_LEGAL_PERSON.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateLegalPerson.name()) == null && commap.get(TableConstants.Company.CORPORATE_LEGAL_PERSON.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateComment.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_COMMENT.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateComment.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_COMMENT.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateComment.name()) == null && commap.get(TableConstants.Company.CORPORATE_COMMENT.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateCode.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_CODE.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateCode.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_CODE.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateCode.name()) == null && commap.get(TableConstants.Company.CORPORATE_CODE.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateAddr.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_ADDR.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateAddr.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_ADDR.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateAddr.name()) == null && commap.get(TableConstants.Company.CORPORATE_ADDR.name()) == null))
-							|| !((company.get(TableConstants.Company.issuedCapitalStock.name()) != null
-							&& commap.get(TableConstants.Company.ISSUED_CAPITAL_STOCK.name()) != null
-							&& Float.valueOf(String.valueOf(company.get(TableConstants.Company.issuedCapitalStock.name()))).floatValue() == Float.valueOf(String.valueOf(commap.get(TableConstants.Company.ISSUED_CAPITAL_STOCK.name()))).floatValue() )
-							|| (company.get(TableConstants.Company.issuedCapitalStock.name()) == null && commap.get(TableConstants.Company.ISSUED_CAPITAL_STOCK.name()) == null))
-							|| !((company.get(TableConstants.Company.corporateLeader.name()) != null
-							&& commap.get(TableConstants.Company.CORPORATE_LEADER.name()) != null
-							&& String.valueOf(company.get(TableConstants.Company.corporateLeader.name())).compareTo(String.valueOf(commap.get(TableConstants.Company.CORPORATE_LEADER.name()))) == 0)
-							|| (company.get(TableConstants.Company.corporateLeader.name()) == null && commap.get(TableConstants.Company.CORPORATE_LEADER.name()) == null))
-							) {
-						updateCompany(commap, ddBB);
-					}
+					updateCompany(commap, ddBB);
 				}
 				else
 				{

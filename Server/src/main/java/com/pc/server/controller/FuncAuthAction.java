@@ -21,9 +21,9 @@ import java.util.Date;
 /**
  * @Description: 功能权限模块
  * @Author: 潘锐 (2017-03-28 14:35)
- * @version: \$Rev: 2395 $
+ * @version: \$Rev: 3150 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-05-18 10:36:38 +0800 (周四, 18 5月 2017) $
+ * @UpdateDateTime: \$Date: 2017-06-21 11:24:03 +0800 (周三, 21 6月 2017) $
  */
 @Controller
 @RequestMapping("/auth")

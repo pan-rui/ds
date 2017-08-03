@@ -65,6 +65,5 @@
         <property name="transactionManager" ref="transactionManager"/>
         <property name="taskExecutor" ref="executor" />
     </bean>-->
-    <import resource="classpath*:cache-redis.xml"/>
-    <cache:annotation-driven proxy-target-class="true" cache-manager="cacheManagerSlave" order="1001"/>
+
 </beans>

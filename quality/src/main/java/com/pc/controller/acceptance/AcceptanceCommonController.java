@@ -36,6 +36,7 @@ import com.pc.service.auth.DataPrivilegeTypeService;
 import com.pc.service.organization.impl.CompanyService;
 import com.pc.service.organization.impl.PostInfoService;
 import com.pc.service.organization.impl.TeamInfoService;
+import com.pc.service.procedure.impl.ProcedureTypeService;
 import com.pc.service.project.impl.HouseholdChartAreaService;
 import com.pc.service.project.impl.ProjectHouseholdService;
 import com.pc.service.project.impl.ProjectPartnerRelateService;
@@ -83,8 +84,141 @@ public class AcceptanceCommonController extends BaseController {
 	
 	@Autowired
 	private CompanyService companyService;
+	
+	@Autowired
+	private ProcedureTypeService procedureTypeService;
 
 	private Logger logger = LogManager.getLogger(this.getClass());
+	
+	@RequestMapping("/acceptanceNote/getProjectAcceptanceDetailCount")
+	@ResponseBody
+	public BaseResult getProjectAcceptanceDetailCount(@RequestAttribute(Constants.USER_ID) String userId,
+			@RequestHeader(Constants.TENANT_ID) String tenantId,
+			@RequestAttribute String ddBB,@EncryptProcess ParamsVo params) {
+		String projectPeriodId=(String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+		String beginTime = (String) params.getParams().get("BEGIN_TIME");
+		String endTime = (String) params.getParams().get("END_TIME");
+		if(StringUtils.isBlank(projectPeriodId)){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_MISSING_ERROR);
+		}
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name(), projectPeriodId);
+		
+		if(StringUtils.isNotBlank(beginTime)){
+			paramsMap.put("beginTime", beginTime+" 00:00:00");
+		}
+		if(StringUtils.isNotBlank(endTime)){
+			paramsMap.put("endTime", endTime+" 23:59:59");
+		}
+		
+		Map<String, Object> typeParams=new HashMap<>();
+		typeParams.put(TableConstants.TENANT_ID, tenantId);
+    	typeParams.put(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(), DataConstants.PROCEDURE_TYPE_TJ);
+    	Map<String, Object> ztType=procedureTypeService.getProcedureType(typeParams, ddBB);
+    	if(ztType!=null){
+    		paramsMap.put("ztTypeId", ztType.get("id"));
+    	}else{
+    		paramsMap.put("ztTypeId", "");
+    	}
+    	typeParams.put(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(), DataConstants.PROCEDURE_TYPE_ZX);
+    	Map<String, Object> zxType=procedureTypeService.getProcedureType(typeParams, ddBB);
+    	if(zxType!=null){
+    		paramsMap.put("zxTypeId", zxType.get("id"));
+    	}else{
+    		paramsMap.put("zxTypeId", "");
+    	}
+    	typeParams.put(TableConstants.ProcedureType.PROCEDURE_TYPE_NAME.name(), DataConstants.PROCEDURE_TYPE_DJ);
+    	Map<String, Object> djType=procedureTypeService.getProcedureType(typeParams, ddBB);
+    	if(djType!=null){
+    		paramsMap.put("djTypeId", djType.get("id"));
+    	}else{
+    		paramsMap.put("djTypeId", "");
+    	}
+    	
+    	Map<String, Object> result = new HashMap<String, Object>();
+    	
+    	paramsMap.put(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), DataConstants.INSPECTOR_ROLE_ZJ);
+    	List<Map<String, Object>> zjList=acceptanceNoteService.getProjectAcceptanceDetailCount(paramsMap, ddBB);
+    	result.put("zjList", zjList);
+    	
+    	paramsMap.put(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), DataConstants.INSPECTOR_ROLE_JL);
+    	List<Map<String, Object>> jlList=acceptanceNoteService.getProjectAcceptanceDetailCount(paramsMap, ddBB);
+    	result.put("jlList", jlList);
+    	
+    	paramsMap.put(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), DataConstants.INSPECTOR_ROLE_JF);
+    	List<Map<String, Object>> jfList=acceptanceNoteService.getProjectAcceptanceDetailCount(paramsMap, ddBB);
+    	result.put("jfList", jfList);
+    	
+    	paramsMap.put(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name(), DataConstants.INSPECTOR_ROLE_YF);
+    	List<Map<String, Object>> yfList=acceptanceNoteService.getProjectAcceptanceDetailCount(paramsMap, ddBB);
+    	result.put("yfList", yfList);
+    	
+    	paramsMap.remove(TableConstants.AcceptanceBatch.INSPECTOR_ROLE.name());
+    	List<Map<String, Object>> qtList=acceptanceNoteService.getProjectAcceptanceDetailCount(paramsMap, ddBB);
+    	result.put("qtList", qtList);
+    	
+		return new BaseResult(ReturnCode.OK,result);
+	}
+	
+	@RequestMapping("/acceptanceNote/getProjectAcceptanceCount")
+	@ResponseBody
+	public BaseResult getProjectAcceptanceCount(@RequestAttribute(Constants.USER_ID) String userId,
+			@RequestHeader(Constants.TENANT_ID) String tenantId,
+			@RequestAttribute String ddBB,@EncryptProcess ParamsVo params) {
+		String beginTime = (String) params.getParams().get("BEGIN_TIME");
+		String endTime = (String) params.getParams().get("END_TIME");
+		
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		if(StringUtils.isNotBlank(beginTime)){
+			paramsMap.put("beginTime", beginTime+" 00:00:00");
+		}
+		if(StringUtils.isNotBlank(endTime)){
+			paramsMap.put("endTime", endTime+" 23:59:59");
+		}
+		paramsMap.put(TableConstants.TENANT_ID, tenantId);
+		
+		return new BaseResult(ReturnCode.OK,acceptanceNoteService.getProjectAcceptanceCount(paramsMap, ddBB));
+	}
+	
+	@RequestMapping("/acceptanceNote/getTeamAcceptanceCountByProject")
+	@ResponseBody
+	public BaseResult getTeamAcceptanceCountByProject(@RequestAttribute(Constants.USER_ID) String userId,
+			@RequestHeader(Constants.TENANT_ID) String tenantId,
+			@RequestAttribute String ddBB,@EncryptProcess ParamsVo params) {
+		String projectPeriodId=(String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+		String beginTime = (String) params.getParams().get("BEGIN_TIME");
+		String endTime = (String) params.getParams().get("END_TIME");
+		List<Map<String, Object>> userList = (List<Map<String, Object>>) params.getParams()
+				.get(TableConstants.USER);
+		if(StringUtils.isBlank(projectPeriodId)||userList==null||userList.size()==0){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_MISSING_ERROR);
+		}
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name(), projectPeriodId);
+		paramsMap.put("list", userList);
+		if(StringUtils.isNotBlank(beginTime)){
+			paramsMap.put("beginTime", beginTime+" 00:00:00");
+		}
+		if(StringUtils.isNotBlank(endTime)){
+			paramsMap.put("endTime", endTime+" 23:59:59");
+		}
+		
+		return new BaseResult(ReturnCode.OK,acceptanceNoteService.getTeamAcceptanceCountByProject(paramsMap, ddBB));
+	}
+	
+	@RequestMapping("/acceptanceNote/getTeamInspectorList")
+	@ResponseBody
+	public BaseResult getTeamInspectorList(@RequestAttribute(Constants.USER_ID) String userId,
+			@RequestHeader(Constants.TENANT_ID) String tenantId,
+			@RequestAttribute String ddBB,@EncryptProcess ParamsVo params) {
+		String projectPeriodId=(String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
+		if(StringUtils.isBlank(projectPeriodId)){
+			return new BaseResult(ReturnCode.REQUEST_PARAMS_MISSING_ERROR);
+		}
+		Map<String, Object> paramsMap = new HashMap<String, Object>();
+		paramsMap.put(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name(), projectPeriodId);
+		return new BaseResult(ReturnCode.OK,acceptanceNoteService.getTeamInspectorList(paramsMap, ddBB));
+	}
 	
 	@RequestMapping("/common/getWeather")
 	@ResponseBody
@@ -161,15 +295,19 @@ public class AcceptanceCommonController extends BaseController {
 		paramsMap.put("inspectorRole", inspectorRole);
 		paramsMap.put("checkRole", checkRole);
 		paramsMap.put("projectPeriodId", projectPeriodId);
-		paramsMap.put("beginTime", beginTime+" 00:00:00");
-		paramsMap.put("endTime", endTime+" 23:59:59");
+		if(StringUtils.isNotBlank(beginTime)){
+			paramsMap.put("beginTime", beginTime+" 00:00:00");
+		}
+		if(StringUtils.isNotBlank(endTime)){
+			paramsMap.put("endTime", endTime+" 23:59:59");
+		}
 
 		return new BaseResult(ReturnCode.OK,acceptanceNoteService.getUserAcceptanceStatisticsByPost(paramsMap, ddBB));
 	}
 	
 	@RequestMapping("/acceptanceNote/getPostUserList")
 	@ResponseBody
-	public BaseResult getInspectorList(@RequestAttribute(Constants.USER_ID) String userId,
+	public BaseResult getPostUserList(@RequestAttribute(Constants.USER_ID) String userId,
 			@RequestHeader(Constants.TENANT_ID) String tenantId,
 			@RequestAttribute String ddBB,@EncryptProcess ParamsVo params) {
 		String projectPeriodId=(String) params.getParams().get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
@@ -223,8 +361,12 @@ public class AcceptanceCommonController extends BaseController {
 		Map<String, Object> paramsMap = new HashMap<>();
 		paramsMap.put("list", companyList);
 		paramsMap.put("inspectorRole", DataConstants.INSPECTOR_ROLE_YF);
-		paramsMap.put("beginTime", beginTime+" 00:00:00");
-		paramsMap.put("endTime", endTime+" 23:59:59");
+		if(StringUtils.isNotBlank(beginTime)){
+			paramsMap.put("beginTime", beginTime+" 00:00:00");
+		}
+		if(StringUtils.isNotBlank(endTime)){
+			paramsMap.put("endTime", endTime+" 23:59:59");
+		}
 		paramsMap.put(TableConstants.TENANT_ID, tenantId);
 
 		return new BaseResult(ReturnCode.OK,acceptanceNoteService.getCompanyAcceptanceStatisticsRanking(paramsMap, ddBB));
@@ -280,8 +422,12 @@ public class AcceptanceCommonController extends BaseController {
 		Map<String, Object> paramsMap = new HashMap<>();
 		paramsMap.put("list", teamList);
 		paramsMap.put("inspectorRole", DataConstants.INSPECTOR_ROLE_ZJ);
-		paramsMap.put("beginTime", beginTime+" 00:00:00");
-		paramsMap.put("endTime", endTime+" 23:59:59");
+		if(StringUtils.isNotBlank(beginTime)){
+			paramsMap.put("beginTime", beginTime+" 00:00:00");
+		}
+		if(StringUtils.isNotBlank(endTime)){
+			paramsMap.put("endTime", endTime+" 23:59:59");
+		}
 		paramsMap.put("projectPeriodId", projectPeriodId);
 
 		return new BaseResult(ReturnCode.OK,acceptanceNoteService.getTeamAcceptanceStatisticsRanking(paramsMap, ddBB));
@@ -304,9 +450,8 @@ public class AcceptanceCommonController extends BaseController {
 			@RequestAttribute String ddBB) {
 		
 		Map<String, Object> params=new HashMap<>();
-		params.put(TableConstants.TENANT_ID, tenantId);
 		params.put(TableConstants.IS_SEALED, 0);
-		return new BaseResult(ReturnCode.OK,postInfoService.getPostInfoList(params, ddBB));
+		return new BaseResult(ReturnCode.OK,postInfoService.getPublishPostInfoList(params, ddBB));
 	}
 	
 	@RequestMapping("/acceptanceNote/getProjectAcceptanceStatisticsRanking")
@@ -367,7 +512,10 @@ public class AcceptanceCommonController extends BaseController {
 		String procedureId = (String) params.getParams().get(TableConstants.AcceptanceNote.PROCEDURE_ID.name());
 		String projectPeriodId = (String) params.getParams()
 				.get(TableConstants.AcceptanceNote.PROJECT_PERIOD_ID.name());
-		if (StringUtils.isBlank(projectPeriodId) || StringUtils.isBlank(projectPeriodId)) {
+		String regionId = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_ID.name());
+		String regionType = (String) params.getParams().get(TableConstants.AcceptanceNote.REGION_TYPE.name());
+		if (StringUtils.isBlank(projectPeriodId) || StringUtils.isBlank(projectPeriodId)
+				|| StringUtils.isBlank(regionId)|| StringUtils.isBlank(regionType)) {
 			return new BaseResult(ReturnCode.REQUEST_PARAMS_MISSING_ERROR);
 		}
 		Map<String, Object> map = new LinkedHashMap<>();
@@ -375,6 +523,8 @@ public class AcceptanceCommonController extends BaseController {
 		map.put(TableConstants.User.postId.name(), DataConstants.INSPECTOR_ROLE_ZJ);
 		map.put(TableConstants.AcceptanceNote.procedureId.name(), procedureId);
 		map.put(TableConstants.AcceptanceNote.projectPeriodId.name(), projectPeriodId);
+		map.put(TableConstants.AcceptanceNote.regionId.name(), regionId);
+		map.put(TableConstants.AcceptanceNote.regionType.name(), regionType);
 		String gDataTypeId = (String) dataPrivilegeTypeService.getDataPrivilegeType(
 				ParamsMap.newMap(TableConstants.DataPrivilegeType.TABLE_NAME.name(), TableConstants.PROJECT_HOUSEHOLD),
 				ddBB).get(TableConstants.DataPrivilegeType.id.name());
@@ -401,12 +551,16 @@ public class AcceptanceCommonController extends BaseController {
 
 		String procedureId = (String) acceptanceNote.get(TableConstants.AcceptanceNote.procedureId.name());
 		String projectPeriodId = (String) acceptanceNote.get(TableConstants.AcceptanceNote.projectPeriodId.name());
-
+		String regionId = (String) acceptanceNote.get(TableConstants.AcceptanceNote.regionId.name());
+		String regionType = (String) acceptanceNote.get(TableConstants.AcceptanceNote.regionType.name());
+		
 		Map<String, Object> map = new LinkedHashMap<>();
 		map.put(TableConstants.User.tenantId.name(), tenantId);
 		map.put(TableConstants.User.postId.name(), DataConstants.INSPECTOR_ROLE_JL);
 		map.put(TableConstants.AcceptanceNote.procedureId.name(), procedureId);
 		map.put(TableConstants.AcceptanceNote.projectPeriodId.name(), projectPeriodId);
+		map.put(TableConstants.AcceptanceNote.regionId.name(), regionId);
+		map.put(TableConstants.AcceptanceNote.regionType.name(), regionType);
 		String gDataTypeId = (String) dataPrivilegeTypeService.getDataPrivilegeType(
 				ParamsMap.newMap(TableConstants.DataPrivilegeType.TABLE_NAME.name(), TableConstants.PROJECT_HOUSEHOLD),
 				ddBB).get(TableConstants.DataPrivilegeType.id.name());

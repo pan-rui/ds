@@ -3,6 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pc.dao.labor.LaborProjectPersonInfoDao">
+	<select id="updateErrorDataInTab" parameterType="map"
+		resultType="map" statementType="PREPARED">
+		UPDATE ${tTableName} SET IS_SYNCHRO = 0 WHERE IS_SYNCHRO = 2
+	</select>
+	
 	<select id="queryLaborProjectPersonInfoFailListInTab" parameterType="map"
 		resultType="map" statementType="PREPARED">
 		SELECT a.* FROM ${lpTableName}

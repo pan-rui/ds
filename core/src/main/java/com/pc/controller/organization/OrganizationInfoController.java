@@ -5,6 +5,7 @@ import com.pc.base.BaseResult;
 import com.pc.base.Constants;
 import com.pc.base.ReturnCode;
 import com.pc.controller.BaseController;
+import com.pc.core.DataConstants;
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
 import com.pc.service.organization.impl.CompanyService;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +89,7 @@ public class OrganizationInfoController extends BaseController {
 			commap = (Map) paramsmMap.get(ORGAIZATION_PARAM_KEY.COMPANY.name());
 
 			if (commap != null) {
-				corporateId = companyService.companyAdd(userId, tenantId, commap, ddBB, datestr);
+				corporateId = companyService.addCompany(userId, tenantId, commap, ddBB, datestr);
 			}
 		}
 
@@ -260,9 +262,32 @@ public class OrganizationInfoController extends BaseController {
 		
 		Map<String, Object> orgmap = (Map) paramsmMap.get(ORGAIZATION_PARAM_KEY.ORG.name());
 		if(orgmap!=null){
+			Map<String, Object> oldOrg=organizationInfoService.getByID((String) orgmap.get(TableConstants.OrganizationInfo.ID.name()), ddBB);
+			
 			orgmap.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 			orgmap.put(TableConstants.UPDATE_USER_ID, userId);
-			boolean b = organizationInfoService.updateOrganizationInfo(orgmap, ddBB);
+			if(!((String)oldOrg.get(TableConstants.OrganizationInfo.organizationName.name())).equals((String)orgmap.get(TableConstants.OrganizationInfo.ORGANIZATION_NAME.name()))){
+				String oldNameTree=(String) oldOrg.get(TableConstants.OrganizationInfo.nameTree.name());
+				if(oldNameTree.contains(TableConstants.SEPARATE_TREE)){
+					String tree=oldNameTree.substring(0,oldNameTree.lastIndexOf(TableConstants.SEPARATE_TREE))+TableConstants.SEPARATE_TREE+orgmap.get(TableConstants.OrganizationInfo.ORGANIZATION_NAME.name());
+					orgmap.put(TableConstants.OrganizationInfo.NAME_TREE.name(), tree);
+					
+					Map<String, Object> treeParams=new HashMap<String, Object>();
+					treeParams.put("oldName", TableConstants.SEPARATE_TREE+oldOrg.get(TableConstants.OrganizationInfo.organizationName.name())+TableConstants.SEPARATE_TREE);
+					treeParams.put("newName", TableConstants.SEPARATE_TREE+orgmap.get(TableConstants.OrganizationInfo.ORGANIZATION_NAME.name())+TableConstants.SEPARATE_TREE);
+					treeParams.put("id", "%"+TableConstants.SEPARATE_TREE+orgmap.get(TableConstants.OrganizationInfo.ID.name())+TableConstants.SEPARATE_TREE+"%");
+					organizationInfoService.updateOrganizationInfoTree(treeParams, ddBB);
+				}else{
+					orgmap.put(TableConstants.OrganizationInfo.NAME_TREE.name(), orgmap.get(TableConstants.OrganizationInfo.ORGANIZATION_NAME.name()));
+					
+					Map<String, Object> treeParams=new HashMap<String, Object>();
+					treeParams.put("oldName", oldOrg.get(TableConstants.OrganizationInfo.organizationName.name())+TableConstants.SEPARATE_TREE);
+					treeParams.put("newName", orgmap.get(TableConstants.OrganizationInfo.ORGANIZATION_NAME.name())+TableConstants.SEPARATE_TREE);
+					treeParams.put("id", orgmap.get(TableConstants.OrganizationInfo.ID.name())+TableConstants.SEPARATE_TREE+"%");
+					organizationInfoService.updateOrganizationInfoTree(treeParams, ddBB);
+				}
+			}
+			organizationInfoService.updateOrganizationInfo(orgmap, ddBB);
 		}
 		
 		return new BaseResult(ReturnCode.OK);

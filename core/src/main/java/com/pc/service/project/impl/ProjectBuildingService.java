@@ -48,6 +48,10 @@ public class ProjectBuildingService extends BaseService {
 	public boolean updateProjectBuilding(Map<String, Object> params, String ddBB) {
 		return update(params, ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_BUILDING) > 0;
 	}
+	
+	public boolean updateProjectBuildingTree(Map<String, Object> params, String ddBB) {
+		return updateTree(params, ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_BUILDING) > 0;
+	}
 
 	public Map<String, Object> getProjectBuilding(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,

@@ -47,6 +47,10 @@ public class LaborProjectPersonInfoDao {
 		return sqlSessionTemplate;
 	}
 	
+	@DataSource
+	public int updateErrorDataInTab(Map<String, Object> paramsMap) {
+		return sqlSessionTemplate.update(className + ".updateErrorDataInTab", paramsMap);
+	}
 	
 	@DataSource
 	public List<Map<String, Object>> queryLaborProjectPersonInfoFailListInTab(Map<String, Object> paramsMap) {

@@ -368,7 +368,6 @@ public class AcceptanceBatchService extends BaseService {
 			map.put(TableConstants.AcceptanceNote.BATCH_TIMES.name(), 1);
 			map.put(TableConstants.AcceptanceNote.CHECK_TIMES.name(), 0);
 
-			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECKED.name(), 0);
 			map.put(TableConstants.AcceptanceNote.TEAM_INSPECTOR_CHECK_TIME.name(),
 					DateUtil.convertDateTimeToString(new Date(), null));
 

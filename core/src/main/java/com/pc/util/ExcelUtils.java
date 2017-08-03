@@ -39,9 +39,9 @@ import java.util.UUID;
 /**
  * @Description: ${Description}
  * @Author: 潘锐 (2017-04-26 16:44)
- * @version: \$Rev: 3594 $
+ * @version: \$Rev: 3620 $
  * @UpdateAuthor: \$Author: panrui $
- * @UpdateDateTime: \$Date: 2017-07-15 18:00:44 +0800 (周六, 15 7月 2017) $
+ * @UpdateDateTime: \$Date: 2017-07-17 19:14:37 +0800 (周一, 17 7月 2017) $
  */
 @Service
 public class ExcelUtils {
@@ -274,7 +274,7 @@ public class ExcelUtils {
                     if (cellNum > firstCellNum) {
                         if (cellNum == lastCellNum - fields.size() - 2) {
                             if (!StringUtils.isEmpty(cellVal)) {
-                                List<Map<String, Object>> procedure = baseDao.queryByProsInTab(relateTable, ParamsMap.newMap("PROCEDURE_CODE", cellVal));
+                                List<Map<String, Object>> procedure = baseDao.queryByProsInTab(relateTable, ParamsMap.newMap("PROCEDURE_CODE", cellVal).addParams(TableConstants.TENANT_ID,tenantId));
                                 procedureIdList = new LinkedList<>();
                                 if (!procedure.isEmpty()) {
                                     for (Map<String, Object> map : procedure)

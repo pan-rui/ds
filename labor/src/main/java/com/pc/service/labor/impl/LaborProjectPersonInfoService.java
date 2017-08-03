@@ -21,6 +21,25 @@ public class LaborProjectPersonInfoService extends BaseService {
     @Autowired
 	private LaborProjectPersonInfoDao laborProjectPersonInfoDao;
     
+    public int updateErrorData(String ddBB) {
+    	int i=0;
+    	Map<String, Object> params=new HashMap<>();
+    	params.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_CONTRACTOR_COMPANY_INFO);
+    	i+=laborProjectPersonInfoDao.updateErrorDataInTab(params);
+    	params.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO);
+    	i+=laborProjectPersonInfoDao.updateErrorDataInTab(params);
+    	params.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_ATTENDANCE_DETAIL_RECORD);
+    	i+=laborProjectPersonInfoDao.updateErrorDataInTab(params);
+    	params.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSONNEL_CONTRACT_RELATE);
+    	i+=laborProjectPersonInfoDao.updateErrorDataInTab(params);
+    	params.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_TRAINING_DETAIL_INFO);
+    	i+=laborProjectPersonInfoDao.updateErrorDataInTab(params);
+    	params.put("tTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PAY_WAGES_RECORD);
+    	i+=laborProjectPersonInfoDao.updateErrorDataInTab(params);
+    	return i;
+	}
+    
+    
     public List<Map<String, Object>> getLaborProjectPersonInfoFailList(Map<String, Object> params, String ddBB) {
     	params.put("lppTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PROJECT_PERSON_INFO);
     	params.put("lpTableName", ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO);

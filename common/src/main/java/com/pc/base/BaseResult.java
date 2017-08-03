@@ -38,6 +38,11 @@ public class BaseResult implements Serializable {
         this.code = code;
         this.data = data;
     }
+    public BaseResult(int code, String msg,Object data) {
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
+    }
 
     public String getMsg() {
         return msg;

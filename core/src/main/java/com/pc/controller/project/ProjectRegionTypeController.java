@@ -46,7 +46,6 @@ public class ProjectRegionTypeController extends BaseController {
 			@RequestAttribute String ddBB) {
 		
                 Map<String, Object> map = new LinkedHashMap<>(params.getParams());
-		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
 		map.put(TableConstants.IS_SEALED, 0); 
@@ -96,7 +95,6 @@ public class ProjectRegionTypeController extends BaseController {
 	@ResponseBody
 	public BaseResult getList(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess ParamsVo params, @RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
-		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
 		return new BaseResult(ReturnCode.OK, projectRegionTypeService.getProjectRegionTypeList(map, ddBB));
 	}
@@ -106,7 +104,6 @@ public class ProjectRegionTypeController extends BaseController {
 	public BaseResult getPage(@RequestHeader(Constants.TENANT_ID) String tenantId, @EncryptProcess Page page,
 			@RequestAttribute String ddBB) {
 		Map<String, Object> map = new LinkedHashMap<>(page.getParams());
-		map.put(TableConstants.TENANT_ID, tenantId);
 		map.put(TableConstants.IS_SEALED, 0);
 		page.setParams(map);
 		return new BaseResult(ReturnCode.OK, projectRegionTypeService.getProjectRegionTypePage(page, ddBB));

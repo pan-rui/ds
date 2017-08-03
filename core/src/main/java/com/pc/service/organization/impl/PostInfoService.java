@@ -2,9 +2,11 @@ package com.pc.service.organization.impl;
 
 import com.pc.core.Page;
 import com.pc.core.TableConstants;
+import com.pc.dao.organization.PostInfoDao;
 import com.pc.service.BaseService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +15,19 @@ import java.util.Map;
 @Service
 public class PostInfoService extends BaseService {
     private Logger logger = LogManager.getLogger(this.getClass());
-
+    
+    @Autowired
+	private PostInfoDao postInfoDao;
+    
+    public List<Map<String, Object>> getTenantPostInfoList(Map<String, Object> params, String ddBB) {
+    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.POST_INFO);
+		return postInfoDao.queryTenantPostInfoListInTab(params);
+	}
+    
+    public List<Map<String, Object>> getPublishPostInfoList(Map<String, Object> params, String ddBB) {
+    	params.put("pTableName", ddBB + TableConstants.SEPARATE + TableConstants.POST_INFO);
+		return postInfoDao.queryPublicPostInfoListInTab(params);
+	}
      
     public void addPostInfo(Map<String, Object> params, String ddBB) {
 		add(params, ddBB + TableConstants.SEPARATE + TableConstants.POST_INFO);
@@ -42,7 +56,7 @@ public class PostInfoService extends BaseService {
 		return super.getByID(ddBB + TableConstants.SEPARATE + TableConstants.POST_INFO,id);
 	}
 
-        public List<Map<String, Object>> getPostInfoList(Map<String, Object> params, String ddBB) {
+    public List<Map<String, Object>> getPostInfoList(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,
 				ddBB + TableConstants.SEPARATE + TableConstants.POST_INFO);
 		return list;

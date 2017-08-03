@@ -47,6 +47,10 @@ public class ProjectPeriodService extends BaseService {
 	public boolean updateProjectPeriod(Map<String, Object> params, String ddBB) {
 		return update(params, ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD) > 0;
 	}
+	
+	public boolean updateProjectPeriodTree(Map<String, Object> params, String ddBB) {
+		return updateTree(params, ddBB + TableConstants.SEPARATE + TableConstants.PROJECT_PERIOD) > 0;
+	}
 
 	public Map<String, Object> getProjectPeriod(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,

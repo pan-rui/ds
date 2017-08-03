@@ -19,7 +19,32 @@
 	        </if>
         </select>
 
+    <select id="queryListInT" parameterType="map" resultType="map">
+        select * FROM ${tableName}
+        <trim prefix="where" prefixOverrides="or | and">
+            <foreach collection="params" item="item" index="key" separator=" and ">
+                <if test="null != item">${key}=#{item}</if>
+            </foreach>
+        </trim>
+        <if test="null != orderMap">
+            <trim prefix="order by" prefixOverrides=",">
+                <foreach collection="orderMap" item="item" index="key" separator=",">
+                    <if test="null != item">${key} ${item}</if>
+                </foreach>
+            </trim>
+        </if>
+    </select>
+
     <select id="queryByProsInTab" parameterType="map" resultType="map">
+        select * FROM ${tableName}
+        <trim prefix="where" prefixOverrides="or | and">
+            <foreach collection="params" item="item" index="key" separator=" and ">
+                <if test="null != item">${key}=#{item}</if>
+            </foreach>
+        </trim>
+    </select>
+
+    <select id="queryByProsInT" parameterType="map" resultType="map">
         select * FROM ${tableName}
         <trim prefix="where" prefixOverrides="or | and">
             <foreach collection="params" item="item" index="key" separator=" and ">
@@ -55,6 +80,12 @@
                 </foreach>
             </trim>
         </update>
+        
+        <update id="updateTreeInTab" parameterType="map">
+            UPDATE ${tableName} SET `NAME_TREE`=REPLACE(`NAME_TREE`,#{oldName},#{newName}) WHERE 
+            `ID_TREE` LIKE #{id}
+        </update>
+        
         
         <delete id="deleteByProsInTab" parameterType="map">
             delete from ${tableName}

@@ -38,6 +38,10 @@ public class OrganizationInfoService extends BaseService {
 	public boolean updateOrganizationInfo(Map<String, Object> params, String ddBB) {
 		return update(params, ddBB + TableConstants.SEPARATE + TableConstants.ORGANIZATION_INFO) > 0;
 	}
+	
+	public int updateOrganizationInfoTree(Map<String, Object> params, String ddBB) {
+		return updateTree(params, ddBB + TableConstants.SEPARATE + TableConstants.ORGANIZATION_INFO);
+	}
 
 	public Map<String, Object> getOrganizationInfo(Map<String, Object> params, String ddBB) {
 		List<Map<String, Object>> list = queryList(params, null,

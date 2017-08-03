@@ -183,13 +183,21 @@ public class ProjectBuildingController extends BaseController {
 		Map<String, Object> map = new LinkedHashMap<>(params.getParams());
 		map.put(TableConstants.UPDATE_TIME, DateUtil.convertDateTimeToString(new Date(), null));
 		map.put(TableConstants.UPDATE_USER_ID, userId);
-		boolean b = projectBuildingService.updateProjectBuilding(map, ddBB);
-		if (b) {
-			return new BaseResult(ReturnCode.OK);
-		} else {
-			return new BaseResult(ReturnCode.FAIL);
+		
+		Map<String, Object> old=projectBuildingService.getByID((String) map.get(TableConstants.ProjectBuilding.ID.name()), ddBB);
+		if(!((String)old.get(TableConstants.ProjectBuilding.buildingName.name())).equals((String)map.get(TableConstants.ProjectBuilding.BUILDING_NAME.name()))){
+			String oldNameTree=(String) old.get(TableConstants.ProjectBuilding.nameTree.name());
+			String tree=oldNameTree.substring(0,oldNameTree.lastIndexOf(TableConstants.SEPARATE_TREE))+TableConstants.SEPARATE_TREE+map.get(TableConstants.ProjectBuilding.BUILDING_NAME.name());
+			map.put(TableConstants.ProjectBuilding.NAME_TREE.name(), tree);
+			
+			Map<String, Object> treeParams=new HashMap<String, Object>();
+			treeParams.put("oldName", TableConstants.SEPARATE_TREE+old.get(TableConstants.ProjectBuilding.buildingName.name())+TableConstants.SEPARATE_TREE);
+			treeParams.put("newName", TableConstants.SEPARATE_TREE+map.get(TableConstants.ProjectBuilding.BUILDING_NAME.name())+TableConstants.SEPARATE_TREE);
+			treeParams.put("id", "%"+TableConstants.SEPARATE_TREE+map.get(TableConstants.ProjectBuilding.ID.name())+TableConstants.SEPARATE_TREE+"%");
+			projectBuildingService.updateProjectBuildingTree(treeParams, ddBB);
 		}
-
+		projectBuildingService.updateProjectBuilding(map, ddBB);
+		return new BaseResult(ReturnCode.OK);
 	}
 
 	@RequestMapping("/projectBuilding/get")
