@@ -1,5 +1,6 @@
 package com.pc.wx.action;
 
+import com.alibaba.fastjson.JSON;
 import com.pc.base.BaseImpl;
 import com.pc.base.BaseResult;
 import com.pc.core.Base64;
@@ -145,7 +146,7 @@ public class UserAction extends BaseAction{
         }
             String userId=UUID.randomUUID().toString().replace("-", "");
         Map<String, Object> userMap = ParamsMap.newMap("ID", userId).addParams("USER_NAME", phone)
-                .addParams("PHONE", phone).addParams("PWD", Base64.encode(DigestUtils.md5Hex(phone.substring(5)).getBytes())).addParams("POST_ID", "20").addParams("TENANT_ID", tId);       //TODO:劳务工岗位
+                .addParams("PHONE", phone).addParams("PWD", Base64.encode(DigestUtils.md5Hex(phone.substring(5)).getBytes())).addParams("POST_ID", "20").addParams("TENANT_ID", tId).addParams("IS_SEALED", "0");       //TODO:劳务工岗位
         List<Map> users=baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.USER, ParamsMap.newMap("PHONE", phone));
         jedis.close();
         int i=users.size();
@@ -155,14 +156,16 @@ public class UserAction extends BaseAction{
         if(i>0){
             Map<String,Object> wxUser=(Map<String, Object>) vo.getParams().get("wxUser");
             baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.SOCIAL_LOGIN,ParamsMap.newMap("ID",UUID.randomUUID().toString().replace("-", ""))
-            .addParams("FROM_PLATFORM","WeChat").addParams("SOCIAL_UID",wxUser.get("openid")).addParams("USER_ID",CollectionUtils.isEmpty(users)?userId:users.get(0).get("id")).addParams("CITY",wxUser.get("city"))
+            .addParams("FROM_PLATFORM","WeChat").addParams("SOCIAL_UID",openId).addParams("USER_ID",CollectionUtils.isEmpty(users)?userId:users.get(0).get("id")).addParams("CITY",wxUser.get("city"))
             .addParams("SEX",wxUser.get("sex")).addParams("USER_IMAGE",wxUser.get("headimgurl")).addParams("SOCIAL_USER_CREATE_TIME",new Date()).addParams("PROVINCE",wxUser.get("province"))
                     .addParams("MOBILE",phone).addParams("MEDIA_UID",wxUser.get("unionid")).addParams("IS_SEALED","0").addParams("UPDATE_TIME",new Date()).addParams("TENANT_ID",tId));
             String usId=UUID.randomUUID().toString().replace("-", "");
 //            List<Map<String,Object>> userMaps=baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.USER, ParamsMap.newMap("PHONE", phone));
 //            if(!CollectionUtils.isEmpty(userMaps))
 //                usId= (String) userMaps.get(0).get("id");
-            i=baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, ParamsMap.newMap("ID", usId).addParams("USER_ID", CollectionUtils.isEmpty(users)?userId:users.get(0).get("id")).addParams("EMP_PHONE", phone));
+            List<Map> rList=baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, ParamsMap.newMap("EMP_PHONE", phone));
+            if(CollectionUtils.isEmpty(rList))
+                i=baseDao.insertByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, ParamsMap.newMap("ID", usId).addParams("USER_ID", CollectionUtils.isEmpty(users)?userId:users.get(0).get("id")).addParams("EMP_PHONE", phone).addParams("WECHAT_ID",openId).addParams("IS_SEALED","0"));
         }
         return i > 0 ? new BaseResult(0, "OK") : new BaseResult(100, "存在该用户");
     }
@@ -178,6 +181,7 @@ public class UserAction extends BaseAction{
         String projectCode = (String) vo.getParams().get("projectCode");
         Map userInfo = (Map) vo.getParams().get("userInfo");
         Jedis jedis=Constants.jedisPool.getResource();
+//        jedis.hset("USERINFO", openId, JSON.toJSONString(userInfo));
         if(StringUtils.isEmpty(tenantId))
             tenantId = jedis.hget(CacheKey.TENANTID, openId);
         if(StringUtils.isEmpty(ddBB))
@@ -193,12 +197,19 @@ public class UserAction extends BaseAction{
         if(!CollectionUtils.isEmpty(userMaps))
             pseronInfo.addParams("USER_ID", userMaps.get(0).get("id"));
         try {
-            int size1=baseDao.insertUpdateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, pseronInfo),size2=0;
+            List<Map> rList=baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, ParamsMap.newMap("EMP_PHONE", userInfo.get("lpi_empPhone")));
+            int size1=0,size2=0;
+            if(CollectionUtils.isEmpty(rList))
+                size1=baseDao.insertByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, pseronInfo.addParams("WECHAT_ID",openId).addParams("IS_SEALED", "0"));
+            else{
+                size1=baseDao.updateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, pseronInfo.addParams("ID", rList.get(0).get("id")));
+                persId = (String) rList.get(0).get("id");
+            }
             if(size1>0) {
-                if(size1>1){
-                    List<Map<String,Object>> users=baseDao.queryByProsInTab(ddBB+TableConstants.SEPARATE+TableConstants.LABOR_PERSON_INFO,ParamsMap.newMap("ID_CODE",userInfo.get("lpi_idCode")));
-                    persId = (String) users.get(0).get("id");
-                }
+//                if(size1>1){
+//                    List<Map<String,Object>> users=baseDao.queryByProsInTab(ddBB+TableConstants.SEPARATE+TableConstants.LABOR_PERSON_INFO,ParamsMap.newMap("ID_CODE",userInfo.get("lpi_idCode")));
+//                    persId = (String) rList.get(0).get("id");
+//                }
                 String ppId = UUID.randomUUID().toString().replace("-", "");
                 String projectId= (String) userInfo.get("pp_id");
                 Map<String, Object> projectPersonMap = ParamsMap.newMap("ID", ppId).addParams("EMP_CARDNUM", userInfo.get("lppi_empCardnum")).addParams("EMP_BANKNAME", userInfo.get("lppi_empBandname"))
@@ -232,15 +243,19 @@ public class UserAction extends BaseAction{
     @RequestMapping(value = "downImg",method = RequestMethod.POST)
     @ResponseBody
     public BaseResult downImg(HttpServletRequest request,String openId,String tenantId,String ddBB,String projectCode,String serverId,String accToken,int isFront){
-        Map<String, Object> userMul = (Map<String, Object>) userInfo(request, openId, tenantId, ddBB, "WeChat").getData();
+        Jedis jedis=Constants.jedisPool.getResource();
+        String ppId = jedis.hget(CacheKey.PROJECTID, openId);
+        String phone = jedis.hget(CacheKey.PHONE, openId);
+        if(StringUtils.isEmpty(phone))        return new BaseResult(305,"无此用户记录!");
+        List<Map<String, Object>> userMul = baseDao.queryByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, ParamsMap.newMap("EMP_PHONE", phone));
         if(!CollectionUtils.isEmpty(userMul)){
-            String pathSuffix= userMul.get("pp_id") + "/1/"+userMul.get("lpi_idCode")+"_"+isFront+".jpg";
+            String pathSuffix= ppId + "/1/"+userMul.get(0).get("idCode")+"_"+isFront+".jpg";
             int size=0;
 //            File file = new File(ImgUtil.BASE_PATH+pathSuffix);
 //            if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
             if(downUrlTxt("http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accToken+"&media_id="+serverId,ImgUtil.BASE_PATH+pathSuffix)){
                size=baseDao.updateByProsInTab(ddBB + TableConstants.SEPARATE + TableConstants.LABOR_PERSON_INFO, ParamsMap.newMap(isFront > 1 ? "IDPHOTO_SCAN2" : "IDPHOTO_SCAN", pathSuffix)
-                       .addParams("UPDATE_TIME", new Date()).addParams("ID", userMul.get("lpi_id")));
+                       .addParams("UPDATE_TIME", new Date()).addParams("ID", userMul.get(0).get("id")));
             };
             return size>0?new BaseResult(0, "OK",ParamsMap.newMap("url",serverPath+pathSuffix)):new BaseResult(301,"保存图片失败!");
         }
@@ -253,8 +268,8 @@ public class UserAction extends BaseAction{
             file.getParentFile().mkdirs();
         }
         try {
-            if(file!=null && !file.exists()){
-                file.createNewFile();
+            if(file!=null && file.exists()){
+                file.delete();
             }
             OutputStream oputstream = new FileOutputStream(file);
             URL url = new URL(fileUrl);
