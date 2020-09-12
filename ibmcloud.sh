@@ -25,12 +25,12 @@ cd v2ray1
 chmod 777 *
 cd ..
 rm -rf v2ray-linux-64.zip
-mv $HOME/cloudfoundry/v2ray1/v2ray $HOME/cloudfoundry/v2ray
+mv $HOME/cloudfoundry/v2ray1/v2ray $HOME/cloudfoundry/v2r
 mv $HOME/cloudfoundry/v2ray1/v2ctl $HOME/cloudfoundry/v2ctl
 rm -rf $HOME/cloudfoundry/v2ray1
 cat >  $HOME/cloudfoundry/start.sh  << EOF
 #!/bin/bash
-./v2ray&
+./v2r&
 sleep 120s
 ./ibmcloud config --check-version=false
 ./ibmcloud login -a "https://cloud.ibm.com" -r "us-south" -u "${account}" -p "${password}"
