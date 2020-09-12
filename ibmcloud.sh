@@ -42,7 +42,8 @@ chmod 0755 $HOME/cloudfoundry/start.sh
 echo "配置完成。"
 curl -L -H 'Cache-Control: no-cache' -o "ibmcloud" "https://github.com/rootmelo92118/IBMYes-edit-from-CCChieh/raw/master/IBM_Cloud_CLI/ibmcloud"
 curl -L -H 'Cache-Control: no-cache' -o "ibmcloud-analytics" "https://github.com/rootmelo92118/IBMYes-edit-from-CCChieh/raw/master/IBM_Cloud_CLI/ibmcloud-analytics"
-
+chmod +x ibmcloud
+chmod +x ibmcloud-analytics
 uuid=`cat /proc/sys/kernel/random/uuid`
 path=`echo $uuid | cut -f1 -d'-'`
 echo '{"inbounds":[{"port":8080,"protocol":"vmess","settings":{"clients":[{"id":"'$uuid'","alterId":64}]},"streamSettings":{"network":"ws","wsSettings":{"path":"/'$path'"}}}],"outbounds":[{"protocol":"freedom","settings":{}}]}'>$HOME/cloudfoundry/config.json
