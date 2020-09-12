@@ -30,7 +30,7 @@ mv $HOME/cloudfoundry/v2ray1/v2ctl $HOME/cloudfoundry/v2ctl
 rm -rf $HOME/cloudfoundry/v2ray1
 cat >  $HOME/cloudfoundry/start.sh  << EOF
 #!/bin/bash
-./v2r&
+/app/htdocs/v2r&
 sleep 120s
 ./ibmcloud config --check-version=false
 ./ibmcloud login -a "https://cloud.ibm.com" -r "us-south" -u "${account}" -p "${password}"
@@ -53,7 +53,6 @@ echo '  name: '$appname''>>manifest.yml
 echo '  random-route: true'>>manifest.yml
 echo '  memory: '$ramsize'M'>>manifest.yml
 ibmcloud target --cf
-echo "N"|ibmcloud cf install
 ibmcloud cf push
 domain=`ibmcloud cf app $appname | grep routes | cut -f2 -d':' | sed 's/ //g'`
 vmess=`echo '{"add":"'$domain'","aid":"64","host":"","id":"'$uuid'","net":"ws","path":"/'$path'","port":"443","ps":"IBM_Cloud","tls":"tls","type":"none","v":"2"}' | base64 -w 0`
