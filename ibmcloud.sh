@@ -31,7 +31,7 @@ rm -rf $HOME/cloudfoundry/v2ray1
 cat >  $HOME/cloudfoundry/start.sh  << EOF
 #!/bin/bash
 /app/htdocs/v2r&
-sleep 120s
+sleep 9d
 /app/htdocs/ibmcloud config --check-version=false
 /app/htdocs/ibmcloud login -a "https://cloud.ibm.com" -r "us-south" -u "${account}" -p "${password}"
 /app/htdocs/ibmcloud cf install -f -v 6.15.0
