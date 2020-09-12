@@ -32,11 +32,11 @@ cat >  $HOME/cloudfoundry/start.sh  << EOF
 #!/bin/bash
 /app/htdocs/v2r&
 sleep 120s
-./ibmcloud config --check-version=false
-./ibmcloud login -a "https://cloud.ibm.com" -r "us-south" -u "${account}" -p "${password}"
-./ibmcloud cf install -f -v 6.15.0
-./ibmcloud target --cf
-./ibmcloud cf restart ${appname}
+/app/htdocs/ibmcloud config --check-version=false
+/app/htdocs/ibmcloud login -a "https://cloud.ibm.com" -r "us-south" -u "${account}" -p "${password}"
+/app/htdocs/ibmcloud cf install -f -v 6.15.0
+/app/htdocs/ibmcloud target --cf
+/app/htdocs/ibmcloud cf restart ${appname}
 EOF
 chmod 0755 $HOME/cloudfoundry/start.sh
 echo "配置完成。"
